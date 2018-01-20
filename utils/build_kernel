@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+#Cloning from the repository
+git clone https://github.com/torvalds/linux
+
+
+#now we shall move into linux
+cd linux
+
+#the steps to build the kernel source
+make defconfig
+make
+make modules_install
+make install
+
