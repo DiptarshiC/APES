@@ -19,9 +19,9 @@
 
 
 /**
-*@description :the  structure node is  
+*@description :the  structure node is
 *
-* a structure which 
+* a structure which
 *
 * contains the fields of prev and  next
 *
@@ -32,9 +32,9 @@
 
 	struct node{
 
-	struct node *prev;
+	struct node  *prev;
 
-	struct node *next;
+	struct node  *next;
 
 	};
 
@@ -48,44 +48,44 @@
 */
 
 
-	typedef struct {
+	 struct info{
 
 	uint32_t data;
 
-	struct node;
+	struct node n1;
 
-	}info;
+	};
 
-	
-
-
-/**
-*@description :a pointer head which always points to the head 
-*
-*of a double linked list keeps a track
-*
-*of the head and is incremented or decremented 
-*
-*based on the operation.It is of the type info
-*/
- 
-	
-info *head;
 
 
 
 /**
-*@description :a pointer head which always points to the tail 
+*@description :a pointer head which always points to the head
 *
 *of a double linked list keeps a track
 *
-*of the tail and is incremented or decremented 
+*of the head and is incremented or decremented
 *
 *based on the operation.It is of the type info
 */
- 
-	
-info *tail;
+
+
+//struct info *head;
+
+
+
+/**
+*@description :a pointer head which always points to the tail
+*
+*of a double linked list keeps a track
+*
+*of the tail and is incremented or decremented
+*
+*based on the operation.It is of the type info
+*/
+
+
+//struct info *tail;
 
 
 /**
@@ -99,7 +99,7 @@ info *tail;
 *
 */
 
-info* destroy(info *info1);
+struct node* destroy(struct node *info1);
 
 
 /**
@@ -113,7 +113,7 @@ info* destroy(info *info1);
 *
 */
 
-info*  insert_at_beginning(info *info1, uint32_t data);
+struct node*  insert_at_beginning(struct node *info1, uint32_t data);
 
 /**
 *@Function name:insert_at_end
@@ -126,7 +126,7 @@ info*  insert_at_beginning(info *info1, uint32_t data);
 *
 */
 
-info*  insert_at_end(info *info1, uint32_t data);
+struct node*  insert_at_end(struct node *info1, uint32_t data);
 
 
 
@@ -142,7 +142,7 @@ info*  insert_at_end(info *info1, uint32_t data);
 *
 */
 
-info* insert_at_position(info *base,uint32_t data, uint8_t pos);
+struct node* insert_at_position(struct node *base,uint32_t data, uint8_t pos);
 
 
 
@@ -158,7 +158,7 @@ info* insert_at_position(info *base,uint32_t data, uint8_t pos);
 */
 
 
-info* delete_from_end(info *head);
+struct node* delete_from_end(struct node *head);
 
 
 
@@ -174,7 +174,7 @@ info* delete_from_end(info *head);
 *
 */
 
-info* delete_from_beginning(info *head);
+struct node* delete_from_beginning(struct node *head);
 
 
 
@@ -192,7 +192,7 @@ info* delete_from_beginning(info *head);
 */
 
 
-info* delete_from_position(info *base,uint8_t index);
+struct node* delete_from_position(struct node *base,uint8_t index);
 
 
 
@@ -207,5 +207,4 @@ info* delete_from_position(info *base,uint8_t index);
 *
 */
 
-
-uint8_t  size(info *node);
+uint32_t  size(struct node* info1);
