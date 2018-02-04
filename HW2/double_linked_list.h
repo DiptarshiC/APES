@@ -52,7 +52,7 @@
 
 	uint32_t data;
 
-	struct node n1;
+	struct node *n1;
 
 	};
 
@@ -99,7 +99,7 @@
 *
 */
 
-struct node* destroy(struct node *info1);
+struct info* destroy(struct info *info1);
 
 
 /**
@@ -113,7 +113,7 @@ struct node* destroy(struct node *info1);
 *
 */
 
-struct node*  insert_at_beginning(struct node *info1, uint32_t data);
+struct info*  insert_at_beginning(struct info *info1, uint32_t data1);
 
 /**
 *@Function name:insert_at_end
@@ -126,7 +126,7 @@ struct node*  insert_at_beginning(struct node *info1, uint32_t data);
 *
 */
 
-struct node*  insert_at_end(struct node *info1, uint32_t data);
+struct info*  insert_at_end(struct info *info1, uint32_t data1);
 
 
 
@@ -142,7 +142,7 @@ struct node*  insert_at_end(struct node *info1, uint32_t data);
 *
 */
 
-struct node* insert_at_position(struct node *base,uint32_t data, uint8_t pos);
+struct info* insert_at_position(struct info *base,uint32_t data, uint8_t pos);
 
 
 
@@ -158,7 +158,7 @@ struct node* insert_at_position(struct node *base,uint32_t data, uint8_t pos);
 */
 
 
-struct node* delete_from_end(struct node *head);
+struct info* delete_from_end(struct info *head);
 
 
 
@@ -174,7 +174,7 @@ struct node* delete_from_end(struct node *head);
 *
 */
 
-struct node* delete_from_beginning(struct node *head);
+struct info* delete_from_beginning(struct info *head);
 
 
 
@@ -192,7 +192,7 @@ struct node* delete_from_beginning(struct node *head);
 */
 
 
-struct node* delete_from_position(struct node *base,uint8_t index);
+struct info* delete_from_position(struct info *base,uint8_t index);
 
 
 
@@ -207,4 +207,4 @@ struct node* delete_from_position(struct node *base,uint8_t index);
 *
 */
 
-uint32_t  size(struct node* info1);
+uint32_t  size(struct info* info1);

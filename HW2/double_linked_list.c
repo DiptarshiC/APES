@@ -65,7 +65,7 @@
 */
 
 
-struct node* destroy(struct node *info1)
+struct info* destroy(struct info *info1)
 {
 
 
@@ -73,7 +73,7 @@ struct node* destroy(struct node *info1)
 
 	/*Below is a null pointer check that is common to all functions*/
 
-	if(info1==NULL)
+	if(info1->n1==NULL)
 
 	{
 
@@ -81,7 +81,7 @@ struct node* destroy(struct node *info1)
 
 	}
 
-	struct node *temp=(struct node*) malloc(sizeof(struct node));/**
+	struct info *temp=(struct info*) malloc(sizeof(struct info));/**
                                                                       *A temporary pointer variable which helps
                                                                       *
                                                                       *to store a node tempoararily while look
@@ -92,13 +92,13 @@ struct node* destroy(struct node *info1)
                                                                       */
 
 
-	if(info1->prev==NULL)//tail found!!
+	if(info1->n1->prev==NULL)//tail found!!
 	{
-		while(info1->next!=NULL)//while we donot reach the head
+		while(info1->n1->next!=NULL)//while we donot reach the head
 		{
-			temp=info1->next;//temporarily stores the current node.
+			temp->n1=info1->n1->next;//temporarily stores the current node.
 
-			info1=info1->next;//we are moving to the next node
+			info1->n1=info1->n1->next;//we are moving to the next node
 
 			free(temp);//we are freeing the memory from the current node
 		}
@@ -106,9 +106,9 @@ struct node* destroy(struct node *info1)
 
 	else
 	{
-		while(info1->prev!=NULL)//checks whether the tail has been reached yet
+		while(info1->n1->prev!=NULL)//checks whether the tail has been reached yet
 		{
-			info1=info1->prev;//keeps moving till it reaches the tail node
+			info1->n1=info1->n1->prev;//keeps moving till it reaches the tail node
 
 		}
 
@@ -117,11 +117,11 @@ struct node* destroy(struct node *info1)
 		*destruction  can begin
 		*/
 
-		 while(info1->next!=NULL)//while we donot reach the head
+		 while(info1->n1->next!=NULL)//while we donot reach the head
                 {
                         temp=info1;//temporarily stores the current node.
 
-                        info1=info1->next;//we are moving to the next node
+                        info1->n1=info1->n1->next;//we are moving to the next node
 
                         free(temp);//we are freeing the memory from the current node
                 }
@@ -168,9 +168,9 @@ struct node* destroy(struct node *info1)
 *
 */
 
-struct node*  insert_at_end(struct node *info1, uint32_t data1){
+struct info*  insert_at_end(struct info *info1, uint32_t data1){
 
- 	struct node *temp=(struct node*) malloc(sizeof(struct node));/**
+ 	struct info *temp=(struct info*) malloc(sizeof(struct info));/**
                               					      *A temporary pointer variable which helps
                                                                       *
                                                                       *to store a node tempoararily while look
@@ -188,31 +188,31 @@ struct node*  insert_at_end(struct node *info1, uint32_t data1){
 
         {
 
-                info1=(struct node*) malloc(sizeof(struct node));
+                info1=(struct info*) malloc(sizeof(struct info));
 	/*	struct info * cont;
 		cont=get_list_container(info1,struct info,n1);*/
-		info1->prev=NULL;
-		info1->next=NULL;
+		info1->n1->prev=NULL;
+		info1->n1->next=NULL;
 
         }
 
 	else
 
 	{
-		struct node *new_node=(struct node*) malloc(sizeof(struct node));/*This is a new pointer  that
+		struct info *new_node=(struct info*) malloc(sizeof(struct info));/*This is a new pointer  that
 					  					   *that will be the new head node*/
 
 
 
-		while(info1->prev!=NULL)//checks whether the tail has been reached yet
+		while(info1->n1->prev!=NULL)//checks whether the tail has been reached yet
 		{
-			info1=info1->prev;//keeps moving till it reaches the tail node
+			info1->n1=info1->n1->prev;//keeps moving till it reaches the tail node
 
 		}
 
-		//new_node->data=data1;
-		new_node->next=info1;
-		new_node->prev=NULL;
+		new_node->data=data1;
+		new_node->n1->next=info1->n1;
+		new_node->n1->prev=NULL;
 		info1=new_node;//assigning the new node as the head node
 
 
@@ -244,9 +244,9 @@ struct node*  insert_at_end(struct node *info1, uint32_t data1){
 *
 */
 
-struct node*  insert_at_beginning(struct node *info1, uint32_t data){
+struct info*  insert_at_beginning(struct info *info1, uint32_t data1){
 
-	struct node *temp=(struct node*) malloc(sizeof(struct node));/**
+	struct info *temp=(struct info*) malloc(sizeof(struct info));/**
                               					      *A temporary pointer variable which helps
                                                                       *
                                                                       *to store a node tempoararily while look
@@ -264,25 +264,25 @@ struct node*  insert_at_beginning(struct node *info1, uint32_t data){
 
         {
 
-                info1=(struct node*) malloc(sizeof(struct node));
-		//info1->data=data1;
-		info1->prev=NULL;
-		info1->next=NULL;
+                info1=(struct info*) malloc(sizeof(struct info));
+		info1->data=data1;
+		info1->n1->prev=NULL;
+		info1->n1->next=NULL;
 
         }
 
 	else
 
 	{
-		struct node *new_node=(struct node*) malloc(sizeof(struct node));/*This is a new pointer  that
+		struct info *new_node=(struct info*) malloc(sizeof(struct info));/*This is a new pointer  that
 					  					   *that will be the new head node*/
 
 
 
 
-		//new_node->data=data1;
-		new_node->next=NULL;
-		new_node->prev=info1;
+		new_node->data=data1;
+		new_node->n1->next=NULL;
+		new_node->n1->prev=info1->n1;
 		info1=new_node;//assigning the new node as the head node
 
 
@@ -298,16 +298,60 @@ struct node*  insert_at_beginning(struct node *info1, uint32_t data){
 *
 *@Description:adds a node to a given position to the linked list
 *
+*@Verbose : In this method,a node is inserted into the linked list 
+*
+*If the base pointer is null, the function will return a null pointer. However, if
+*
+*it is not a null pointer, the function creates a node using memory allocation function and adds
+*
+*it to the given index relative to the head or the base pointer
+*
 *@Input parameters :The base node pointer, data to add, and the relative position to add the data
 *
 *@Returns:pointer to the head of the linked list
 *
 */
 
-struct node* insert_at_position(struct node *base,uint32_t data, uint8_t pos);
+struct info* insert_at_position(struct info *base,uint32_t data1, uint8_t pos){
 
+	
+	struct info *temp1=base;
+	
+	if(base==NULL)
 
+	{
 
+		return NULL;
+
+	}
+
+	else
+	
+	{
+		
+		for(uint8_t i=1;i<=pos;i++)/**
+				     	    *An for loop to reach the given 
+				            *index
+				            */
+
+			{
+			
+				base->n1=base->n1->prev;
+			
+			}		
+		struct info *new_node=(struct info*) malloc(sizeof(struct info));//creation of a new node
+		struct info *temp=(struct info*) malloc(sizeof(struct info));//creation of a temporary node
+		new_node->data=data1;
+		temp->n1=base->n1->prev;		
+		new_node->n1->next=base->n1;
+		new_node->n1->prev=base->n1->prev;
+		base->n1->prev=new_node->n1;
+		temp->n1->next=new_node->n1;
+
+		return temp1;
+
+	}
+}
 /**
 *@Function name:delete_from_end
 *
@@ -328,7 +372,7 @@ struct node* insert_at_position(struct node *base,uint32_t data, uint8_t pos);
 */
 
 
-struct node* delete_from_end(struct node *head){
+struct info* delete_from_end(struct info *head){
 
 
 	if(head==NULL)
@@ -339,7 +383,9 @@ struct node* delete_from_end(struct node *head){
 
         }
 
-        struct node *temp=(struct node*) malloc(sizeof(struct node));/**
+	else{
+
+        struct info *temp=(struct info*) malloc(sizeof(struct info));/**
                                                                       *A temporary pointer variable which helps
                                                                       *
                                                                       *to store a node tempoararily while look
@@ -349,19 +395,19 @@ struct node* delete_from_end(struct node *head){
                                                                       *traversal towards the head begins
                                                                       */
 
-	while(head->prev!=NULL)//checks whether the tail has been reached yet
+	while(head->n1->prev!=NULL)//checks whether the tail has been reached yet
 		{
-			head=head->prev;//keeps moving till it reaches the tail node
+			head->n1=head->n1->prev;//keeps moving till it reaches the tail node
 
 		}
 
         temp=head;//assigns the head to a temporary node type pointer
-        head=head->next;//assigns the new head to its next node
+        head->n1=head->n1->next;//assigns the new head to its next node
         free(temp);
         return head;
 
 
-
+	}
 
 }
 /**
@@ -383,7 +429,7 @@ struct node* delete_from_end(struct node *head){
 *
 */
 
-struct node* delete_from_beginning(struct node *head){
+struct info* delete_from_beginning(struct info *head){
 
 
 
@@ -394,8 +440,11 @@ struct node* delete_from_beginning(struct node *head){
 		return NULL;
 
 	}
-
-	struct node *temp=(struct node*) malloc(sizeof(struct node));/**
+	
+	else
+	
+	{
+	struct info *temp=(struct info*) malloc(sizeof(struct info));/**
                                                                       *A temporary pointer variable which helps
                                                                       *
                                                                       *to store a node tempoararily while look
@@ -407,9 +456,11 @@ struct node* delete_from_beginning(struct node *head){
 
 
 	temp=head;//assigns the head to a temporary node type pointer
-	head=head->prev;//assigns the new head to its previous
+	head->n1=head->n1->prev;//assigns the new head to its previous
 	free(temp);
 	return head;
+
+	}
 }
 /**
 *@Function name:delete_from_position
@@ -418,12 +469,12 @@ struct node* delete_from_beginning(struct node *head){
 *
 *@Input parameters :base node pointer and an index where to remove the data
 *
-*@Returns:pointer to the head of the linked list
+*@Returns:pointer to the added node in linked list
 *
 */
 
 
-struct node* delete_from_position(struct node *base,uint8_t index){
+struct info* delete_from_position(struct info *base,uint8_t index){
 
 		if(base==NULL)
 
@@ -432,8 +483,10 @@ struct node* delete_from_position(struct node *base,uint8_t index){
                 return NULL;
 
         }
-
-        struct node *temp=(struct node*) malloc(sizeof(struct node));/**
+	
+	else
+	{
+        struct info *temp=(struct info*) malloc(sizeof(struct info));/**
                                                                       *A temporary pointer variable which helps
                                                                       *
                                                                       *to store a node tempoararily while look
@@ -443,7 +496,7 @@ struct node* delete_from_position(struct node *base,uint8_t index){
                                                                       *
                                                                       */
 	
-	struct node *free1=(struct node*) malloc(sizeof(struct node));/**
+	struct info *free1=(struct info*) malloc(sizeof(struct info));/**
                                                                       *A temporary pointer variable which helps
                                                                       *
                                                                       *us free a block of memory
@@ -460,13 +513,15 @@ struct node* delete_from_position(struct node *base,uint8_t index){
  
 	{
 
-		base=base->prev;
+		base->n1=base->n1->prev;
 	}
 		free1=base;
 		free(free1);
-		temp=base->next;
-		base=base->prev;//moves one place towards the tail
-		base->next=temp;
+		temp->n1=base->n1->next;
+		base->n1=base->n1->prev;//moves one place towards the tail
+		base->n1->next=temp->n1;
+		return base;
+	}
 
 }
 /**
@@ -489,16 +544,16 @@ struct node* delete_from_position(struct node *base,uint8_t index){
 */
 
 
-uint32_t  size(struct node *info1){
+uint32_t  size(struct info *info1){
 
 
 	uint32_t count=0;
 
-	while(info1->prev!=NULL)
+	while(info1->n1->prev!=NULL)
 	{
 
 		count++;
-		info1=info1->prev;
+		(info1->n1)=info1->n1->prev;
 
 	}
 
