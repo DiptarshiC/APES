@@ -1,7 +1,17 @@
 /**
  *@filename: pthread_practice.c
  *
- *@Description: A parent task creates two child tasks
+ *@Description: A parent thread creates two child thread.The job of
+ *child thread 1 is to look for a character which has occured 3 times
+ *in a .txt file.The file i am using here is the valentinesday.txt file
+ *which is present in the HW3 directory.The search i have used is a
+ *linked list search.The second child task prints CPU usage stats
+ *every 100 msecs. All these three tasks write to a common file
+ *whose name is accepted at the beginning. To see that there is no
+ *corruption in file data, i am passing the data to the individual
+ *threads inside a common structure declared globally. When the individual
+ *file write operations occur, the file is locked using a mutex lock, opened
+ *written to and closed again. The mutex is then unlocked
  *
  *@Date:2/11/2018
  *
@@ -25,7 +35,20 @@
 #define 	NUM_CHILD	2
 
 
-/*Below is a structure to pass arguments to a thread*/
+/**
+*Below is a structure to pass arguments to a thread.
+*The structure has been declared globally so
+*that all threads may have access to them.
+*To make the operations thread safe, I have
+*used a mutex lock to ensure that the operations
+*are atomic.The structure has two fields. The 1st
+*is the job_code which allows it to perform operations
+*based on whether it is the first child thread
+*or the second. The second is the pointer to the file
+*handle which these individual child tasks write
+*to.
+*/
+
 struct thread_info{
 
   int job_code;
@@ -33,6 +56,8 @@ struct thread_info{
 
   };
 
+/*An array of strucutres is being created.
+This array shall be passed to the individual threads*/
 struct thread_info myinfo[NUM_CHILD];
 
 void periodic_task(int signum)
@@ -67,50 +92,69 @@ void periodic_task(int signum)
 		fclose(fptr);
 
 }
+/**
+*@Function pointer name:child_play
+*
+*@parameters:void
+*
+*@return:none
+*
+*@Description:Based on the parameters being passed
+*to this function pointer, child play will either
+*find the character which has three occurences in a 
+*.txt file or will print CPU stats every 100 msecs. All
+*this will be printed to a common log file whose name
+*will be entered by the user when the main thread begins
+*
+*/
 
 void * child_play(void * parm)
 {
-  int *jobname;
-  jobname=(int*) parm;
-  if(*(jobname)==1)
-    {
-	printf("This is child task 1\n");
-	printf("My job is to search text in a file\n");
-    }
-  else if(*(jobname)==2)
-    {
-	/*printf("This is child task 2\n");
-	printf("My job is to print CPU stats\n");*/
-
-	struct sigaction sa;
-	struct itimerval timer;
+  	int *jobname;
+  	jobname=(int*) parm;
+	printf("I am child task (%d) \n",*(jobname));
+	printf("My thread id is (%ld)\n",pthread_self());
 
 
-	/*Install the periodic task as the signal handler for SIGVTALRM*/
+ 	if(*(jobname)==1)
+    	{
+		//printf("This is child task 1\n");
+		printf("My job is to search text in a file\n");
+    	}
+  	else if(*(jobname)==2)
+    	{
+		//printf("This is child task 2\n");
+		printf("My job is to print CPU stats\n");
 
-	memset(&sa,0,sizeof(sa));
-	sa.sa_handler=&periodic_task;
-	sigaction(SIGVTALRM,&sa,NULL);
-
-	/*Configure the timer to expire after 100 msec*/
-
-	timer.it_value.tv_sec=0;
-	timer.it_value.tv_usec=100000;
-
-	/*and every 100 msec after that*/
-
-	timer.it_interval.tv_sec=0;
-	timer.it_interval.tv_usec=100000;
+		struct sigaction sa;
+		struct itimerval timer;
 
 
-	/*Starts a virtual timer.It counts down whenever this process is executing*/
+		/*Install the periodic task as the signal handler for SIGVTALRM*/
 
-	setitimer(ITIMER_VIRTUAL,&timer,NULL);
+		memset(&sa,0,sizeof(sa));
+		sa.sa_handler=&periodic_task;
+		sigaction(SIGVTALRM,&sa,NULL);
 
-	/*Do busy work*/
-	while(1);
+		/*Configure the timer to expire after 100 msec*/
 
-   }
+		timer.it_value.tv_sec=0;
+		timer.it_value.tv_usec=100000;
+
+		/*and every 100 msec after that*/
+
+		timer.it_interval.tv_sec=0;
+		timer.it_interval.tv_usec=100000;
+
+
+		/*Starts a virtual timer.It counts down whenever this process is executing*/
+
+		setitimer(ITIMER_VIRTUAL,&timer,NULL);
+
+		/*Do busy work*/
+		while(1);
+
+   	}
 
 
 }
@@ -119,11 +163,13 @@ void main()
 {
 
 
-
+	printf("I am a parent thread\n");
+	printf("My thread id is (%ld)\n",pthread_self());
 
 	timer_t timerid;
 	struct sigevent sev;
 	struct itimerspec its;
+
 
 
 	int thread_status;//This variable stores the status of a thread
