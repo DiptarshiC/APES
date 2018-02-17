@@ -452,8 +452,17 @@ void main()
     		fprintf(stderr,"Error, pthread_create returned code: %d\n",thread_status);
     		exit(EXIT_FAILURE);
   	}
+	else
+	{
+		FILE *ptra=fopen(myinfoarray[0].filename,"a");
+
+                printf("Creating child thread 1\n\n");
+		fprintf(ptra,"Creating child thread1\n\n");
+
+		fclose(ptra);
 
 
+        }
 
 	/*The line below creates the second thread*/
 	thread_status=pthread_create(&thread2,&attr,child_play,(void*) &myinfoarray[1]);
@@ -463,6 +472,19 @@ void main()
     		fprintf(stderr,"Error, pthread_create returned code: %d\n",thread_status);
 		exit(EXIT_FAILURE);
   	}
+
+	 else
+        {
+		FILE *ptra=fopen(myinfoarray[1].filename,"a");
+
+                printf("Creating  child thread 2!\n\n");
+		fprintf(ptra,"Creating child thread2\n\n");
+		 fclose(ptra);
+
+
+
+        }
+
 
 	pthread_attr_destroy(&attr);
 	/* The code below ensures that the main thread or
@@ -476,6 +498,16 @@ void main()
     		perror("Error, joining operation failed");
 
   	}
+	else
+	{
+		FILE *ptra=fopen(myinfoarray[0].filename,"a");
+
+		printf("Goodbye from thread 1!\n\n");
+
+		fprintf(ptra,"Goodbye from thread 1!\n\n");
+
+		fclose(ptra);
+	}
 
 
 	thread_status=pthread_join(thread2,(void*)&thread_stat);
@@ -483,8 +515,20 @@ void main()
 
 	if(thread_status<0)
   	{
+
+		 
      		perror("Error, joining operation failed");
   	}
+
+	 else
+        {
+		FILE *ptrb=fopen(myinfoarray[1].filename,"a");
+                printf("Goodbye from thread 2!\n\n");
+		fprintf(ptrb,"Goodbye from thread 2!\n\n");
+		fclose(ptrb);
+
+
+        }
 
 
 
