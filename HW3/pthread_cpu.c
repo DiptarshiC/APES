@@ -27,6 +27,14 @@
 #include<signal.h>
 #include<sys/time.h>
 #include <string.h>
+#include<stdint.h>
+ struct node{
+
+        char car;
+        uint32_t count;
+        struct node *next;
+        };
+
 
 #define 	CLOCKID 	CLOCK_REALTIME
 #define 	SIG 		SIGRTMIN
@@ -156,6 +164,123 @@ void * child_play(void * parm)
 		printf("\n");
 		fprintf(ptr,"\n");
 		fprintf(ptr,"\n");
+		char c;
+	char newchar;
+	char flag=0;
+
+	FILE *PTR=fopen("textcopy.txt","a");
+	FILE *FPTR=fopen("Valentinesday.txt","r");
+
+	c=fgetc(FPTR);
+	struct node *headnode;
+	headnode = (struct node*)malloc(sizeof(struct node));
+	headnode->count=1;
+	headnode->car=c;
+	headnode->next=NULL;
+	struct node *currentnode;
+	currentnode = (struct node*)malloc(sizeof(struct node));
+
+	while(c!=EOF)
+	{
+			c=fgetc(FPTR);
+			flag=0;
+			currentnode=headnode;
+
+			while(currentnode->next!=NULL)
+			{
+				if((c==(currentnode->car)))
+				{
+					(currentnode->count)=(currentnode->count)+1;
+					flag=1;
+					break;
+				}
+				else
+				{
+			 		currentnode=currentnode->next;
+				}
+			}
+				if(flag==1)
+				{
+
+					continue;
+				}
+
+
+				//I move forward 
+				if(currentnode->next==NULL)
+				{
+
+					if((c==(currentnode->car)))
+                                	{
+                                        	(currentnode->count)=(currentnode->count)+1;
+
+						continue;
+
+                                	}
+
+					else
+					{
+                        			//create new node
+                        			struct node *nextnode;
+                        			nextnode = (struct node*)malloc(sizeof(struct node));
+                        			nextnode->car=c;
+                        			nextnode->count=1;
+						nextnode->next=NULL;
+                        			currentnode->next=nextnode;
+						continue;
+					}
+
+                 		}
+
+
+
+
+		fprintf(ptr,"%c",c);
+		//c=fgetc(fptr);
+	}
+
+	fclose(FPTR);
+	fclose(PTR);
+
+	/*Now to check the count
+
+	printf("Charactrer \t Count\n");
+	currentnode=headnode;
+
+	while(currentnode->next!=NULL)
+	{
+
+		printf("%c \t          %d\n",currentnode->car,currentnode->count);
+		currentnode=currentnode->next;
+
+	}
+		printf("\n\n");*/
+
+	     /*Now to check the count*/
+	
+        printf("This is thread 1 running \n");
+	fprintf(ptr,"This is thread 1 running \n");
+        printf("Charactrer \t Count\n");
+	fprintf(ptr,"Charactrer \t Count\n");
+
+        currentnode=headnode;
+
+        while(currentnode->next!=NULL)
+        {
+		if(currentnode->count==3)
+		{
+                printf("%c \t          %d\n",currentnode->car,currentnode->count);
+		fprintf(ptr,"%c \t          %d\n",currentnode->car,currentnode->count);
+
+		}
+                currentnode=currentnode->next;
+
+        }
+		printf("\n\n");
+		fprintf(ptr,"\n\n");
+
+
+
 		fclose(ptr);
 
 	//	pthread_mutex_unlock(&mutexfile);
