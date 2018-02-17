@@ -28,6 +28,8 @@
 #include<sys/time.h>
 #include <string.h>
 #include<stdint.h>
+#include<sys/syscall.h>
+
  struct node{
 
         char car;
@@ -155,8 +157,10 @@ void * child_play(void * parm)
 		//fprintf(ptr,"My job is to search text in a file\n");
 		printf("I am child thread (%d) \n",MY_INFO->job_code);
 		fprintf(ptr,"I am child thread (%d) \n",MY_INFO->job_code);
-       		printf("My thread id is (%ld)\n",pthread_self());
-		fprintf(ptr,"My thread id is (%ld)\n",pthread_self());
+       		printf("My POSIX thread id is (%ld)\n",pthread_self());
+		fprintf(ptr,"My POSIX thread id is (%ld)\n",pthread_self());
+		printf("My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+                fprintf(ptr,"My linux thread id is (%ld)\n",syscall(__NR_gettid ));
 		printf("My job is to search text in a file\n");
 		fprintf(ptr,"My job is to search text in a file\n");
 
@@ -298,8 +302,10 @@ void * child_play(void * parm)
 
 		printf("I am child thread (%d) \n",MY_INFO->job_code);
 		fprintf(ptr1,"I am child thread (%d) \n",MY_INFO->job_code);
-	        printf("My thread id is (%ld)\n",pthread_self());
-		fprintf(ptr1,"My thread id is (%ld)\n",pthread_self());
+	        printf("My POSIX thread id is (%ld)\n",pthread_self());
+		fprintf(ptr1,"My POSIX thread id is (%ld)\n",pthread_self());
+		printf("My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+                fprintf(ptr1,"My linux thread id is (%ld)\n",syscall(__NR_gettid ));
 
 		printf("My job is to print CPU stats\n");
 		fprintf(ptr1,"My job is to print CPU stats\n");
@@ -417,8 +423,11 @@ void main()
 
 	printf("This is parent thread \n");
 	fprintf(ptr,"This is parent thread \n");
-	printf("My thread id is (%ld)\n",pthread_self());
-	fprintf(ptr,"My thread id is (%ld)\n",pthread_self());
+	printf("My POSIX thread id is (%ld)\n",pthread_self());
+	fprintf(ptr,"My POSIX thread id is (%ld)\n",pthread_self());
+	printf("My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+        fprintf(ptr,"My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+
 
         printf("My job is to create two child threads\n");
 	printf("\n");
