@@ -82,6 +82,12 @@ use to lock a file
 pthread_mutex_t mutexfile;
 
 
+/*This is a the object for
+posix timer functions
+*/
+
+struct timespec tms;
+
 
 void periodic_task(int signum)
 {
@@ -371,7 +377,7 @@ void * child_play(void * parm)
 
 void main()
 {
-
+clock_gettime(CLOCK_REALTIME,&tms);
 
 
 	printf("Please enter the name of the file you would like to create\n");
@@ -456,8 +462,12 @@ void main()
 	{
 		FILE *ptra=fopen(myinfoarray[0].filename,"a");
 
-                printf("Creating child thread 1\n\n");
-		fprintf(ptra,"Creating child thread1\n\n");
+                printf("Creating child thread 1\n");
+		fprintf(ptra,"Creating child thread1\n");
+		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_sec);
+		fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_sec);
+
+
 
 		fclose(ptra);
 
@@ -477,8 +487,11 @@ void main()
         {
 		FILE *ptra=fopen(myinfoarray[1].filename,"a");
 
-                printf("Creating  child thread 2!\n\n");
-		fprintf(ptra,"Creating child thread2\n\n");
+                printf("Creating  child thread 2!\n");
+		fprintf(ptra,"Creating child thread2\n");
+		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_sec);
+                fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_sec);
+
 		 fclose(ptra);
 
 
@@ -502,9 +515,15 @@ void main()
 	{
 		FILE *ptra=fopen(myinfoarray[0].filename,"a");
 
-		printf("Goodbye from thread 1!\n\n");
+		printf("Goodbye from thread 1!\n");
 
-		fprintf(ptra,"Goodbye from thread 1!\n\n");
+		fprintf(ptra,"Goodbye from thread 1!\n");
+
+		 printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+
+
+		 fprintf(ptra,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+
 
 		fclose(ptra);
 	}
@@ -523,8 +542,14 @@ void main()
 	 else
         {
 		FILE *ptrb=fopen(myinfoarray[1].filename,"a");
-                printf("Goodbye from thread 2!\n\n");
-		fprintf(ptrb,"Goodbye from thread 2!\n\n");
+                printf("Goodbye from thread 2!\n");
+		fprintf(ptrb,"Goodbye from thread 2!\n");
+
+		printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+
+
+                fprintf(ptrb,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+
 		fclose(ptrb);
 
 
