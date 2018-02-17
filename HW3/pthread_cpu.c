@@ -167,6 +167,8 @@ void * child_play(void * parm)
 		fprintf(ptr,"My POSIX thread id is (%ld)\n",pthread_self());
 		printf("My linux thread id is (%ld)\n",syscall(__NR_gettid ));
                 fprintf(ptr,"My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+		printf("My pid is (%d)\n",getpid( ));
+	        fprintf(ptr,"My pid is (%d)\n",getpid( ));
 		printf("My job is to search text in a file\n");
 		fprintf(ptr,"My job is to search text in a file\n");
 
@@ -312,6 +314,9 @@ void * child_play(void * parm)
 		fprintf(ptr1,"My POSIX thread id is (%ld)\n",pthread_self());
 		printf("My linux thread id is (%ld)\n",syscall(__NR_gettid ));
                 fprintf(ptr1,"My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+		 printf("My pid is (%d)\n",getpid( ));
+	        fprintf(ptr1,"My pid is (%d)\n",getpid( ));
+
 
 		printf("My job is to print CPU stats\n");
 		fprintf(ptr1,"My job is to print CPU stats\n");
@@ -433,6 +438,10 @@ clock_gettime(CLOCK_REALTIME,&tms);
 	fprintf(ptr,"My POSIX thread id is (%ld)\n",pthread_self());
 	printf("My linux thread id is (%ld)\n",syscall(__NR_gettid ));
         fprintf(ptr,"My linux thread id is (%ld)\n",syscall(__NR_gettid ));
+	printf("My pid is (%d)\n",getpid( ));
+        fprintf(ptr,"My pid is (%d)\n",getpid( ));
+
+
 
 
         printf("My job is to create two child threads\n");
@@ -464,8 +473,8 @@ clock_gettime(CLOCK_REALTIME,&tms);
 
                 printf("Creating child thread 1\n");
 		fprintf(ptra,"Creating child thread1\n");
-		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_sec);
-		fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_sec);
+		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_nsec);
+		fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_nsec);
 
 
 
@@ -489,8 +498,8 @@ clock_gettime(CLOCK_REALTIME,&tms);
 
                 printf("Creating  child thread 2!\n");
 		fprintf(ptra,"Creating child thread2\n");
-		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_sec);
-                fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_sec);
+		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_nsec);
+                fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_nsec);
 
 		 fclose(ptra);
 
@@ -519,10 +528,10 @@ clock_gettime(CLOCK_REALTIME,&tms);
 
 		fprintf(ptra,"Goodbye from thread 1!\n");
 
-		 printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+		 printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
 
 
-		 fprintf(ptra,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+		 fprintf(ptra,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
 
 
 		fclose(ptra);
@@ -545,10 +554,10 @@ clock_gettime(CLOCK_REALTIME,&tms);
                 printf("Goodbye from thread 2!\n");
 		fprintf(ptrb,"Goodbye from thread 2!\n");
 
-		printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+		printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
 
 
-                fprintf(ptrb,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_sec);
+                fprintf(ptrb,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
 
 		fclose(ptrb);
 
