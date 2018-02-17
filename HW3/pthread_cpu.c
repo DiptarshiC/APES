@@ -192,7 +192,7 @@ void * child_play(void * parm)
 
 			while(currentnode->next!=NULL)
 			{
-				if((c==(currentnode->car)))
+				if((c==(currentnode->car))||(c==(currentnode->car+32))||(c==(currentnode->car-32)))
 				{
 					(currentnode->count)=(currentnode->count)+1;
 					flag=1;
@@ -214,7 +214,7 @@ void * child_play(void * parm)
 				if(currentnode->next==NULL)
 				{
 
-					if((c==(currentnode->car)))
+					if((c==(currentnode->car))||(c==(currentnode->car-32))||(c==(currentnode->car+32)))
                                 	{
                                         	(currentnode->count)=(currentnode->count)+1;
 
