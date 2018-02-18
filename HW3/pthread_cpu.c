@@ -73,6 +73,8 @@ The task no. for 1 will be 1 and for the other will be 2
 */
 struct thread_info myinfoarray[NUM_CHILD];
 
+pthread_t thread1,thread2;//The first and the second child thread
+
 
 /*This is a globally defined mutex
 that allows us to lock resources
@@ -95,6 +97,7 @@ void handle_signal(int signal)
 	printf("Bye bye.Child thread 2 terminating \n\n");
 	fprintf(ptr,"Bye bye.Child thread 2 terminating \n\n");
 	fclose(ptr);
+	pthread_cancel(thread2);
 
 
 }
@@ -458,7 +461,7 @@ clock_gettime(CLOCK_REALTIME,&tms);
 
 
 	int thread_status;//This variable stores the status of a thread
-	pthread_t thread1,thread2;//The first and the second child thread
+	//pthread_t thread1,thread2;//The first and the second child thread
 	int thread_stat;
 
 	int jobcode1=1;//Depending on the job codes the child thread does its job.This is the job code for child thread1
