@@ -421,6 +421,8 @@ void * child_play(void * parm)
 void main()
 {
 clock_gettime(CLOCK_REALTIME,&tms);
+struct timeval now;
+int rc;
 
 
 	printf("Please enter the name of the file you would like to create\n");
@@ -508,11 +510,12 @@ clock_gettime(CLOCK_REALTIME,&tms);
 	else
 	{
 		FILE *ptra=fopen(myinfoarray[0].filename,"a");
-
+		rc=gettimeofday(&now,NULL);
                 printf("Creating child thread 1\n");
 		fprintf(ptra,"Creating child thread1\n");
-		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_nsec);
-		fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_nsec);
+		printf("Timestamp for thread creation:%u.%06u\n\n",now.tv_sec,now.tv_usec);
+		fprintf(ptra,"Timestamp for thread creation:%u.%06u\n\n",now.tv_sec,now.tv_usec);
+
 
 
 
@@ -533,11 +536,12 @@ clock_gettime(CLOCK_REALTIME,&tms);
 	 else
         {
 		FILE *ptra=fopen(myinfoarray[1].filename,"a");
-
+		rc=gettimeofday(&now,NULL);
                 printf("Creating  child thread 2!\n");
 		fprintf(ptra,"Creating child thread2\n");
-		printf("Timestamp for thread creation:(%ld)\n\n",tms.tv_nsec);
-                fprintf(ptra,"Timestamp:(%ld)\n\n",tms.tv_nsec);
+		printf("Timestamp for thread creation:%u.%06u\n\n",now.tv_sec,now.tv_usec);
+                fprintf(ptra,"Timestamp for thread creation:%u.%06u\n\n",now.tv_sec,now.tv_usec);
+
 
 		 fclose(ptra);
 
@@ -562,14 +566,17 @@ clock_gettime(CLOCK_REALTIME,&tms);
 	{
 		FILE *ptra=fopen(myinfoarray[0].filename,"a");
 
+		rc=gettimeofday(&now,NULL);
+
+
 		printf("Goodbye from thread 1!\n");
 
 		fprintf(ptra,"Goodbye from thread 1!\n");
 
-		 printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
+		printf("Timestamp for thread destruction:%u.%06u\n\n",now.tv_sec,now.tv_usec);
+                fprintf(ptra,"Timestamp for thread destruction:%u.%06u\n\n",now.tv_sec,now.tv_usec);
 
 
-		 fprintf(ptra,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
 
 
 		fclose(ptra);
@@ -589,13 +596,15 @@ clock_gettime(CLOCK_REALTIME,&tms);
 	 else
         {
 		FILE *ptrb=fopen(myinfoarray[1].filename,"a");
+
+		rc=gettimeofday(&now,NULL);
+
                 printf("Goodbye from thread 2!\n");
 		fprintf(ptrb,"Goodbye from thread 2!\n");
 
-		printf("Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
+		printf("Timestamp for thread destruction:%u.%06u\n\n",now.tv_sec,now.tv_usec);
+                fprintf(ptrb,"Timestamp for thread destruction:%u.%06u\n\n",now.tv_sec,now.tv_usec);
 
-
-                fprintf(ptrb,"Timestamp for thread destruction is:(%ld)\n\n",tms.tv_nsec);
 
 		fclose(ptrb);
 
