@@ -88,6 +88,17 @@ posix timer functions
 
 struct timespec tms;
 
+void handle_signal(int signal)
+{
+
+	FILE *ptr=fopen(myinfoarray[1].filename,"a");
+	printf("Bye bye.Child thread 2 terminating \n\n");
+	fprintf(ptr,"Bye bye.Child thread 2 terminating \n\n");
+	fclose(ptr);
+
+
+}
+
 
 void periodic_task(int signum)
 {
@@ -151,8 +162,26 @@ void * child_play(void * parm)
 	struct thread_info *MY_INFO;
 
 	MY_INFO=(struct thread_info*) parm;
+	/*Install the periodic task as the signal handler for SIGUSR1*/
+
+	struct sigaction sa1;
+
+	/*Setup signal handler*/
+	sa1.sa_handler=&handle_signal;
+
+	/*Restart the thread if at all not possible*/
+	sa1.sa_flags=SA_RESTART;
+
+	/*Block every other signal handler*/
+	sigfillset(&sa1.sa_mask);
 
 
+	if(sigaction(SIGUSR1,&sa1,NULL)==-1)
+	{
+
+		perror("Error: Cannot handle SIGUSR1\n");
+
+	}
  	if(MY_INFO->job_code==1)
     	{
 	//	 pthread_mutex_lock(&mutexfile);
@@ -294,6 +323,12 @@ void * child_play(void * parm)
 
 
 		fclose(ptr);
+
+
+ 
+
+
+
 
 	//	pthread_mutex_unlock(&mutexfile);
 
