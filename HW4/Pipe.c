@@ -1,14 +1,39 @@
-#include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
-/* max  receiving buffer size; Note: no check or enforcement is made on this value*/
+/* max  receiving buffer size; Note: no check or
+			 enforcement is made on this value*/
 #define BUF_SIZE 256
 
-int main()
+
+struct mystruct
+
 {
+
+	char mesg[40];
+	int USR_LED;
+};
+
+#define	MSG_LEN	64
+
+/**
+*@function:main
+*
+*@description:The main function creates two 
+*		child processes
+*
+*@input_param:None
+*
+*@return_type:void
+*
+*/
+
+void main()
+{
+
     int pfd1[2];
     int pfd2[2];
 
@@ -189,4 +214,15 @@ int main()
 
     printf("Parent finishing.\n");
     exit(EXIT_SUCCESS);
-}
+
+	
+
+	
+}	
+
+	
+	
+
+
+
+
