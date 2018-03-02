@@ -27,16 +27,23 @@ MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
 
 static int __init hello_init(void)
-{
-
-struct task_struct *task=current; 
-
-printk(KERN_ALERT "The process is %s pid : %d\n",task->comm,
-						task->pid);
-
-	return 0;	
+{ 
+	
+	
+	struct task_struct *task;
+	task=current;
+	do
+	{
+	task=task->parent;
+	printk(KERN_ALERT "The process is %s pid : %d\n",task->comm,
+	
+					task->pid);
+	printk(KERN_ALERT "The nice value of the process is %d\n",
+					task_nice(task));
+	
+	}while(task->pid>0);
+	return 0;
 }
-
 static void __exit hello_exit(void)
 {
 
