@@ -41,9 +41,11 @@ static int __init hello_init(void)
        	printk(KERN_ALERT "The status of the current task is %d\n",
 				task->state);
 
-	printk(KERN_ALERT "The prio of the current task is %d\n",
+	printk(KERN_ALERT "The priority of the current task is %d\n",
                                 task->prio);
 
+	 printk(KERN_ALERT "The nice value of the current task is %d\n",
+                                task_nice(task));
 
 
 	task=task->parent;
