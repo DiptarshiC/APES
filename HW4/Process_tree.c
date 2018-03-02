@@ -29,19 +29,18 @@ MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
 static int __init hello_init(void)
 { 
 	
-	
 	struct task_struct *task;
 	task=current;
 	do
 	{
-	task=task->parent;
-	printk(KERN_ALERT "The process is %s pid : %d\n",task->comm,
+
+	printk(KERN_ALERT "The process %s has pid : %d\n",task->comm,
 	
 					task->pid);
-	printk(KERN_ALERT "The nice value of the process is %d\n",
-					task_nice(task));
-	
-	}while(task->pid>0);
+       	printk(KERN_ALERT "The status of the current task is %d\n",
+				task->state);
+	task=task->parent;
+	}while((task->pid)>0);
 	return 0;
 }
 static void __exit hello_exit(void)
