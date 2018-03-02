@@ -34,11 +34,18 @@ static int __init hello_init(void)
 	do
 	{
 
+	printk(KERN_ALERT "\n\n\n"); 
 	printk(KERN_ALERT "The process %s has pid : %d\n",task->comm,
 	
 					task->pid);
        	printk(KERN_ALERT "The status of the current task is %d\n",
 				task->state);
+
+	printk(KERN_ALERT "The prio of the current task is %d\n",
+                                task->prio);
+
+
+
 	task=task->parent;
 	}while((task->pid)>0);
 	return 0;
