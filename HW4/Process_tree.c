@@ -18,6 +18,10 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <asm/current.h>
+#include <linux/sched.h>
+#include <linux/pid.h>
+
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
@@ -25,8 +29,12 @@ MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
 static int __init hello_init(void)
 {
 
-	printk(KERN_ALERT,"Enter process id\n");
-	return 0;
+struct task_struct *task=current; 
+
+printk(KERN_ALERT "The process is %s pid : %d\n",task->comm,
+						task->pid);
+
+	return 0;	
 }
 
 static void __exit hello_exit(void)
