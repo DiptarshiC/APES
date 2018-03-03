@@ -18,61 +18,46 @@
 *
 */
 
-#include <linux/kthread.h>
-#include <linux/sched.h>
-#include <linux/kernel.h>
+
 #include <linux/module.h>
-#include <linux/init.h>
-#include <asm/current.h>
-#include <linux/pid.h>
-#include <linux/time.h>   // for using jiffies 
-#include <linux/timer.h>
+#include <linux/kernel.h>
+#include <linux/delay.h>
+#include <linux/kthread.h>
 
-
-MODULE_LICENSE("Dual BSD/GPL");
-MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
-
-static struct task_struct *thread1;
-
-int thread_fn(void) 
+static struct task_struct *thread_st;
+// Function executed by kernel thread
+static int thread_fn(void *unused)
 {
-
-
-printk(KERN_INFO "Hello ! My name is thread1.I am a baby thread\n");
-
-
-return 0;
-}
-
-static int  thread_init(void)
-{ 
-	
-   
-	char  our_thread[8]="thread1";
-	printk(KERN_INFO "in init\n");
-	thread1 = kthread_run(thread_fn,NULL,our_thread);
-	if((thread1))
-        {
-        printk(KERN_INFO "in if\n");
-        wake_up_process(thread1);
-        }
-
+    while (1)
+    {
+        printk(KERN_INFO "This is baby thread\n");
+        
+    }
+    printk(KERN_INFO "Thread Stopping\n");
+    do_exit(0);
     return 0;
-
-
 }
-
-static void  thread_exit(void)
+// Module Initialization
+static int __init init_thread(void)
 {
-
-	int ret;
-	ret = kthread_stop(thread1);
-	if(!ret)
+    printk(KERN_INFO "Creating Thread\n");
+    //Create the kernel thread with name 'mythread'
+    thread_st = kthread_create(thread_fn, NULL, "mythread");
+    if (thread_st)
 	{
-	printk(KERN_INFO "Thread stopped\n");
+        printk("Thread1 Created successfully\n");
 	}
+    else{
+        printk(KERN_INFO "Thread creation failed\n");
+	}	
+    return 0;
+}
+// Module Exit
+static void __exit cleanup_thread(void)
+{
+    printk("Cleaning Up\n");
 }
 
-
-module_init(thread_init);
-module_exit(thread_exit);
+module_init(init_thread);
+module_exit(cleanup_thread);
+//exit
