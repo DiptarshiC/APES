@@ -32,8 +32,11 @@ static int __init hello_init(void)
 	struct task_struct *task;
 	struct task_struct *task1;
 	struct list_head *list;
-	
-	
+	/**
+	Since the question mentions that we can take the
+	current task as the starting task for the third
+	problem, task is being assigned to current
+	*/
 	task=current;
 	while((task->pid)>0)
 	{
@@ -52,8 +55,11 @@ static int __init hello_init(void)
           
 		                      task_nice(task));
 	
-
-
+	/**
+	This macro wraps around a for loop
+	Incrementing the value of 'count' inside
+	the for loop, i count the number of children
+	*/
 	list_for_each(list, &task->children) 
 	{
 	
