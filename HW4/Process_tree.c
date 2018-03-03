@@ -28,34 +28,52 @@ MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
 
 static int __init hello_init(void)
 { 
-	
+	int count=0;
 	struct task_struct *task;
+	struct task_struct *task1;
+	struct list_head *list;
+	
+	
 	task=current;
-	do
+	while((task->pid)>0)
 	{
-
-	printk(KERN_ALERT "\n\n\n"); 
-	printk(KERN_ALERT "The process %s has pid : %d\n",task->comm,
+	count=0;
+	printk(KERN_INFO "\n\n\n"); 
+	printk(KERN_INFO "The process %s has pid : %d\n",task->comm,
 	
 					task->pid);
-       	printk(KERN_ALERT "The status of the current task is %d\n",
+       	printk(KERN_INFO "The status of the current task is %d\n",
 				task->state);
 
-	printk(KERN_ALERT "The priority of the current task is %d\n",
+	printk(KERN_INFO "The priority of the current task is %d\n",
                                 task->prio);
 
-	 printk(KERN_ALERT "The nice value of the current task is %d\n",
-                                task_nice(task));
+	 printk(KERN_INFO "The nice value of the current task is %d\n",
+          
+		                      task_nice(task));
+	
+
+
+	list_for_each(list, &task->children) 
+	{
+	
+		count=count+1;
+	
+	}
+
+	 printk(KERN_INFO "The no. children of the current task is %d\n",
+						count);
+		
 
 
 	task=task->parent;
-	}while((task->pid)>0);
+	}
 	return 0;
 }
 static void __exit hello_exit(void)
 {
 
-	printk(KERN_ALERT "Goodbye, cruel world\n");
+	printk(KERN_INFO "Goodbye, cruel world\n");
 
 }
 
