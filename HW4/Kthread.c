@@ -24,6 +24,9 @@
 #include <linux/delay.h>
 #include <linux/kthread.h>
 
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
+
 static struct task_struct *thread_st;
 static struct task_struct *thread_st1;
 
