@@ -35,36 +35,50 @@ static int thread_fn(void *unused)
 {
     
     
-        printk(KERN_INFO "This is baby thread\n");
+    printk(KERN_INFO "This is baby thread 1\n");
         
     
-    printk(KERN_INFO "Thread Stopping\n");
+    printk(KERN_INFO "Thread1 Stopping\n");
     do_exit(0);
     return 0;
 }
+
+
+// Function executed by kernel thread
+static int thread_fn1(void *unused)
+{
+
+
+	printk(KERN_INFO "This is baby thread 2\n");
+	printk(KERN_INFO "Thread2 Stopping\n");
+	do_exit(0);
+	return 0;
+}
+
+
 // Module Initialization
 static int __init init_thread(void)
 {
-    printk(KERN_INFO "Creating Thread1\n");
-    //Create the kernel thread with name 'mythread'
-    thread_st = kthread_run(thread_fn, NULL, "mythread");
-    if (thread_st)
+	printk(KERN_INFO "Creating Thread1\n");
+	//Create the kernel thread with name 'mythread'
+	thread_st = kthread_run(thread_fn, NULL, "mythread");
+	if (thread_st)
 	{
         printk("Thread1 Created successfully\n");
 	}
-    else
+    	else
 	{
         printk(KERN_INFO "Thread creation failed\n");
 	}
 
-	 printk(KERN_INFO "Creating Thread2\n");
-    //Create the kernel thread2 with name 'mythread'
-    thread_st1 = kthread_run(thread_fn, NULL, "mythread2");
-    if (thread_st1)
+	printk(KERN_INFO "Creating Thread2\n");
+	//Create the kernel thread2 with name 'mythread'
+	thread_st1 = kthread_run(thread_fn1, NULL, "mythread2");
+	if (thread_st1)
         {
         printk("Thread2 Created successfully\n");
         }
-    else
+	else
 	{
         printk(KERN_INFO "Thread creation failed\n");
         }
