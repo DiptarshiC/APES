@@ -68,10 +68,10 @@ static int writer(void *unused)
 {
     
     
-    printk(KERN_INFO "This is baby thread 1\n");
+    printk(KERN_INFO "This is writer thread \n");
         
     
-    printk(KERN_INFO "Thread1 Stopping\n");
+    printk(KERN_INFO "Writer thread stopping\n");
     do_exit(0);
     return 0;
 }
@@ -94,7 +94,7 @@ static int kern_logger(void *unused)
 
 
 	printk(KERN_INFO "This is kern logger thread\n");
-	printk(KERN_INFO "Thread2 Stopping\n");
+	printk(KERN_INFO "kern logger thread Stopping\n");
 	do_exit(0);
 	return 0;
 }
@@ -125,7 +125,7 @@ static int __init init_thread(void)
         printk(KERN_INFO "Writer thread creation failed\n");
 	}
 
-	printk(KERN_INFO "Creating Thread2\n");
+	printk(KERN_INFO "Creating Kern Logger thread\n");
 	//Create the kernel thread2 with name 'mythread'
 	thread_st1 = kthread_run(kern_logger, NULL, "Kern_logger");
 	if (thread_st1)
