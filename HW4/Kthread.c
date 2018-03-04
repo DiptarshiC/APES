@@ -23,6 +23,25 @@
 #include <linux/kernel.h>
 #include <linux/delay.h>
 #include <linux/kthread.h>
+#include <linux/kfifo.h>
+#include <linux/mutex.h>
+#include <linux/proc_fs.h>
+
+
+/* fifo size in elements (ints) */
+#define FIFO_SIZE	32
+
+/* name of the proc entry */
+#define	PROC_FIFO	"int-fifo"
+
+/* lock for procfs read access */
+static DEFINE_MUTEX(read_lock);
+
+/* lock for procfs write access */
+static DEFINE_MUTEX(write_lock);
+
+/*This function declares a dynamically allocated FIFO*/
+static DECLARE_KFIFO_PTR(test, int);
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
@@ -30,8 +49,22 @@ MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
 static struct task_struct *thread_st;
 static struct task_struct *thread_st1;
 
-// Function executed by kernel thread
-static int thread_fn(void *unused)
+/**
+*@function:writer
+*
+*@description:This thread writes to the kfifo 
+*	at regular intervals and calls the kern
+*	logger thread.The info that it writes is about 
+*	the currently scheduled process in the rbtree.
+*	i.e, the id, vruntime of the current prev and 
+*	next pid.
+*
+*@param:none(void *unused) 	
+*
+*@return:(int)
+*/
+
+static int writer(void *unused)
 {
     
     
@@ -44,49 +77,83 @@ static int thread_fn(void *unused)
 }
 
 
-// Function executed by kernel thread
-static int thread_fn1(void *unused)
+/**
+*@function:kern_logger
+*
+*@description:This thread reads from the kfifo
+*       and prints to the kernel log when called
+*      	by the reader function.
+*
+*@param:none(void *unused)
+*
+*@return:(int)
+*/
+
+static int kern_logger(void *unused)
 {
 
 
-	printk(KERN_INFO "This is baby thread 2\n");
+	printk(KERN_INFO "This is kern logger thread\n");
 	printk(KERN_INFO "Thread2 Stopping\n");
 	do_exit(0);
 	return 0;
 }
 
+/**
+*@function:init_thread
+*
+*@description:This function creates the two threads
+*       kern_logger and writer.
+*       
+*
+*@param:none(void)
+*
+*@return:(int)
+*/
 
-// Module Initialization
 static int __init init_thread(void)
 {
-	printk(KERN_INFO "Creating Thread1\n");
+	printk(KERN_INFO "Creating Writer thread\n");
 	//Create the kernel thread with name 'mythread'
-	thread_st = kthread_run(thread_fn, NULL, "mythread");
+	thread_st = kthread_run(writer, NULL, "Writer");
 	if (thread_st)
 	{
-        printk("Thread1 Created successfully\n");
+        printk("Writer thread Created successfully\n");
 	}
     	else
 	{
-        printk(KERN_INFO "Thread creation failed\n");
+        printk(KERN_INFO "Writer thread creation failed\n");
 	}
 
 	printk(KERN_INFO "Creating Thread2\n");
 	//Create the kernel thread2 with name 'mythread'
-	thread_st1 = kthread_run(thread_fn1, NULL, "mythread2");
+	thread_st1 = kthread_run(kern_logger, NULL, "Kern_logger");
 	if (thread_st1)
         {
-        printk("Thread2 Created successfully\n");
+        printk("Kern logger Created successfully\n");
         }
 	else
 	{
-        printk(KERN_INFO "Thread creation failed\n");
+        printk(KERN_INFO "Kern logger thread creation failed\n");
         }
 
 	
     return 0;
 }
-// Module Exit
+
+
+/**
+*@function:cleanup_thread
+*
+*@description:This function is called during the 
+*       cleanup of the kernel module kthread.c
+*
+*
+*@param:none(void)
+*
+*@return:void
+*/
+
 static void __exit cleanup_thread(void)
 {
     printk(KERN_INFO "Cleaning Up\n");
