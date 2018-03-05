@@ -27,6 +27,7 @@
 #include <linux/timer.h>
 
 struct task_struct *task;
+struct task_struct *task1;
 struct task_struct *previous_task;
 struct task_struct *next_task;
 
@@ -48,6 +49,8 @@ static DEFINE_MUTEX(write_lock);
 /*This function declares a dynamically allocated FIFO*/
 static DECLARE_KFIFO(test, unsigned char,FIFO_SIZE);
 static DECLARE_KFIFO(test1,unsigned int,FIFO_SIZE);
+
+
 
 
 static int kern_logger(void *unused);
@@ -89,15 +92,25 @@ static int writer(void *unused)
 	 INIT_KFIFO(test);
 	 INIT_KFIFO(test1);    	
     	 printk(KERN_INFO "\n\n");
-
+	
   
+ previous_task= list_entry(task->tasks.prev, struct task_struct, tasks);
+  
+ next_task=list_entry(task->tasks.next, struct task_struct, tasks);
 
  
    
     
-    printk(KERN_INFO "This is writer thread \n");
-    printk(KERN_INFO "The name of the task is %s\n",(task->comm));
-    printk(KERN_INFO "The PID of the task is %d\n",(task->pid));
+printk(KERN_INFO "This is writer thread \n");
+printk(KERN_INFO "The name of the current task is %s\n",(task->comm));
+printk(KERN_INFO "The PID of the current task is %d\n",(task->pid));
+printk(KERN_INFO "The name of the previous task is %s\n",(previous_task->comm));
+printk(KERN_INFO "The PID of the previous task is %d\n",(previous_task->pid));
+printk(KERN_INFO "The name of the next task is %s\n",(next_task->comm));
+printk(KERN_INFO "The PID of the next task is %d\n",(next_task->pid));
+
+
+
     printk(KERN_INFO "Now let us put data into the fifo. \n");
     p=kfifo_put(&test, 'd');
     p=kfifo_put(&test, 'i');
