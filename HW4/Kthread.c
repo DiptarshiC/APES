@@ -1,3 +1,4 @@
+
 /**
 *@file: Kthread.c
 *
@@ -26,13 +27,18 @@
 #include <linux/kfifo.h>
 #include <linux/mutex.h>
 #include <linux/proc_fs.h>
+#include <linux/timer.h>
+
+struct task_struct *task;
 
 
-/* fifo size in elements (ints) */
+/*Create a timer of type list_timer*/
+static struct timer_list my_timer;
+
+/* fifo size in elements (ints)The fifo 
+	stores 3 elements of size integer */
 #define FIFO_SIZE	32
 
-/* name of the proc entry */
-#define	PROC_FIFO	"int-fifo"
 
 /* lock for procfs read access */
 static DEFINE_MUTEX(read_lock);
@@ -41,7 +47,13 @@ static DEFINE_MUTEX(read_lock);
 static DEFINE_MUTEX(write_lock);
 
 /*This function declares a dynamically allocated FIFO*/
-static DECLARE_KFIFO_PTR(test, int);
+static DECLARE_KFIFO(test, unsigned char,FIFO_SIZE);
+
+
+static int kern_logger(void *unused);
+static int writer(void *unused);
+
+
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("DIPTARSHI CHAKRABORTY");
@@ -66,12 +78,38 @@ static struct task_struct *thread_st1;
 
 static int writer(void *unused)
 {
-    
+    task=current;
+    unsigned char	buf[6];
+    unsigned char	i, j;
+    unsigned int	ret;
+    unsigned char 	p;	
+    unsigned char      *g;
+
+    	
+    	 printk(KERN_INFO "\n\n");
+	 printk(KERN_INFO "Now let us put data into the fifo. \n");
+	
+    for (i = 0; i != 10; i++)
+	{
+	p=kfifo_put(&test, i);
+printk(KERN_INFO "The number of processed elements in the kfifo is %d\n",p);
+	}
+
+   for (i = 0; i != 10; i++)
+        {
+        p=kfifo_get(&test, g);
+printk(KERN_INFO "The element in the kfifo is %d\n",(*g));
+
+        }
+
+ 
+   
     
     printk(KERN_INFO "This is writer thread \n");
-        
-    
+    printk(KERN_INFO "The name of the task is %s\n",(task->comm));
+    printk(KERN_INFO "The PID of the task is %d\n",(task->pid));
     printk(KERN_INFO "Writer thread stopping\n");
+    printk(KERN_INFO "\n\n");
     do_exit(0);
     return 0;
 }
@@ -92,9 +130,16 @@ static int writer(void *unused)
 static int kern_logger(void *unused)
 {
 
+	task=current;
+	printk(KERN_INFO "\n\n");
+	
+		
 
 	printk(KERN_INFO "This is kern logger thread\n");
+	printk(KERN_INFO "The name of the task is %s\n",(task->comm));
+	printk(KERN_INFO "The PID of the task is %d\n",(task->pid));
 	printk(KERN_INFO "kern logger thread Stopping\n");
+	printk(KERN_INFO "\n\n");
 	do_exit(0);
 	return 0;
 }
@@ -156,7 +201,10 @@ static int __init init_thread(void)
 
 static void __exit cleanup_thread(void)
 {
-    printk(KERN_INFO "Cleaning Up\n");
+	int ret;
+ 
+	ret = del_timer( &my_timer );
+    	printk(KERN_INFO "Cleaning Up\n");
 }
 
 module_init(init_thread);
