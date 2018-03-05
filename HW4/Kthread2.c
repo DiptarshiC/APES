@@ -49,9 +49,11 @@ static DEFINE_MUTEX(read_lock);
 /* lock for procfs write access */
 static DEFINE_MUTEX(write_lock);
 
-/*This function declares a dynamically allocated FIFO*/
+/*This function declares a statically allocated FIFO*/
 static DECLARE_KFIFO(test, unsigned char,FIFO_SIZE);
 static DECLARE_KFIFO(test1,unsigned int,FIFO_SIZE);
+static DECLARE_KFIFO(test2,unsigned long long ,FIFO_SIZE);
+
 
 
 
@@ -111,15 +113,15 @@ static int writer(void *unused)
 printk(KERN_INFO "This is writer thread \n");
 printk(KERN_INFO "The name of the current task is %s\n",(task->comm));
 printk(KERN_INFO "The PID of the current task is %d\n",(task->pid));
-printk(KERN_INFO "The vruntime of the current task is %llu\n",task->se.vruntime);
+
 
 printk(KERN_INFO "The name of the previous task is %s\n",(previous_task->comm));
 printk(KERN_INFO "The PID of the previous task is %d\n",(previous_task->pid));
-printk(KERN_INFO "The vruntime of the previous task is %llu\n",previous_task->se.vruntime);
+
 
 printk(KERN_INFO "The name of the next task is %s\n",(next_task->comm));
 printk(KERN_INFO "The PID of the next task is %d\n",(next_task->pid));
-printk(KERN_INFO "The vruntime of the next task is %llu\n",next_task->se.vruntime);
+
 
 
 
@@ -132,6 +134,9 @@ printk(KERN_INFO "The vruntime of the next task is %llu\n",next_task->se.vruntim
     p=kfifo_put(&test1, previous_task->pid);
     p=kfifo_put(&test1, next_task->pid);
    
+    p=kfifo_put(&test2, current->se.vruntime);
+    p=kfifo_put(&test2, previous_task->se.vruntime);
+    p=kfifo_put(&test2, next_task->se.vruntime);
 
 	
     printk(KERN_INFO "Writer thread stopping\n");
@@ -157,6 +162,7 @@ static int kern_logger(void *unused)
 {
 	unsigned char g[10];
 	unsigned int g1[10];
+	unsigned long long g2[10];
 	char p;
 	task=current;
 	printk(KERN_INFO "\n\n");
@@ -174,12 +180,21 @@ static int kern_logger(void *unused)
         printk(KERN_INFO "buf : %c\n",g[0]);
         p=kfifo_get(&test, g);
         printk(KERN_INFO "buf : %c\n",g[0]);
-	p=kfifo_get(&test1,g1);
- printk(KERN_INFO "The pid of the current task from buffer : %d\n",g1[0]);
- p=kfifo_get(&test1,g1);
- printk(KERN_INFO "The pid of the previous task from buffer : %d\n",g1[0]);
- p=kfifo_get(&test1,g1);
- printk(KERN_INFO "The pid of the next task from buffer : %d\n",g1[0]);
+
+p=kfifo_get(&test1,g1);
+printk(KERN_INFO "The pid of the current task from buffer : %d\n",g1[0]);
+p=kfifo_get(&test1,g1);
+printk(KERN_INFO "The pid of the previous task from buffer : %d\n",g1[0]);
+p=kfifo_get(&test1,g1);
+printk(KERN_INFO "The pid of the next task from buffer : %d\n",g1[0]);
+
+
+p=kfifo_get(&test2,g2);
+printk(KERN_INFO "The vruntime of the current task from buffer : %llu\n",g2[0]);
+p=kfifo_get(&test2,g2);
+printk(KERN_INFO "The vruntime of the previous task from buffer : %llu\n",g2[0]);
+p=kfifo_get(&test2,g2);
+printk(KERN_INFO "The vruntime of the next task from buffer : %llu\n",g2[0]);
 
 
 
