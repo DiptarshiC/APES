@@ -25,6 +25,9 @@
 #include <linux/mutex.h>
 #include <linux/proc_fs.h>
 #include <linux/timer.h>
+#include <linux/sched.h>
+
+
 
 struct task_struct *task;
 struct task_struct *task1;
@@ -88,6 +91,9 @@ static int writer(void *unused)
     unsigned char 	p;	
     unsigned char       g[10];
     unsigned char       g1;
+    u64			vc;
+    u64			vp;
+    u64			vn;
 
 	 INIT_KFIFO(test);
 	 INIT_KFIFO(test1);    	
@@ -98,16 +104,22 @@ static int writer(void *unused)
   
  next_task=list_entry(task->tasks.next, struct task_struct, tasks);
 
+/* vc=task->se.vruntime;
+ vp=previous_task->se.vruntime;   
+ vn=next_task->se.vruntime;*/  
  
-   
-    
 printk(KERN_INFO "This is writer thread \n");
 printk(KERN_INFO "The name of the current task is %s\n",(task->comm));
 printk(KERN_INFO "The PID of the current task is %d\n",(task->pid));
+printk(KERN_INFO "The vruntime of the current task is %llu\n",task->se.vruntime);
+
 printk(KERN_INFO "The name of the previous task is %s\n",(previous_task->comm));
 printk(KERN_INFO "The PID of the previous task is %d\n",(previous_task->pid));
+printk(KERN_INFO "The vruntime of the previous task is %llu\n",previous_task->se.vruntime);
+
 printk(KERN_INFO "The name of the next task is %s\n",(next_task->comm));
 printk(KERN_INFO "The PID of the next task is %d\n",(next_task->pid));
+printk(KERN_INFO "The vruntime of the next task is %llu\n",next_task->se.vruntime);
 
 
 
@@ -117,7 +129,8 @@ printk(KERN_INFO "The PID of the next task is %d\n",(next_task->pid));
     p=kfifo_put(&test, 'p');
    	
     p=kfifo_put(&test1, current->pid);
-    
+    p=kfifo_put(&test1, previous_task->pid);
+    p=kfifo_put(&test1, next_task->pid);
    
 
 	
@@ -162,7 +175,11 @@ static int kern_logger(void *unused)
         p=kfifo_get(&test, g);
         printk(KERN_INFO "buf : %c\n",g[0]);
 	p=kfifo_get(&test1,g1);
-	printk(KERN_INFO "The pid of the current task from buffer : %d\n",g1[0]);
+ printk(KERN_INFO "The pid of the current task from buffer : %d\n",g1[0]);
+ p=kfifo_get(&test1,g1);
+ printk(KERN_INFO "The pid of the previous task from buffer : %d\n",g1[0]);
+ p=kfifo_get(&test1,g1);
+ printk(KERN_INFO "The pid of the next task from buffer : %d\n",g1[0]);
 
 
 
