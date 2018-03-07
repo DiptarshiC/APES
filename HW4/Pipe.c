@@ -18,100 +18,125 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-//Structure of the data which is communicated between the parent and the child using pipes.
-typedef struct payload
+
+typedef struct DATA
 {
   char string[30];
   bool led_state;
-} payload_t;
+} DATA1;
 
-void errExit(char *);
+
 
 int main(void)
 {
-  pid_t Child_Pid = 0;
-  payload_t data;
+  pid_t Child = 0;
+  DATA1 data;
 
      /*File descriptor 1*/	
-  int parent_to_child[2];     
+  int fd1[2];     
    /*file descriptor 2*/
-  int child_to_parent[2];     
+  int fd2[2];     
 
 
 
-  if(pipe(parent_to_child) == -1)
-    errExit("pipe parent_to_child");
+  if(pipe(fd1) == -1)
+    perror("pipe parent_to_child");
 
-  if(pipe(child_to_parent) == -1)
-    errExit("pipe child_to_parent");
+  if(pipe(fd2) == -1)
+    perror("pipe child_to_parent");
 
   printf("Parent process is forking child process.\n");
 
-  switch (Child_Pid = fork())
+  switch (Child = fork())
   {
      case -1: 
-     errExit("fork");
+     perror("fork");
      break;
 
      case 0: 
      printf(" Child process has  Forked.\n");
-     if(close(child_to_parent[0]) == -1)      
-        errExit("close child_to_parent read");
+     if(close(fd2[0]) == -1)      
+        perror("couldnt close file properly");
 
-     if(close(parent_to_child[1]) == -1)     
-        errExit("close parent_to_child write");
+     if(close(fd1[1]) == -1)     
+        perror("couldnt close file properly\n");
      printf(" Handled pipe descriptors.\n");
 
-     if(read(parent_to_child[0], &data, sizeof(payload_t)) == -1)
-        errExit("read parent_to_child");
+     if((fd1[0], &data, sizeof(DATA1)) == -1)
+        perror("read parent_to_child");
 
-      printf(" the child has received string: \"%s\". Received LED State: %s.\n", data.string, data.led_state ? "true" : "false");
+      printf("the child has received string: %s\n", data.string);
+     if(data.led_state==true)
+        printf("The state of the led is true\n");
+      else if(data.led_state==false)
+        printf("The state of the led is false\n");
 
-      if(close(parent_to_child[0]) == -1)    
-        errExit("close parent_to_child read");
-      printf(" read end of parent_to_child closed.\n");
 
-      strcat(data.string, " World");
+
+      if(close(fd1[0]) == -1)    
+        perror("close parent_to_child read");
+      printf("parent_to_child closed. file descritptor closed\n");
+
+      strcat(data.string, "Hello Diptarshi");
       data.led_state = !data.led_state;
 
-      printf("This is child here.Piping modified string: \"%s\". Modified Received LED State: %s.\n", data.string, data.led_state ? "true" : "false");
-      if(write(child_to_parent[1], &data, sizeof(payload_t)) == -1)
-        errExit("write child_to_parent");
+      printf("This is child here.The string is %s \n", data.string);
+      if(data.led_state==true)
+	printf("The state of the led is true\n");
+      else if(data.led_state==false)
+	printf("The state of the led is false\n"); 
+	
 
-      if(close(child_to_parent[1]) == -1)        //close child_to_parent write
-        errExit("close child_to_parent write");
-      printf(" Piping successful. Closed write end of child_to_parent.\n");
+      if(write(fd2[1], &data, sizeof(DATA1)) == -1)
+        perror("write child_to_parent");
+
+      if(close(fd2[1]) == -1)      
+        perror("close child_to_parent write");
+      printf("  Closing write end of child_to_parent.\n");
 
       break;
 
     default: 
-      if(close(child_to_parent[1]) == -1)  /*close child_to_parent write*/
-        errExit("close child_to_parent write");
+      if(close(fd2[1]) == -1)  
+        perror("close child_to_parent write");
 
-      if(close(parent_to_child[0]) == -1)  /*close parent_to_child read*/
-        errExit("close parent_to_child read");
+      if(close(fd1[0]) == -1)
+        perror("close parent_to_child read");
       printf(" Handled pipe descriptors.\n");
 
-      strcpy(data.string, "Hello");
+      strcpy(data.string, "Hi again");
       data.led_state = false;
 
-      printf(" Piping string: \"%s\". LED State: %s.\n", data.string, data.led_state ? "true" : "false");
+      printf(" The string is: %s\n", data.string);
+      if(data.led_state==true)
+	{
+	printf("The state of the led is true\n");
+	}
+      else if(data.led_state==false)
+	{
+       printf("The state of the led is false\n");	
+        }
 
-      if(write(parent_to_child[1], &data, sizeof(payload_t)) == -1)
-        errExit("write parent_to_child");
+      if(write(fd1[1], &data, sizeof(DATA1)) == -1)
+        perror("write parent_to_child");
 
-      if(close(parent_to_child[1]) == -1)       
-        errExit("close parent_to_child write");
-      printf(" Piping successful. Closed write end of parent_to_child.\n");
+      if(close(fd1[1]) == -1)       
+        perror("close parent_to_child write");
+      printf(" successfully Closed write end of parent_to_child.\n");
 
-      if(read(child_to_parent[0], &data, sizeof(payload_t)) == -1)
-        errExit("read child_to_parent");
+      if(read(fd2[0], &data, sizeof(DATA1)) == -1)
+        perror("read child_to_parent");
 
-      printf(" Received string: \"%s\". Received LED State: %s.\n", data.string, data.led_state ? "true" : "false");
+      printf(" Received string: %s\n", data.string);
+      if(data.led_state==true)
+	printf("The state of the LED is true\n");
+      else(data.led_state==false);
+	printf("The state of the LED is false");
 
-      if(close(child_to_parent[0]) == -1)        
-        errExit("close child_to_parent read");
-      printf(" Piping successful. Closed read end of child_to_parent.\n");
+
+      if(close(fd2[0]) == -1)        
+        perror("close child_to_parent read");
+      printf("Closed read end of child_to_parent.\n");
 
       break;
   }
@@ -121,11 +146,7 @@ int main(void)
 }
 
 
-void errExit(char *strError)
-{
-  perror(strError);
-  exit(EXIT_FAILURE);
-}	
+	
 	
 
 
