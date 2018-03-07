@@ -40,10 +40,10 @@ int main(void)
 
 
   if(pipe(fd1) == -1)
-    perror("pipe parent_to_child");
+    perror(" parent to child pipe");
 
   if(pipe(fd2) == -1)
-    perror("pipe child_to_parent");
+    perror("child to parent pipe");
 
   printf("Parent process is forking child process.\n");
 
@@ -63,7 +63,7 @@ int main(void)
      printf(" Handled pipe descriptors.\n");
 
      if((fd1[0], &data, sizeof(DATA1)) == -1)
-        perror("read parent_to_child");
+        perror("read from parent to child");
 
       printf("the child has received string: %s\n", data.string);
      if(data.led_state==true)
@@ -75,7 +75,7 @@ int main(void)
 
       if(close(fd1[0]) == -1)    
         perror("close parent_to_child read");
-      printf("parent_to_child closed. file descritptor closed\n");
+      printf("parent to child closed.\n");
 
       strcat(data.string, "Hello Diptarshi");
       data.led_state = !data.led_state;
