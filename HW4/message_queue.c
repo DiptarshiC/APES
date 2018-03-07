@@ -1,8 +1,8 @@
 /** 
-*@file: Pipe.c 
+*@file: message_queue.c 
 * 
 *@Description:Use the pipe IPC to create 
-* a pipe to communicate between a parent
+* a message queue to communicate between a parent
 * and a child  
 * 
 *@Author : Diptarshi Chakraborty 
