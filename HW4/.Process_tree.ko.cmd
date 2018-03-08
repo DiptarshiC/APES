@@ -1,0 +1,1 @@
+cmd_/home/APES/HW4/Process_tree.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -T ./arch/arm/kernel/module.lds -o /home/APES/HW4/Process_tree.ko /home/APES/HW4/Process_tree.o /home/APES/HW4/Process_tree.mod.o ;  true

@@ -1,5 +1,6 @@
 #Makefile for process tree
-obj-m +=   Kthread2.o Process_tree.o
+obj-m +=   Kthread2.o Process_tree.o Sample.o Sample1.o
+
 
 all:
 

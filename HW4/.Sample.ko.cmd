@@ -1,0 +1,1 @@
+cmd_/home/APES/HW4/Sample.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -T ./arch/arm/kernel/module.lds -o /home/APES/HW4/Sample.ko /home/APES/HW4/Sample.o /home/APES/HW4/Sample.mod.o ;  true

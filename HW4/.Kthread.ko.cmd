@@ -1,0 +1,1 @@
+cmd_/home/APES/HW4/Kthread.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -T ./arch/arm/kernel/module.lds -o /home/APES/HW4/Kthread.ko /home/APES/HW4/Kthread.o /home/APES/HW4/Kthread.mod.o ;  true
