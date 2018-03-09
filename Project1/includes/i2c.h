@@ -24,12 +24,12 @@
 * Given an address it will read from the 
 *       address
 *
-* @param uint8_t address : address of the register to read from
-*              
+* @param  uint8_t address : address of the register to read from
+*               uint8_t buf[] to store values that are read   
 *
-* @return uint8_t *
+* @return void
 */
-uint8_t * i2c_read(uint8_t address);
+void  i2c_read(uint8_t address,uint8_t buf[]);
 
 
 /**
