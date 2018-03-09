@@ -19,10 +19,10 @@
 /**
 * @function i2c_read
 *
-* @brief writes into an i2c register
+* @brief reads from an i2c register
 *
-* Given an address and a pointer to that address,
-*       it writes to the address
+* Given an address it will read from the 
+*       address
 *
 * @param uint8_t address : address of the register to read from
 *              
@@ -48,11 +48,6 @@ uint8_t * i2c_read(uint8_t address);
 */
 
 void i2c_write(uint8_t address, uint8_t *data);
-
-
-
-
-
 
 
 #endif /*__I2C_H__ */
