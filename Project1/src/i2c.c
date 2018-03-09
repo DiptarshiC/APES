@@ -12,9 +12,19 @@
 
 
 #include <stdint.h>
-#include <../includes/i2c.h>
-#include <<linux/i2c-dev.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <assert.h>
+#include <sys/types.h>
+#include "../includes/i2c.h"
+#include <linux/i2c-dev.h>
+#include <error.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+ 
 /**
 * @function i2c_read
 *
@@ -24,13 +34,13 @@
 *       address
 *
 * @param uint8_t address : address of the register to read from
-*              
+*              	uint8_t buf[] to store values that are read 
 *
-* @return uint8_t *
+* @return void
 */
-uint8_t * i2c_read(uint8_t address)
+void  i2c_read(uint8_t address,uint8_t buf[])
 {
-/*In both i2c read and i2c write operations
+/*	In both i2c read and i2c write operations
 	
 	the first step is the initialization 
 	
@@ -41,8 +51,49 @@ uint8_t * i2c_read(uint8_t address)
 	with the code below
 	
 Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-interface
-				*/	
+*/
 
+	int file;
+	int adapter_nr = 2; /* probably dynamically determined */
+	char filename[20];
+	
+  
+	snprintf(filename, 19, "/dev/i2c-2", adapter_nr);
+	file = open(filename, O_RDWR);
+	if (file < 0) 
+	{
+		perror("Error in opening the file\n");
+    		exit(1);
+  	}
+/*
+	After we have opened the device, 
+	
+	we must specify with what device
+
+	address we want to communicate:
+		
+*/
+	
+
+	if (ioctl(file, I2C_SLAVE, address) < 0) 
+	{
+ 	perror("Could not open the file\n");
+	exit(1);
+  	}
+
+	/* Using I2C Read*/
+	if (read(file,buf,2) != 2) 
+	{
+        /*ERROR HANDLING: i2c transaction failed */
+	perror("Failed to read from the i2c bus.\n");
+	}
+	
+	if(close(file)<0)
+	{
+	perror("Error in closing file.\n");	
+	}
+	
+	
 }
 
 /**
@@ -67,9 +118,40 @@ void i2c_write(uint8_t address, uint8_t *data)
 
 
 }
+void main()
+{
 
 
+	
+	
+	while(1)
+	{
+      
+	uint8_t buf[2]={0};
+	i2c_read(0x48,buf);
+	int temp;
+	uint8_t MSB=0;
+	uint8_t LSB=0;
+	
+	MSB=buf[0];
+	LSB=buf[1];
+	
+	
+	float f, c;
 
+       /* Convert 12bit int using two's compliment */
+       /* Credit: http://bildr.org/2011/01/tmp102-arduino/ */
+       temp = ((MSB << 8) | LSB) >> 4;
+
+       c = temp*0.0625;
+       f = (1.8 * c) + 32;
+
+       printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
+
+	sleep(1);
+	}
+	
+}
 	
 	
 
