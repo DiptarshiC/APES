@@ -30,6 +30,18 @@
 */
 uint8_t * i2c_read(uint8_t address)
 {
+/*In both i2c read and i2c write operations
+	
+	the first step is the initialization 
+	
+	of the i2c bus for read and write.
+	
+	The initialization of the i2c bus is done
+
+	with the code below
+	
+Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-interface
+				*/	
 
 }
 
