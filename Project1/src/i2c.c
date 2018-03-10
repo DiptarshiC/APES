@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <pthread.h>
  
 /**
 * @function i2c_read
@@ -111,19 +112,60 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 * @return void.
 */
 
-void i2c_write(uint8_t address, uint8_t *data)
+void i2c_write(uint8_t address, uint8_t data)
 {
 
+/*	In both i2c read and i2c write operations
+	
+	the first step is the initialization 
+	
+	of the i2c bus for read and write.
+	
+	The initialization of the i2c bus is done
+	with the code below
+	
+Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-interface
+*/
 
+	int file;
+	int adapter_nr = 2; /* probably dynamically determined */
+	char filename[20];
+	
+  
+	snprintf(filename, 19, "/dev/i2c-2", adapter_nr);
+	file = open(filename, O_RDWR);
+	if (file < 0) 
+	{
+		perror("Error in opening the file\n");
+    		exit(1);
+  	}
+/*
+	After we have opened the device, 
+	
+	we must specify with what device
+	address we want to communicate:
+		
+*/
+	
+
+	if (ioctl(file, I2C_SLAVE, address) < 0) 
+	{
+ 	perror("Could not open the file\n");
+	exit(1);
+  	}
+
+	if (write(file, data, 1) != 1) 
+	{
+        /*ERROR HANDLING: i2c transaction failed */
+        perror("write failed\n");
+        return FAILURE;
+	}
 
 
 }
 void main()
 {
 
-
-	
-	
 	while(1)
 	{
       

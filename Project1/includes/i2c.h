@@ -40,14 +40,14 @@ void  i2c_read(uint8_t address,uint8_t buf[]);
 * Given an address and a pointer to that address,
 * 	it writes to the address
 *
-* @param __user data Pointer to a data item fro
+* @param __user data  to a data item fro
 *		user space
 * @param value value to write to the location
 *
 * @return void.
 */
 
-void i2c_write(uint8_t address, uint8_t *data);
+void i2c_write(uint8_t address, uint8_t data);
 
 
 #endif /*__I2C_H__ */
