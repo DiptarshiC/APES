@@ -18,13 +18,14 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <sys/types.h>
-#include "../includes/i2c.h"
 #include <linux/i2c-dev.h>
 #include <error.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "../includes/i2c.h"
+
  
 /**
 * @function i2c_read
@@ -164,7 +165,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 
 
 }
-
+/*
 void main()
 {
 
@@ -183,8 +184,8 @@ void main()
 	
 	float f, c;
 
-       /* Convert 12bit int using two's compliment */
-       /* Credit: http://bildr.org/2011/01/tmp102-arduino/ */
+       /* Convert 12bit int using two's compliment 
+       /* Credit: http://bildr.org/2011/01/tmp102-arduino/ 
        temp = ((MSB << 8) | LSB) >> 4;
 
        c = temp*0.0625;
@@ -196,7 +197,7 @@ void main()
 	}
 	
 }
-	
+*/	
 	
 
 

@@ -14,7 +14,7 @@
 #define __I2C_H__
 
 
-
+#include <stdint.h>
 
 /**
 * @function i2c_read

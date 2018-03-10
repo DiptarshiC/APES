@@ -10,12 +10,13 @@
 *@Author:Diptarshi Chakraborty and Connor Shapiro
 */
 
-#include "../includes/i2c.h"
-#include "../includes/temp.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "../includes/i2c.h"
+#include "../includes/temp.h"
 
 
 
@@ -91,12 +92,12 @@ temperature_e_t write_thi_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint8_t *data)
+temperature_e_t read_temperature_reg (uint8_t data)
 {
 
-	 data = (uint8_t*)malloc(2*sizeof(uint8_t));	
-	*data=(POINTER_REG|TEMP_REG_ADDR);
-	i2c_read( DEV_ADDR,data);
+	 	
+	data=(POINTER_REG|TEMP_REG_ADDR);
+	i2c_read( DEV_ADDR,&data);
 }
 
 
@@ -112,11 +113,11 @@ temperature_e_t read_temperature_reg (uint8_t *data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint8_t *data)
+temperature_e_t read_config_reg (uint8_t data)
 {
-	 data = (uint8_t*)malloc(2*sizeof(uint8_t));	
-        *data=(POINTER_REG| CONF_REG_ADDR);
-        i2c_read( DEV_ADDR,data);
+	 	
+        data=(POINTER_REG| CONF_REG_ADDR);
+        i2c_read( DEV_ADDR,&data);
 }
 /**
 * @function tlow_config_reg
@@ -130,12 +131,12 @@ temperature_e_t read_config_reg (uint8_t *data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_tlow_reg (uint8_t *data)
+temperature_e_t read_tlow_reg (uint8_t data)
 {
 
-	 data = (uint8_t*)malloc(2*sizeof(uint8_t));
-	*data=(POINTER_REG|TLOW_REG_ADDR) ;
-        i2c_read( DEV_ADDR,data);
+	 
+	data=(POINTER_REG|TLOW_REG_ADDR) ;
+        i2c_read( DEV_ADDR,&data);
 
 }
 
@@ -151,25 +152,15 @@ temperature_e_t read_tlow_reg (uint8_t *data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint8_t *data)
+temperature_e_t read_thi_reg (uint8_t data)
 {
 	
-	 data = (uint8_t*)malloc(2*sizeof(uint8_t));
-	*data=(POINTER_REG| THIGH_REG_ADDR) ;
-        i2c_read( DEV_ADDR,data);	
+	  
+	data=(POINTER_REG| THIGH_REG_ADDR) ;
+        i2c_read( DEV_ADDR,&data);	
 
 }
-/**
-* @function read_thi_reg
-*
-* @brief reads from the thi reg
-*
-* @param  uint8_t data:pointer to store data
-*
-* @return temperature_e_t
-*/
 
-temperature_e_t read_thi_reg (uint8_t *data);
 
 /**
 * @function timeout
@@ -189,30 +180,34 @@ temperature_e_t timeout (void);
 void main()
 {
 
+	uint8_t MSB=0;
+	uint8_t LSB=0;
+	uint8_t *msb=NULL;
+	uint8_t *lsb=NULL;
+	uint8_t temp=0;
+	float f=0;
+	float c=0;
+	uint8_t  buf;
 	while(1)
 	{
       
-	uint8_t *buf;
-	read_temperature_reg(0x48,buf);
-	int temp;
-	uint8_t MSB=0;
-	uint8_t LSB=0;
 	
-	MSB=*(buf);
-	LSB=*(buf+1);;
+	read_temperature_reg(buf);
 	
+	msb=&(buf);
+	lsb=msb+1;
 	
-	float f, c;
+	MSB=*msb;
+	LSB=*lsb;
 
        /* Convert 12bit int using two's compliment */
-       /* Credit: http://bildr.org/2011/01/tmp102-arduino/ */
+       /* Credit: http://bildr.org/2011/01/tmp102-arduino */
        temp = ((MSB << 8) | LSB) >> 4;
 
        c = temp*0.0625;
        f = (1.8 * c) + 32;
 
-       printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
-
+       	printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
 	sleep(1);
 	}
 
