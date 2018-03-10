@@ -13,7 +13,16 @@
 #ifndef __TEMP_H__
 #define __TEMP_H__
 
-#include <stdint.h>
+
+
+#define POINTER_REG 	0x00
+#define DEV_ADDR 	0x48
+#define TEMP_REG_ADDR 	0x00
+#define CONF_REG_ADDR 	0x01
+#define TLOW_REG_ADDR 	0x02
+#define THIGH_REG_ADDR 	0x03
+
+
 
 
 /**
@@ -28,8 +37,8 @@
 typedef enum
 {
 
-	TEMP_NO_ERR;
-	TEMP_BAD_PARAM;
+	TEMP_NO_ERR,
+	TEMP_BAD_PARAM
 
 
 }temperature_e_t;
@@ -107,7 +116,7 @@ temperature_e_t write_thi_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint16_t *data);
+temperature_e_t read_temperature_reg (uint8_t *data);
 
 
 /**
@@ -122,7 +131,7 @@ temperature_e_t read_temperature_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint16_t *data);
+temperature_e_t read_config_reg (uint8_t *data);
 
 
 /**
@@ -137,7 +146,7 @@ temperature_e_t read_config_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_tlow_reg (uint16_t *data);
+temperature_e_t read_tlow_reg (uint8_t *data);
 
 /**
 * @function read_thi_reg
@@ -151,7 +160,7 @@ temperature_e_t read_tlow_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint16_t *data);
+temperature_e_t read_thi_reg (uint8_t *data);
 
 /**
 * @function read_thi_reg
@@ -163,7 +172,7 @@ temperature_e_t read_thi_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint16_t *data);
+temperature_e_t read_thi_reg (uint8_t *data);
 
 /**
 * @function timeout

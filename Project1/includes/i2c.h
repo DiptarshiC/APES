@@ -13,7 +13,7 @@
 #ifndef __I2C_H__
 #define __I2C_H__
 
-#include <stdint.h>
+
 
 
 /**
@@ -29,7 +29,7 @@
 *
 * @return void
 */
-void  i2c_read(uint8_t address,uint8_t buf[]);
+void  i2c_read(uint8_t address,uint8_t* buf);
 
 
 /**
@@ -47,7 +47,7 @@ void  i2c_read(uint8_t address,uint8_t buf[]);
 * @return void.
 */
 
-void i2c_write(uint8_t address, uint8_t data);
+void i2c_write(uint8_t address, uint8_t *data);
 
 
 #endif /*__I2C_H__ */

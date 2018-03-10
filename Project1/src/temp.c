@@ -11,17 +11,13 @@
 */
 
 #include "../includes/i2c.h"
+#include "../includes/temp.h"
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 
-/**
-*@brief temperature_e_t is a specialized
-*	enum that is used to return
-*	error codes for the 
-*	temperature functions that 
-*	are declared in this file.
-*
-*/
 
 /**
 * @function write_ptr_reg
@@ -95,7 +91,13 @@ temperature_e_t write_thi_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint16_t *data);
+temperature_e_t read_temperature_reg (uint8_t *data)
+{
+
+	 data = (uint8_t*)malloc(2*sizeof(uint8_t));	
+	*data=(POINTER_REG|TEMP_REG_ADDR);
+	i2c_read( DEV_ADDR,data);
+}
 
 
 /**
@@ -110,9 +112,12 @@ temperature_e_t read_temperature_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint16_t *data);
-
-
+temperature_e_t read_config_reg (uint8_t *data)
+{
+	 data = (uint8_t*)malloc(2*sizeof(uint8_t));	
+        *data=(POINTER_REG| CONF_REG_ADDR);
+        i2c_read( DEV_ADDR,data);
+}
 /**
 * @function tlow_config_reg
 *
@@ -125,7 +130,14 @@ temperature_e_t read_config_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_tlow_reg (uint16_t *data);
+temperature_e_t read_tlow_reg (uint8_t *data)
+{
+
+	 data = (uint8_t*)malloc(2*sizeof(uint8_t));
+	*data=(POINTER_REG|TLOW_REG_ADDR) ;
+        i2c_read( DEV_ADDR,data);
+
+}
 
 /**
 * @function read_thi_reg
@@ -139,8 +151,14 @@ temperature_e_t read_tlow_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint16_t *data);
+temperature_e_t read_thi_reg (uint8_t *data)
+{
+	
+	 data = (uint8_t*)malloc(2*sizeof(uint8_t));
+	*data=(POINTER_REG| THIGH_REG_ADDR) ;
+        i2c_read( DEV_ADDR,data);	
 
+}
 /**
 * @function read_thi_reg
 *
@@ -151,7 +169,7 @@ temperature_e_t read_thi_reg (uint16_t *data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint16_t *data);
+temperature_e_t read_thi_reg (uint8_t *data);
 
 /**
 * @function timeout
@@ -168,3 +186,35 @@ temperature_e_t read_thi_reg (uint16_t *data);
 
 temperature_e_t timeout (void);
 
+void main()
+{
+
+	while(1)
+	{
+      
+	uint8_t *buf;
+	read_temperature_reg(0x48,buf);
+	int temp;
+	uint8_t MSB=0;
+	uint8_t LSB=0;
+	
+	MSB=*(buf);
+	LSB=*(buf+1);;
+	
+	
+	float f, c;
+
+       /* Convert 12bit int using two's compliment */
+       /* Credit: http://bildr.org/2011/01/tmp102-arduino/ */
+       temp = ((MSB << 8) | LSB) >> 4;
+
+       c = temp*0.0625;
+       f = (1.8 * c) + 32;
+
+       printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
+
+	sleep(1);
+	}
+
+
+}

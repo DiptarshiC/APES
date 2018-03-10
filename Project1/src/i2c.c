@@ -39,7 +39,8 @@
 *
 * @return void
 */
-void  i2c_read(uint8_t address,uint8_t buf[])
+
+void  i2c_read(uint8_t address,uint8_t * buf)
 {
 /*	In both i2c read and i2c write operations
 	
@@ -112,7 +113,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 * @return void.
 */
 
-void i2c_write(uint8_t address, uint8_t data)
+void i2c_write(uint8_t address, uint8_t *data)
 {
 
 /*	In both i2c read and i2c write operations
@@ -158,25 +159,26 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 	{
         /*ERROR HANDLING: i2c transaction failed */
         perror("write failed\n");
-        return FAILURE;
+ 
 	}
 
 
 }
+
 void main()
 {
 
 	while(1)
 	{
       
-	uint8_t buf[2]={0};
+	uint8_t *buf=(uint8_t*)malloc(2*sizeof(uint8_t));
 	i2c_read(0x48,buf);
 	int temp;
 	uint8_t MSB=0;
 	uint8_t LSB=0;
 	
-	MSB=buf[0];
-	LSB=buf[1];
+	MSB=*(buf);
+	LSB=*(buf+1);
 	
 	
 	float f, c;
