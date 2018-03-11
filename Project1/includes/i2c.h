@@ -29,7 +29,7 @@
 *
 * @return void
 */
-void  i2c_read(uint8_t address,uint16_t* buf);
+void  i2c_read(uint8_t address,uint8_t* buf);
 
 /**
 * @function i2c_read_word
@@ -45,7 +45,7 @@ void  i2c_read(uint8_t address,uint16_t* buf);
 *
 * @return void.
 */
-void i2c_read_word(uint8_t address, uint32_t *data);
+void i2c_read_word(uint8_t address, uint8_t *data);
 
 
 
@@ -64,7 +64,7 @@ void i2c_read_word(uint8_t address, uint32_t *data);
 *
 * @return void.
 */
-void i2c_write(uint8_t address, uint16_t *data);
+void i2c_write(uint8_t address, uint8_t *data);
 
 /**
 * @function i2c_write_word
@@ -81,7 +81,7 @@ void i2c_write(uint8_t address, uint16_t *data);
 * @return void.
 */
 
-void i2c_write_word(uint8_t address, uint32_t *data);
+void i2c_write_word(uint8_t address, uint8_t *data);
 
 
 

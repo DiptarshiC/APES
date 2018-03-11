@@ -50,9 +50,15 @@ temperature_e_t write_ptr_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_conf_reg (uint16_t data);
+temperature_e_t write_conf_reg (uint8_t data)
+{
 
+	unsigned char DATA[2];
+	DATA[0]=(POINTER_REG| CONF_REG_ADDR);
+	DATA[1]=data;
+        i2c_write_word( DEV_ADDR,&DATA[0]);
 
+}
 /**
 * @function write_tlow_reg
 *
@@ -64,9 +70,15 @@ temperature_e_t write_conf_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_tlow_reg (uint16_t data);
+temperature_e_t write_tlow_reg (uint16_t data)
+{
+	unsigned char DATA[3];
+        DATA[0]=(POINTER_REG| TLOW_REG_ADDR);
+        DATA[1]=data%0x100;
+	DATA[2]=data/0x100;
+        i2c_write_word( DEV_ADDR,&DATA[0]);
 
-
+}
 /**
 * @function write_thi_reg
 *
@@ -79,7 +91,15 @@ temperature_e_t write_tlow_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_thi_reg (uint16_t data);
+temperature_e_t write_thi_reg (uint16_t data)
+{
+	unsigned char DATA[3];
+        DATA[0]=(POINTER_REG| THIGH_REG_ADDR);
+        DATA[1]=data%0x100;
+        DATA[2]=data/0x100;
+        i2c_write_word( DEV_ADDR,&DATA[0]);
+
+}
 
 /**
 * @function read_temperature_reg
@@ -92,11 +112,14 @@ temperature_e_t write_thi_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint16_t* data)
+temperature_e_t read_temperature_reg (uint8_t* data)
 {
 
-	 	
-	*data=(POINTER_REG|TEMP_REG_ADDR);
+	
+		
+	data[0]=(POINTER_REG|TEMP_REG_ADDR);
+	data[1]=0;
+	
 	i2c_read( DEV_ADDR,data);
 }
 
@@ -113,7 +136,7 @@ temperature_e_t read_temperature_reg (uint16_t* data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint16_t* data)
+temperature_e_t read_config_reg (uint8_t* data)
 {
 	 	
         *data=(POINTER_REG| CONF_REG_ADDR);
@@ -185,16 +208,17 @@ void main()
 	uint8_t temp=0;
 	float f=0;
 	float c=0;
-	uint16_t buf;
+	
 
 	while(1)
 	{
       
 	
-	read_temperature_reg(&msb[0]);
+	read_temperature_reg(msb);
 	
 	//msb[0]=(buf)%100;
 	//msb[1]=(buf)/100;
+	
 	
 	MSB=msb[0];
 	LSB=msb[1];

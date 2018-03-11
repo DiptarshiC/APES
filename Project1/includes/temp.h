@@ -74,7 +74,7 @@ temperature_e_t write_ptr_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_conf_reg (uint16_t data);
+temperature_e_t write_conf_reg (uint8_t data);
 
 
 /**
@@ -116,7 +116,7 @@ temperature_e_t write_thi_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint16_t* data);
+temperature_e_t read_temperature_reg (uint8_t* data);
 
 
 /**
@@ -131,7 +131,7 @@ temperature_e_t read_temperature_reg (uint16_t* data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint16_t* data);
+temperature_e_t read_config_reg (uint8_t* data);
 
 
 /**
