@@ -18,7 +18,9 @@
 #include "../includes/i2c.h"
 #include "../includes/temp.h"
 
-
+uint8_t msb1[];
+uint8_t LSB;
+uint8_t MSB;
 
 /**
 * @function write_ptr_reg
@@ -53,7 +55,7 @@ temperature_e_t write_ptr_reg (uint8_t data);
 temperature_e_t write_conf_reg (uint8_t data)
 {
 
-	unsigned char DATA[2];
+	unsigned DATA[2];
 	DATA[0]=(POINTER_REG| CONF_REG_ADDR);
 	DATA[1]=data;
         i2c_write_word( DEV_ADDR,&DATA[0]);
@@ -116,7 +118,7 @@ temperature_e_t read_temperature_reg (uint8_t* data)
 {
 
 	
-		
+	data=(uint8_t*)malloc(2*sizeof(uint8_t));	
 	data[0]=(POINTER_REG|TEMP_REG_ADDR);
 	data[1]=0;
 	
@@ -203,25 +205,24 @@ temperature_e_t timeout (void);
 void main()
 {
 
-	uint8_t msb[2]={0};
-	uint8_t MSB,LSB;
-	uint8_t temp=0;
+	
+	MSB=0,
+	LSB=0;
+	int temp=0;
 	float f=0;
 	float c=0;
 	
-
+	//msb1=(uint8_t*)malloc(2*sizeof(uint8_t));
+	
 	while(1)
 	{
       
 	
-	read_temperature_reg(msb);
-	
-	//msb[0]=(buf)%100;
-	//msb[1]=(buf)/100;
+	read_temperature_reg(&msb1[0]);
 	
 	
-	MSB=msb[0];
-	LSB=msb[1];
+	MSB=msb1[0];
+	LSB=msb1[1];
 
        /* Convert 12bit int using two's compliment */
        /* Credit: http://bildr.org/2011/01/tmp102-arduino */

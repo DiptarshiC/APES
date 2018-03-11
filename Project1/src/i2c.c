@@ -155,7 +155,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
   	}
 
 	/* Using I2C Read*/
-	if (read(file,buf,3) != 3) 
+	if (read(file,buf,2) != 2) 
 	{
         /*ERROR HANDLING: i2c transaction failed */
 	perror("Failed to read from the i2c bus.\n");
