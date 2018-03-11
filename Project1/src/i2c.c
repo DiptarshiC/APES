@@ -113,7 +113,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 * @return void
 */
 
-void  i2c_read_word(uint8_t address,uint16_t * buf)
+void  i2c_read_word(uint8_t address,uint32_t * buf)
 {
 /*	In both i2c read and i2c write operations
 	
