@@ -41,7 +41,7 @@
 * @return void
 */
 
-void  i2c_read(uint8_t address,uint8_t * buf)
+void  i2c_read(uint8_t address,uint16_t * buf)
 {
 /*	In both i2c read and i2c write operations
 	
@@ -100,6 +100,78 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 }
 
 /**
+* @function i2c_read_word
+*
+* @brief reads from an i2c register
+*
+* Given an address it will read from the 
+*       address
+*
+* @param uint8_t address : address of the register to read from
+*              	uint8_t buf[] to store values that are read 
+*
+* @return void
+*/
+
+void  i2c_read_word(uint8_t address,uint16_t * buf)
+{
+/*	In both i2c read and i2c write operations
+	
+	the first step is the initialization 
+	
+	of the i2c bus for read and write.
+	
+	The initialization of the i2c bus is done
+	with the code below
+	
+Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-interface
+*/
+
+	int file;
+	int adapter_nr = 2; /* probably dynamically determined */
+	char filename[20];
+	
+  
+	snprintf(filename, 19, "/dev/i2c-2", adapter_nr);
+	file = open(filename, O_RDWR);
+	if (file < 0) 
+	{
+		perror("Error in opening the file\n");
+    		exit(1);
+  	}
+/*
+	After we have opened the device, 
+	
+	we must specify with what device
+	address we want to communicate:
+		
+*/
+	
+
+	if (ioctl(file, I2C_SLAVE, address) < 0) 
+	{
+ 	perror("Could not open the file\n");
+	exit(1);
+  	}
+
+	/* Using I2C Read*/
+	if (read(file,buf,3) != 3) 
+	{
+        /*ERROR HANDLING: i2c transaction failed */
+	perror("Failed to read from the i2c bus.\n");
+	}
+	
+	if(close(file)<0)
+	{
+	perror("Error in closing file.\n");	
+	}
+	
+	
+}
+
+
+
+/**
 * @function i2c_write
 *
 * @brief writes into an i2c register
@@ -114,7 +186,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 * @return void.
 */
 
-void i2c_write(uint8_t address, uint8_t *data)
+void i2c_write(uint8_t address, uint16_t *data)
 {
 
 /*	In both i2c read and i2c write operations
@@ -156,7 +228,80 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 	exit(1);
   	}
 
-	if (write(file, data, 1) != 1) 
+	if (write(file, data, 2) != 2) 
+	{
+        /*ERROR HANDLING: i2c transaction failed */
+        perror("write failed\n");
+ 
+	}
+
+	 if(close(file)<0)
+        {
+        perror("Error in closing file.\n");
+        }
+
+
+
+}
+
+/**
+* @function i2c_write_word
+*
+* @brief writes into an i2c register
+*
+* Given an address and a pointer to that address,
+* 	it writes to the address
+*
+* @param __user data Pointer to a data item fro
+*		user space
+* @param value value to write to the location
+*
+* @return void.
+*/
+
+void i2c_write_word(uint8_t address, uint32_t *data)
+{
+
+/*	In both i2c read and i2c write operations
+	
+	the first step is the initialization 
+	
+	of the i2c bus for read and write.
+	
+	The initialization of the i2c bus is done
+	with the code below
+	
+Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-interface
+*/
+
+	int file;
+	int adapter_nr = 2; /* probably dynamically determined */
+	char filename[20];
+	
+  
+	snprintf(filename, 19, "/dev/i2c-2", adapter_nr);
+	file = open(filename, O_RDWR);
+	if (file < 0) 
+	{
+		perror("Error in opening the file\n");
+    		exit(1);
+  	}
+/*
+	After we have opened the device, 
+	
+	we must specify with what device
+	address we want to communicate:
+		
+*/
+	
+
+	if (ioctl(file, I2C_SLAVE, address) < 0) 
+	{
+ 	perror("Could not open the file\n");
+	exit(1);
+  	}
+
+	if (write(file, data, 3) != 3) 
 	{
         /*ERROR HANDLING: i2c transaction failed */
         perror("write failed\n");
@@ -165,6 +310,8 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 
 
 }
+
+
 /*
 void main()
 {

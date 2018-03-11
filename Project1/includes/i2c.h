@@ -29,7 +29,25 @@
 *
 * @return void
 */
-void  i2c_read(uint8_t address,uint8_t* buf);
+void  i2c_read(uint8_t address,uint16_t* buf);
+
+/**
+* @function i2c_read_word
+*
+* @brief writes into an i2c register
+*
+* Given an address and a pointer to that address,
+*       it writes to the address
+*
+* @param __user data  to a data item fro
+*               user space
+* @param value value to write to the location
+*
+* @return void.
+*/
+void i2c_read_word(uint8_t address, uint32_t *data);
+
+
 
 
 /**
@@ -46,8 +64,27 @@ void  i2c_read(uint8_t address,uint8_t* buf);
 *
 * @return void.
 */
+void i2c_write(uint8_t address, uint16_t *data);
 
-void i2c_write(uint8_t address, uint8_t *data);
+/**
+* @function i2c_write_word
+*
+* @brief writes word into an i2c register
+*
+* Given an address and a pointer to that address,
+*       it writes to the address
+*
+* @param __user data  to a data item fro
+*               user space
+* @param value value to write to the location
+*
+* @return void.
+*/
+
+void i2c_write_word(uint8_t address, uint32_t *data);
+
+
+
 
 
 #endif /*__I2C_H__ */

@@ -116,7 +116,7 @@ temperature_e_t write_thi_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint8_t data);
+temperature_e_t read_temperature_reg (uint16_t* data);
 
 
 /**
@@ -131,7 +131,7 @@ temperature_e_t read_temperature_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint8_t data);
+temperature_e_t read_config_reg (uint16_t* data);
 
 
 /**
@@ -146,7 +146,7 @@ temperature_e_t read_config_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_tlow_reg (uint8_t data);
+temperature_e_t read_tlow_reg (uint16_t* data);
 
 /**
 * @function read_thi_reg
@@ -160,7 +160,7 @@ temperature_e_t read_tlow_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint8_t data);
+temperature_e_t read_thi_reg (uint16_t* data);
 
 /**
 * @function read_thi_reg
@@ -172,7 +172,7 @@ temperature_e_t read_thi_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint8_t data);
+temperature_e_t read_thi_reg (uint16_t* data);
 
 /**
 * @function timeout
