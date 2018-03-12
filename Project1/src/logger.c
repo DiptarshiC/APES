@@ -24,6 +24,8 @@
 #define FAILURE         -1
 #define SUCCESS         0
 #define TIME_STR_SIZE   9
+#define PRIORITY_LOWEST 0
+#define PRIORITY_TWO    2
 
 typedef enum                // Error enum for the logger thread
 {
@@ -31,6 +33,33 @@ typedef enum                // Error enum for the logger thread
 } log_e_t;
 
 FILE * gp_log_file;
+
+/*!
+* @brief Internal function to log any string literal to logfile.
+* @description  Appends a timestamp to the beginning of param string and a 
+*               newline at the end, then logs that to the logfile.
+* @param[in] string String to be logged
+* @return int8_t
+*/
+static int8_t log_str_raw(uint8_t * string)
+{
+    time_t thetime;
+    if (time(&thetime) == FAILURE)
+    {
+        perror("Failed to get time.\n");  /* Use perror() instead of some sort
+                                           * weird recursive logging.
+                                           */
+        return FAILURE;
+    }
+    uint8_t strtime[TIME_STR_SIZE];
+    strftime(strtime, TIME_STR_SIZE, '%T', localtime(&thetime));
+    if (fprintf(gp_log_file, "%s - %s\n", strtime, string) < SUCCESS)
+    {
+        perror("Failed to write to logfile.\n");
+        return FAILURE;
+    }
+    return SUCCESS;
+}
 
 /*!
 * @brief Project 1 Logger thread.
@@ -76,6 +105,12 @@ void * logger(void * arg)
     }
     p_main_msg->id = START_OK;
     p_main_msg->source = LOGGER;
+    if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_LOWEST))
+    {
+        log_str_raw("(Logger) [ERROR]: Failed to send START_OK to Main.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
 
     /* Allocate log_msg */
     log_msg_t * p_log_msg = (log_msg_t *) malloc(sizeof(log_msg_t));
@@ -86,9 +121,48 @@ void * logger(void * arg)
     {
         mq_receive(log_mq, p_log_msg, sizeof(log_msg_t), NULL);
 
-        /* Check for COMMAND Messages */
+        /* Check for COMMAND Messages, Handle them */
+        if (p_log_msg->level == COMMAND)
+        {
+            if (p_log_msg->source == MAIN)
+            {                       // Only allow Main thread to issue Commands
+                if (strcmp(p_log_msg->str, "heartbeat"))
+                {
+                    p_main_msg->id = HEARTBEAT;
+                    p_main_msg->source = LOGGER;
+                    if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t),
+                                                                PRIORITY_TWO) )
+                    {
+                        log_str_raw("(Logger) [ERROR]: Failed to send "
+                                                        "HEARTBEAT to Main.");
+                        int8_t retvalue = FAILURE;
+                        pthread_exit(&retvalue);
+                    }
+                }
+                else if (strcmp(p_log_msg->str, "exit"))
+                {
+                    b_exit = true;
+                    log_str_raw("(Logger) [INFO]: Received exit command from"
+                                                                    " Main.");
+                }
+                else
+                {
+                    log_str_raw("(Logger) [WARNING]: Received unexpected"
+                                                        " command from Main.");
+                }
+            }
+            else
+            {
+                log_str_raw("(Logger) [WARNING]: Received command from thread"
+                                                        " other than Main.");
+            }
+        }
+
         /* If not COMMAND Message, Log the Message */
-        /* Else Handle the COMMAND */
+        else
+        {
+            
+        }
     }
 
     /* Graceful Exit */
@@ -100,22 +174,3 @@ void * logger(void * arg)
     pthread_exit(0);
 }
 
-static int8_t log_str_raw(uint8_t * string)
-{
-    time_t thetime;
-    if (time(&thetime) == FAILURE)
-    {
-        perror("Failed to get time.\n");  /* Use perror() instead of soe sort of
-                                         * weird recursive logging.
-                                         */
-        return FAILURE;
-    }
-    uint8_t strtime[TIME_STR_SIZE];
-    strftime(strtime, TIME_STR_SIZE, '%T', localtime(&thetime));
-    if (fprintf(gp_log_file, "%s - %s\n", strtime, string) < SUCCESS)
-    {
-        perror("Failed to write to logfile.\n");
-        return FAILURE;
-    }
-    return SUCCESS;
-}
