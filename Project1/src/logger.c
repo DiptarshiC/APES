@@ -10,20 +10,31 @@
 * @authors Diptarshi Chakraborty and Connor Shapiro
 */
 
-#include "logger.h"
+#include <pthread.h>
+#include <mqueue.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <time.h>
+#include "../includes/logger.h"
 
-typedef enum log_e          // Error enum for the logger thread
+typedef enum                // Error enum for the logger thread
 {
     LOG_NO_ERROR
 } log_e_t;
 
 /*!
-* @brief Identify the larger of two 8-bit numbers.
-* @param[in] num1  The first number to be compared.
-* @param[in] num2  The second number to be compared.
-* @return int8_t
+* @brief Main thread of the Project 1 Logger thread.
+* @description Takes in log packets from a message queue and logs to a file.
+* @param[in] arg    Pointer to log_thread_info structure from master thread.
+* @return void
 */
 void * logger(void * arg)
 {
+    bool b_exit = false;
+    while (!b_exit) // Do logger things until main() orders a graceful exit.
+    {
 
+
+
+    }
 }
