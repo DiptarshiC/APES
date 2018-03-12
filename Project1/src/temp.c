@@ -1,3 +1,4 @@
+
 /**
 *@file: temp.c
 *
@@ -18,7 +19,7 @@
 #include "../includes/i2c.h"
 #include "../includes/temp.h"
 
-uint8_t data;
+
 uint8_t LSB;
 uint8_t MSB;
 
@@ -55,10 +56,10 @@ temperature_e_t write_ptr_reg (uint8_t data);
 temperature_e_t write_conf_reg (uint8_t data)
 {
 
-	unsigned DATA[2];
+	char DATA[2];
 	DATA[0]=(POINTER_REG| CONF_REG_ADDR);
 	DATA[1]=data;
-        i2c_write_word( DEV_ADDR,&DATA[0]);
+        i2c_write_word( DEV_ADDR,DATA);
 
 }
 /**
@@ -74,7 +75,7 @@ temperature_e_t write_conf_reg (uint8_t data)
 
 temperature_e_t write_tlow_reg (uint16_t data)
 {
-	unsigned char DATA[3];
+	char DATA[3];
         DATA[0]=(POINTER_REG| TLOW_REG_ADDR);
         DATA[1]=data%0x100;
 	DATA[2]=data/0x100;
@@ -95,7 +96,7 @@ temperature_e_t write_tlow_reg (uint16_t data)
 
 temperature_e_t write_thi_reg (uint16_t data)
 {
-	unsigned char DATA[3];
+	char DATA[3];
         DATA[0]=(POINTER_REG| THIGH_REG_ADDR);
         DATA[1]=data%0x100;
         DATA[2]=data/0x100;
@@ -114,11 +115,11 @@ temperature_e_t write_thi_reg (uint16_t data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_temperature_reg (uint16_t data)
+temperature_e_t read_temperature_reg (char data[])
 {
 	
-	
-	i2c_read( DEV_ADDR,&data);
+	data[0]=(POINTER_REG| TEMP_REG_ADDR);
+	i2c_read( DEV_ADDR,data);
 }
 
 
@@ -134,7 +135,7 @@ temperature_e_t read_temperature_reg (uint16_t data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_config_reg (uint8_t* data)
+temperature_e_t read_config_reg (char data[])
 {
 		 	
         *data=(POINTER_REG| CONF_REG_ADDR);
@@ -152,7 +153,7 @@ temperature_e_t read_config_reg (uint8_t* data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_tlow_reg (uint16_t *data)
+temperature_e_t read_tlow_reg (char data[])
 {
 
 	 
@@ -173,7 +174,7 @@ temperature_e_t read_tlow_reg (uint16_t *data)
 * @return temperature_e_t
 */
 
-temperature_e_t read_thi_reg (uint16_t* data)
+temperature_e_t read_thi_reg (char data[])
 {
 	
 	  
@@ -201,24 +202,25 @@ temperature_e_t timeout (void);
 void main()
 {
 
-	
+	char data[2]={0};	
 	MSB=0,
 	LSB=0;
 	int temp=0;
 	float f=0;
 	float c=0;
 	
-	data=0;
+	
 	
 	while(1)
 	{
       
 	
-	read_temperature_reg(&data);
-	printf("data reg=%d \n",data);
+	read_temperature_reg(data);
+	//printf("data reg=%d \n",*(data));
+	//printf("data+1 reg=%d \n",*(data+1));
 	
-	MSB=data%0x100;;
-	LSB=data/0x100;
+	MSB=data[0];
+	LSB=data[1];
 
        /* Convert 12bit int using two's compliment */
        /* Credit: http://bildr.org/2011/01/tmp102-arduino */

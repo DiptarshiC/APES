@@ -315,7 +315,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 /*
 void main()
 {
-
+	char buf[2]={0};
 	while(1)
 	{
       
