@@ -36,8 +36,7 @@ typedef enum
     INFO,
     COMMAND,
     WARNING,
-    ERROR,
-    CRITICAL
+    ERROR
 } log_level_t;
 
 typedef struct log_msg
