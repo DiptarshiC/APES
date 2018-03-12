@@ -59,7 +59,7 @@ temperature_e_t write_conf_reg (uint8_t data)
 	char DATA[2];
 	DATA[0]=(POINTER_REG| CONF_REG_ADDR);
 	DATA[1]=data;
-        i2c_write_word( DEV_ADDR,DATA);
+        i2c_write( DEV_ADDR,DATA);
 
 }
 /**
@@ -73,13 +73,13 @@ temperature_e_t write_conf_reg (uint8_t data)
 * @return temperature_e_t
 */
 
-temperature_e_t write_tlow_reg (uint16_t data)
+temperature_e_t write_tlow_reg (uint8_t MSB, uint8_t LSB)
 {
 	char DATA[3];
         DATA[0]=(POINTER_REG| TLOW_REG_ADDR);
-        DATA[1]=data%0x100;
-	DATA[2]=data/0x100;
-        i2c_write_word( DEV_ADDR,&DATA[0]);
+        DATA[1]=MSB;
+	DATA[2]=LSB;
+        i2c_write_word( DEV_ADDR,DATA);
 
 }
 /**
@@ -94,13 +94,13 @@ temperature_e_t write_tlow_reg (uint16_t data)
 * @return temperature_e_t
 */
 
-temperature_e_t write_thi_reg (uint16_t data)
+temperature_e_t  write_thi_reg (uint8_t MSB,uint8_t LSB)
 {
 	char DATA[3];
-        DATA[0]=(POINTER_REG| THIGH_REG_ADDR);
-        DATA[1]=data%0x100;
-        DATA[2]=data/0x100;
-        i2c_write_word( DEV_ADDR,&DATA[0]);
+        DATA[0]=(POINTER_REG|THIGH_REG_ADDR);
+        DATA[1]=MSB;
+        DATA[2]=LSB;
+        i2c_write_word( DEV_ADDR,DATA);
 
 }
 
@@ -138,7 +138,7 @@ temperature_e_t read_temperature_reg (char data[])
 temperature_e_t read_config_reg (char data[])
 {
 		 	
-        *data=(POINTER_REG| CONF_REG_ADDR);
+        data[0]=(POINTER_REG| CONF_REG_ADDR);
         i2c_read( DEV_ADDR,data);
 }
 /**
@@ -157,7 +157,7 @@ temperature_e_t read_tlow_reg (char data[])
 {
 
 	 
-	*data=(POINTER_REG|TLOW_REG_ADDR) ;
+	data[0]=(POINTER_REG|TLOW_REG_ADDR) ;
         i2c_read( DEV_ADDR,data);
 
 }
@@ -178,7 +178,7 @@ temperature_e_t read_thi_reg (char data[])
 {
 	
 	  
-	*data=(POINTER_REG| THIGH_REG_ADDR) ;
+	data[0]=(POINTER_REG| THIGH_REG_ADDR) ;
         i2c_read( DEV_ADDR,data);	
 
 }
@@ -211,8 +211,8 @@ void main()
 	
 	
 	
-	while(1)
-	{
+//	while(1)
+//	{
       
 	
 	read_temperature_reg(data);
@@ -228,10 +228,31 @@ void main()
 
        c = temp*0.0625;
        f = (1.8 * c) + 32;
-
+	char data1[1];
        	printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
-	sleep(1);
-	}
+
+	printf("Now to check read/write operations on the thigh register\n");
+	write_thi_reg(0xDA,0xBC);
+	read_thi_reg(data);
+	printf("data[0]:%x\n",data[0]);
+	printf("data[1]:%x\n",data[1]);
+
+ 	printf("Now to check read/write operations on the tlow register\n");
+        write_tlow_reg(0xDA,0xBC);
+        read_tlow_reg(data);
+        printf("data[0]:%x\n",data[0]);
+        printf("data[1]:%x\n",data[1]);
+
+	printf("Now to check read/write operations on the config register\n");
+        write_conf_reg (0xBC);
+        read_config_reg(data1);
+        printf("data[0]:%x\n",data1[0]);
+ 
+
+
+	
+//	sleep(1);
+//	}
 
 
 }

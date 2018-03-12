@@ -88,7 +88,7 @@ temperature_e_t write_conf_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_tlow_reg (uint16_t data);
+temperature_e_t write_tlow_reg (uint8_t MSB,uint8_t LSB);
 
 
 /**
@@ -103,7 +103,7 @@ temperature_e_t write_tlow_reg (uint16_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_thi_reg (uint16_t data);
+temperature_e_t write_thi_reg (uint8_t MSB,uint8_t LSB);
 
 /**
 * @function read_temperature_reg
