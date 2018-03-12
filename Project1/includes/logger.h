@@ -12,12 +12,6 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
-/*!
-* @brief Main thread of the Project 1 Logger thread.
-* @description Takes in log packets from a message queue and logs to a file.
-* @param[in] arg    Pointer to thread_info structure from master thread.
-* @return void
-*/
 void * logger (void * arg);
 
 #endif /* _LOGGER_H */
