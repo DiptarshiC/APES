@@ -12,7 +12,6 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
-#define N_TIDS          5
 #define MAX_MQ_NAME     20
 #define MAX_LOG_NAME    16
 #define MAX_STR_LEN     64
