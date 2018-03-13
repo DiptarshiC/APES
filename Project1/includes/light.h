@@ -221,7 +221,7 @@ light_e_t read_id_reg (char data[]);
 * @return light_e_t
 */
 
-light_e_t read_adc_reg (uint8_t channel, uint16_t * data);
+light_e_t read_adc_reg (uint8_t channel, char data[]);
 
 
 /**

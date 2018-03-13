@@ -179,11 +179,9 @@ light_e_t read_irq_thresh_reg (uint8_t channel, uint16_t * data);
 
 light_e_t read_irq_ctrl_reg (char  data[])
 {
-      data[0]=(COMMAND|INTERRUPT);
-      i2c_read(SLAVE_ADDRESS,data);
-
+	data[0]=(COMMAND|INTERRUPT);
+	i2c_read(SLAVE_ADDRESS,data);
 }
-
 
 /**
 * @function read_id__reg
@@ -200,7 +198,7 @@ light_e_t read_irq_ctrl_reg (char  data[])
 light_e_t read_id_reg (char data[])
 {
 	data[0]=(COMMAND|ID);
-      i2c_read(SLAVE_ADDRESS,data);
+	i2c_read(SLAVE_ADDRESS,data);
 }
 
 /**
@@ -215,9 +213,30 @@ light_e_t read_id_reg (char data[])
 * @return light_e_t
 */
 
-light_e_t read_adc_reg (uint8_t channel, uint16_t * data);
+light_e_t read_adc_reg (uint8_t channel, char data[])
+{
+	char DATA[2];
+	if(channel==0)
 
+	{
+		DATA[0]=(COMMAND|DATA0LOW);
+		i2c_read(SLAVE_ADDRESS,DATA);
+		data[0]=DATA[0];
+		DATA[0]=(COMMAND|DATA0HIGH);
+                i2c_read(SLAVE_ADDRESS,DATA);
+		data[1]=DATA[0];
+	}
+	else if(channel==1)
+	{
+		DATA[0]=(COMMAND|DATA1LOW);
+                i2c_read(SLAVE_ADDRESS,DATA);
+                data[0]=DATA[0];
+                DATA[0]=(COMMAND|DATA1HIGH);
+                i2c_read(SLAVE_ADDRESS,DATA);
+                data[1]=DATA[0];
 
+	}
+}
 /**
 * @function convert_light
 *
@@ -248,10 +267,18 @@ void main()
 
 	printf("First ill do a write/read check on control register\n");
 	
-	write_ctrl_reg(0xDA);
+	write_ctrl_reg(0x03);
 	read_ctrl_reg(data);
 
 	printf("The value in the CONTROL register is %x \n",data[0]);
+
+	 printf("Then  ill do a write/read check on timing register\n");
+
+        write_timing_reg(0x02);
+        read_timing_reg(data);
+
+        printf("The value in the CONTROL register is %x \n",data[0]);
+
 
 
 }
