@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <math.h>
+#include <unistd.h>
 #include "../includes/i2c.h"
 #include "../includes/light.h"
 
@@ -263,6 +265,8 @@ void main()
 {
 
 	char data[2];
+	char data1[2];
+	char data2[2];
 	printf("Now we shall check read/write functions\n");
 
 	printf("First ill do a write/read check on control register\n");
@@ -272,13 +276,23 @@ void main()
 
 	printf("The value in the CONTROL register is %x \n",data[0]);
 
-	 printf("Then  ill do a write/read check on timing register\n");
+/*	 printf("Then  ill do a write/read check on timing register\n");
 
         write_timing_reg(0x02);
         read_timing_reg(data);
 
-        printf("The value in the CONTROL register is %x \n",data[0]);
+        printf("The value in the CONTROL register is %x \n",data[0]);*/
 
+	printf("Now i shall print the ADC values in a while loop\n");
 
+	printf("ADC1H\tADC1L\tADC0H\tADC0L\n");
+	while(1)
 
+	{
+	read_adc_reg(0,data1);
+	read_adc_reg(1,data2);
+        printf(" %d \t %d \t %d \t %d \n",data2[1],data2[0],data1[1],data1[0]);
+	sleep(2);	
+
+	}
 }
