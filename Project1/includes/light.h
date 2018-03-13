@@ -17,7 +17,8 @@
 
 
 #define	SLAVE_ADDRESS		0x39
-#define COMMAND			0x00
+#define COMMAND			0x80
+#define COMMAND_WORD		0xA0
 #define	CONTROL			0x00
 #define	TIMING			0x01
 #define THRESH_LOW_LOW		0x02
@@ -136,7 +137,7 @@ light_e_t write_irq_ctrl_reg (uint8_t data);
 * @return light_e_t
 */
 
-light_e_t read_ctrl_reg (uint8_t * data);
+light_e_t read_ctrl_reg (char data[]);
 
 /**
 * @function read_timing_reg
@@ -150,7 +151,7 @@ light_e_t read_ctrl_reg (uint8_t * data);
 * @return light_e_t
 */
 
-light_e_t read_timing_reg (uint8_t * data);
+light_e_t read_timing_reg (char data[]);
 
 
 /**
@@ -178,7 +179,7 @@ light_e_t read_irq_thresh_reg (uint8_t channel, uint16_t * data);
 * @return light_e_t
 */
 
-light_e_t read_irq_ctrl_reg (uint8_t * data);
+light_e_t read_irq_ctrl_reg (char data[]);
 
 /**
 * @function read_irq_ctrl_reg
@@ -192,7 +193,7 @@ light_e_t read_irq_ctrl_reg (uint8_t * data);
 * @return light_e_t
 */
 
-light_e_t read_irq_ctrl_reg (uint8_t * data);
+light_e_t read_irq_ctrl_reg (char data[]);
 
 /**
 * @function read_id__reg
@@ -206,7 +207,7 @@ light_e_t read_irq_ctrl_reg (uint8_t * data);
 * @return light_e_t
 */
 
-light_e_t read_id_reg (uint8_t * data);
+light_e_t read_id_reg (char data[]);
 
 /**
 * @function read_adc_reg

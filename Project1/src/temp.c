@@ -60,7 +60,7 @@ temperature_e_t write_conf_reg (uint8_t MSB, uint8_t LSB)
 	DATA[0]=(POINTER_REG| CONF_REG_ADDR);
 	DATA[1]=MSB;
 	DATA[2]=LSB;
-        i2c_write( DEV_ADDR,DATA);
+        i2c_write_word( DEV_ADDR,DATA);
 
 }
 /**
@@ -203,7 +203,8 @@ temperature_e_t timeout (void);
 void main()
 {
 
-	char data[2]={0};	
+	char data[2]={0};
+	char data2[3]={0};	
 	MSB=0,
 	LSB=0;
 	int temp=0;
