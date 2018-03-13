@@ -16,6 +16,22 @@
 
 
 
+#define	SLAVE_ADDRESS		0x39
+#define COMMAND			0x00
+#define	CONTROL			0x00
+#define	TIMING			0x01
+#define THRESH_LOW_LOW		0x02
+#define	THRESH_LOW_HIGH		0x03
+#define	THRESH_HIGH_LOW		0x04
+#define	THRESH_HIGH_HIGH	0x05
+#define INTERRUPT		0x06
+#define	ID			0x0A
+#define DATA0LOW		0x0C
+#define DATA0HIGH		0x0D
+#define DATA1LOW		0x0E
+#define DATA1HIGH		0x0F
+
+
 /**
 *@brief temperature_e_t is a specialized
 *	enum that is used to return

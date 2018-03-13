@@ -74,7 +74,7 @@ temperature_e_t write_ptr_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_conf_reg (uint8_t data);
+temperature_e_t write_conf_reg (uint8_t MSB,uint8_t LSB);
 
 
 /**

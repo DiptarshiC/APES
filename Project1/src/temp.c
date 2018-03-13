@@ -53,12 +53,13 @@ temperature_e_t write_ptr_reg (uint8_t data);
 * @return temperature_e_t
 */
 
-temperature_e_t write_conf_reg (uint8_t data)
+temperature_e_t write_conf_reg (uint8_t MSB, uint8_t LSB)
 {
 
-	char DATA[2];
+	char DATA[3];
 	DATA[0]=(POINTER_REG| CONF_REG_ADDR);
-	DATA[1]=data;
+	DATA[1]=MSB;
+	DATA[2]=LSB;
         i2c_write( DEV_ADDR,DATA);
 
 }
@@ -244,10 +245,11 @@ void main()
         printf("data[1]:%x\n",data[1]);
 
 	printf("Now to check read/write operations on the config register\n");
-        write_conf_reg (0xBC);
-        read_config_reg(data1);
-        printf("data[0]:%x\n",data1[0]);
- 
+        write_conf_reg (0xBC,0xAD);
+        read_config_reg(data);
+        printf("data[0]:%x\n",data[0]);
+ 	printf("data[1]:%x\n",data[1]);
+
 
 
 	
