@@ -120,7 +120,10 @@ temperature_e_t read_temperature_reg (char data[])
 {
 	
 	data[0]=(POINTER_REG| TEMP_REG_ADDR);
-	i2c_read( DEV_ADDR,data);
+	i2c_write( DEV_ADDR,data);
+	data[0]=(POINTER_REG| TEMP_REG_ADDR);
+        i2c_read( DEV_ADDR,data);
+
 }
 
 
@@ -138,7 +141,9 @@ temperature_e_t read_temperature_reg (char data[])
 
 temperature_e_t read_config_reg (char data[])
 {
-		 	
+	data[0]=(POINTER_REG| CONF_REG_ADDR);
+        i2c_write( DEV_ADDR,data);
+	 	
         data[0]=(POINTER_REG| CONF_REG_ADDR);
         i2c_read( DEV_ADDR,data);
 }
@@ -156,11 +161,10 @@ temperature_e_t read_config_reg (char data[])
 
 temperature_e_t read_tlow_reg (char data[])
 {
-
-	 
+	data[0]=(POINTER_REG|TLOW_REG_ADDR) ;
+        i2c_write( DEV_ADDR,data);
 	data[0]=(POINTER_REG|TLOW_REG_ADDR) ;
         i2c_read( DEV_ADDR,data);
-
 }
 
 /**
@@ -177,11 +181,10 @@ temperature_e_t read_tlow_reg (char data[])
 
 temperature_e_t read_thi_reg (char data[])
 {
-	
-	  
+	data[0]=(POINTER_REG| THIGH_REG_ADDR) ;
+        i2c_write( DEV_ADDR,data);
 	data[0]=(POINTER_REG| THIGH_REG_ADDR) ;
         i2c_read( DEV_ADDR,data);	
-
 }
 
 
