@@ -13,12 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <linux/i2c-dev.h>
-#include <error.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
 #include <math.h>
+#include <unistd.h>
 #include "../includes/i2c.h"
 #include "../includes/light.h"
 
@@ -221,32 +217,27 @@ light_e_t read_id_reg (char data[])
 
 light_e_t read_adc_reg (uint8_t channel, char data[])
 {
-	
-	
 	char DATA[2];
-	
 	if(channel==0)
 
 	{
-		DATA[0]=(COMMAND_WORD|DATA0LOW);
-		i2c_write(SLAVE_ADDRESS,DATA);
-		DATA[0]=(COMMAND_WORD|DATA0LOW);
+		DATA[0]=(COMMAND|DATA0LOW);
 		i2c_read(SLAVE_ADDRESS,DATA);
 		data[0]=DATA[0];
-		data[1]=DATA[1];
-		
+		DATA[0]=(COMMAND|DATA0HIGH);
+                i2c_read(SLAVE_ADDRESS,DATA);
+		data[1]=DATA[0];
 	}
 	else if(channel==1)
 	{
-		DATA[0]=(COMMAND_WORD|DATA1LOW);
-                i2c_write(SLAVE_ADDRESS,DATA);
-                DATA[0]=(COMMAND_WORD|DATA1LOW);
+		DATA[0]=(COMMAND|DATA1LOW);
                 i2c_read(SLAVE_ADDRESS,DATA);
-		data[0]=DATA[0];
-                data[1]=DATA[1];
+                data[0]=DATA[0];
+                DATA[0]=(COMMAND|DATA1HIGH);
+                i2c_read(SLAVE_ADDRESS,DATA);
+                data[1]=DATA[0];
 
-	}	
-	
+	}
 }
 /**
 * @function convert_light
@@ -276,7 +267,6 @@ void main()
 	char data[2];
 	char data1[2];
 	char data2[2];
-	char data3[3];
 	printf("Now we shall check read/write functions\n");
 
 	printf("First ill do a write/read check on control register\n");
@@ -295,14 +285,10 @@ void main()
 
 	printf("Now i shall print the ADC values in a while loop\n");
 
-	printf("ADC1H\tADC1L\tADC0H\tADC0L\n");
+	printf("ADC1H \tADC 1 LOW \t ADC 0 HIGH ADC 0 LOW\n");
 	while(1)
 
 	{
-
-	write_ctrl_reg(0x03);
-        read_ctrl_reg(data);
-
 	read_adc_reg(0,data1);
 	read_adc_reg(1,data2);
         printf(" %d \t %d \t %d \t %d \n",data2[1],data2[0],data1[1],data1[0]);
