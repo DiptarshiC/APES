@@ -26,6 +26,8 @@
 #define TIME_STR_SIZE   9
 #define PRIORITY_LOWEST 0
 #define PRIORITY_TWO    2
+#define MAX_SOURCE_LEN  11
+#define MAX_LEVEL_LEN   7
 
 typedef enum                // Error enum for the logger thread
 {
@@ -35,13 +37,13 @@ typedef enum                // Error enum for the logger thread
 FILE * gp_log_file;
 
 /*!
-* @brief Internal function to log any string literal to logfile.
+* @brief Internal function to log any timestamped string literal to logfile.
 * @description  Appends a timestamp to the beginning of param string and a 
 *               newline at the end, then logs that to the logfile.
 * @param[in] string String to be logged
 * @return int8_t
 */
-static int8_t log_str_raw(uint8_t * string)
+static int8_t log_str(uint8_t * string)
 {
     time_t thetime;
     if (time(&thetime) == FAILURE)
@@ -92,14 +94,14 @@ void * logger(void * arg)
     mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
     if (main_mq == FAILURE)
     {
-        log_str_raw("(Logger) [ERROR]: Failed to open Main message queue.");
+        log_str("(Logger) [ERROR]: Failed to open Main message queue.");
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
     }
     main_msg_t * p_main_msg = (main_msg_t *) malloc(sizeof(main_msg_t));
     if (!p_main_msg)
     {
-        log_str_raw("(Logger) [ERROR]: Failed to malloc for main_msg.");
+        log_str("(Logger) [ERROR]: Failed to malloc for main_msg.");
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
     }
@@ -107,7 +109,7 @@ void * logger(void * arg)
     p_main_msg->source = LOGGER;
     if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_LOWEST))
     {
-        log_str_raw("(Logger) [ERROR]: Failed to send START_OK to Main.");
+        log_str("(Logger) [ERROR]: Failed to send START_OK to Main.");
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
     }
@@ -119,7 +121,7 @@ void * logger(void * arg)
     bool b_exit = false;
     while (!b_exit) // Do Logger things until Main orders a graceful exit.
     {
-        mq_receive(log_mq, p_log_msg, sizeof(log_msg_t), NULL);
+        mq_receive(log_mq, p_log_msg, sizeof(log_msg_t), NULL); // Block empty
 
         /* Check for COMMAND Messages, Handle them */
         if (p_log_msg->level == COMMAND)
@@ -133,7 +135,7 @@ void * logger(void * arg)
                     if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t),
                                                                 PRIORITY_TWO) )
                     {
-                        log_str_raw("(Logger) [ERROR]: Failed to send "
+                        log_str("(Logger) [ERROR]: Failed to send "
                                                         "HEARTBEAT to Main.");
                         int8_t retvalue = FAILURE;
                         pthread_exit(&retvalue);
@@ -142,35 +144,120 @@ void * logger(void * arg)
                 else if (strcmp(p_log_msg->str, "exit"))
                 {
                     b_exit = true;
-                    log_str_raw("(Logger) [INFO]: Received exit command from"
+                    log_str("(Logger) [INFO]: Received exit command from"
                                                                     " Main.");
                 }
                 else
                 {
-                    log_str_raw("(Logger) [WARNING]: Received unexpected"
+                    log_str("(Logger) [WARNING]: Received unexpected"
                                                         " command from Main.");
                 }
             }
             else
             {
-                log_str_raw("(Logger) [WARNING]: Received command from thread"
+                log_str("(Logger) [WARNING]: Received command from thread"
                                                         " other than Main.");
             }
         }
 
         /* If not COMMAND Message, Log the Message */
         else
-        {
-            
+        {   /* Prepare str_time */
+            time_t thetime = p_log_msg->timestamp;
+            uint8_t str_time[TIME_STR_SIZE];
+            if (time(&thetime) == FAILURE)
+            {
+                perror("Failed to get time.\n");  /* Use perror() instead of
+                                                   * some sort weird recursive
+                                                   * logging.
+                                                   */
+                str_time[] = "";
+                return FAILURE;
+            }
+            strftime(str_time, TIME_STR_SIZE, '%T', localtime(&thetime));
+
+            /* Prepare str_source */
+            uint8_t str_source[MAX_SOURCE_LEN];
+            switch (p_log_msg->source) 
+            {
+                case MAIN:
+                    str_source[] = "Main";
+                break;
+
+                case REMOTE:
+                    str_source[] = "Remote";
+                break;
+
+                case TEMPERATURE:
+                    str_source[] = "Termpature";
+                break;
+
+                case LIGHT:
+                    str_source[] = "Light";
+                break;
+
+                default:
+                    log_str("(Logger) [WARNING]: Received log from unknown "
+                                                                    "thread.");
+                    str_source[] = "";
+                    break;
+            }
+
+            /* Prepare str_level */
+            uint8_t str_level[MAX_LEVEL_LEN];
+            switch (p_log_msg->level)
+            {
+                case INFO:
+                    str_level[] = "INFO";
+                break;
+
+                case WARNING:
+                    str_level[] = "WARNING";
+                break;
+
+                case ERROR:
+                    str_level[] = "ERROR";
+                break;
+
+                default:
+                    log_str("(Logger) [WARNING]: Received log of unknown "
+                                                                    "level.");
+                    str_level[] = "";
+                break;
+            }
+
+            /* Log */
+            if (fprintf(gp_log_file, "%s - (%s) [%s]: %s\n", str_time, 
+                            str_source, str_level, p_log_msg->str) < SUCCESS);
+            {
+                perror("Failed to write to logfile.\n");
+            }
         }
     }
 
-    /* Graceful Exit */
-    mq_close(log_mq);
-    mq_unlink(log_mq);
-    fclose(gp_log_file);
+    /* Attempt to Graceful Exit */
+    if (mq_close(log_mq))
+    {
+        log_str("(Logger) [ERROR]: Failed to close Log message queue.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    if (mq_unlink(log_mq))
+    {
+        
+        log_str("(Logger) [ERROR]: Failed to destroy Log message queue.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    if (fclose(gp_log_file))
+    {
+        perror("(Logger) [ERROR]: Failed to close logfile.\n");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
     free(p_main_msg);
     free(p_log_msg);
-    pthread_exit(0);
+    int8_t retvalue = SUCCESS;
+    pthread_exit(&retvalue);
 }
 
