@@ -1,4 +1,6 @@
 **/*.o
+**/*.save*
+
 **/*.out
 **/*.swp
 .vscode/
