@@ -41,6 +41,12 @@
 * @return void
 */
 
+
+
+pthread_mutex_t i2c_locker =PTHREAD_MUTEX_INITIALIZER;
+
+
+
 void  i2c_read(uint8_t address,uint8_t * buf)
 {
 /*	In both i2c read and i2c write operations
@@ -83,14 +89,14 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
  	perror("Could not open the file\n");
 	exit(1);
   	}
-
+	pthread_mutex_lock(&i2c_locker);
 	/* Using I2C Read*/
 	if (read(file,buf,2) != 2) 
 	{
         /*ERROR HANDLING: i2c transaction failed */
 	perror("Failed to read from the i2c bus.\n");
 	}
-	
+	pthread_mutex_unlock(&i2c_locker);
 	if(close(file)<0)
 	{
 	perror("Error in closing file.\n");	
@@ -153,14 +159,14 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
  	perror("Could not open the file\n");
 	exit(1);
   	}
-
+	pthread_mutex_lock(&i2c_locker);
 	/* Using I2C Read*/
 	if (read(file,buf,2) != 2) 
 	{
         /*ERROR HANDLING: i2c transaction failed */
 	perror("Failed to read from the i2c bus.\n");
 	}
-	
+	pthread_mutex_unlock(&i2c_locker);
 	if(close(file)<0)
 	{
 	perror("Error in closing file.\n");	
@@ -227,14 +233,14 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
  	perror("Could not open the file\n");
 	exit(1);
   	}
-
+	pthread_mutex_lock(&i2c_locker);
 	if (write(file, data, 2) != 2) 
 	{
         /*ERROR HANDLING: i2c transaction failed */
         perror("write failed\n");
  
 	}
-
+	pthread_mutex_unlock(&i2c_locker);
 	 if(close(file)<0)
         {
         perror("Error in closing file.\n");
@@ -300,14 +306,18 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
  	perror("Could not open the file\n");
 	exit(1);
   	}
-
+	 pthread_mutex_lock(&i2c_locker);
 	if (write(file, data, 3) != 3) 
 	{
         /*ERROR HANDLING: i2c transaction failed */
         perror("write failed\n");
  
 	}
-
+	pthread_mutex_unlock(&i2c_locker);
+	if(close(file)<0)
+        {
+        perror("Error in closing file.\n");
+        }
 
 }
 
