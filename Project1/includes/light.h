@@ -233,7 +233,7 @@ light_e_t read_adc_reg (uint8_t channel, char data[]);
 *                 
 * @return float
 */
-float convert_light (void);
+float convert_light(uint8_t ADC1H,uint8_t ADC1L,uint8_t ADC0H,uint8_t ADC0L);
 
 /**
 * @function heatbeat
