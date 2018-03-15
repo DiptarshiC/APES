@@ -135,6 +135,7 @@ int main(int argc, char * argv[])
         strcpy(log_msg.str, "Successfully created Logger.\n");
         mq_send(log_mqd, &log_msg, sizeof(log_msg_t), PRIORITY_LOWEST);
     }
+    free(p_log_args);
 
     /* Copy/paste above for the other three once threading is implemented */
     
@@ -148,7 +149,7 @@ int main(int argc, char * argv[])
     {
         if (mq_receive(main_mqd, &msg_main, sizeof(main_msg_t), NULL))
         {
-            perror("A thread did not start OK.\n");
+            perror("(Main) [ERROR]: A thread did not start OK.\n");
             return FAILURE;
         }
     }
@@ -157,16 +158,50 @@ int main(int argc, char * argv[])
     while (!b_sigexit)
     {
         /* Heartbeat */
+        log_msg_t log_msg;
         log_msg.level = COMMAND;
+        log_msg.source = MAIN;
+        time(log_msg.timestamp);
         strcpy(log_msg.str, "heartbeat");
-        mq_send(log_mqd, )
+        mq_send(log_mqd, &log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+        // Repeat above for other modules
         usleep(HEARTBEAT_TIME_US);
+        for (i_threads = 0; i_threads < N_THREADS; i_threads++)
+        {
+            if (mq_receive(main_mqd, &msg_main, sizeof(main_msg_t), NULL))
+            {
+                perror("(Main) [ERROR]: A thread did not heartbeat.\n");
+                return FAILURE;
+            }
+        }
 
-        // USR LED functionality
+        /* USR LED functionality goes here */
     }
+
     /* Cleanup child threads */
-    /* Add other threads to this */
+    log_msg_t log_msg;
+    log_msg.level = COMMAND;
+    log_msg.source = MAIN;
+    time(log_msg.timestamp);
+    strcpy(log_msg.str, "exit");
+    int8_t * log_ret;
+    if (pthread_join(log_thread, &log_ret))
+    {
+        perror("(Main) [ERROR]: Could not join Logger.\n");
+        return FAILURE;
+    }
+    if (!log_ret)
+    {
+        perror("(Main) [WARNING]: Logger experienced a runtime error.\n");
+    }
 
+    /* Repeat for other threads */
 
-    //unlink main
+    /* Cleanup Main */
+    if (mq_unlink(MAIN_MQ))
+    {
+        perror("(Main) [ERROR]: Failed to destory Main message queue.\n");
+        return FAILURE;
+    }
+    return SUCCESS;
 }
