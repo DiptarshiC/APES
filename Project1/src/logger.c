@@ -171,7 +171,7 @@ void * logger(void * arg)
                                                    * some sort weird recursive
                                                    * logging.
                                                    */
-                str_time[] = "";
+                *str_time = NULL; // Null terminate first character
                 return FAILURE;
             }
             strftime(str_time, TIME_STR_SIZE, '%T', localtime(&thetime));
@@ -181,25 +181,25 @@ void * logger(void * arg)
             switch (p_log_msg->source) 
             {
                 case MAIN:
-                    str_source[] = "Main";
+                    strcopy(str_source, "Main");
                 break;
 
                 case REMOTE:
-                    str_source[] = "Remote";
+                    strcopy(str_source, "Remote");
                 break;
 
                 case TEMPERATURE:
-                    str_source[] = "Termpature";
+                    strcopy(str_source, "Temperature");
                 break;
 
                 case LIGHT:
-                    str_source[] = "Light";
+                    strcopy(str_source, "Light");
                 break;
 
                 default:
                     log_str("(Logger) [WARNING]: Received log from unknown "
                                                                     "thread.");
-                    str_source[] = "";
+                    *str_source = NULL; // Null terminate first character
                     break;
             }
 
@@ -208,21 +208,21 @@ void * logger(void * arg)
             switch (p_log_msg->level)
             {
                 case INFO:
-                    str_level[] = "INFO";
+                    strcpy(str_level, "INFO");
                 break;
 
                 case WARNING:
-                    str_level[] = "WARNING";
+                    strcpy(str_level, "WARNING");
                 break;
 
                 case ERROR:
-                    str_level[] = "ERROR";
+                    strcpy(str_level, "ERROR");
                 break;
 
                 default:
                     log_str("(Logger) [WARNING]: Received log of unknown "
                                                                     "level.");
-                    str_level[] = "";
+                    *str_level = NULL;
                 break;
             }
 
