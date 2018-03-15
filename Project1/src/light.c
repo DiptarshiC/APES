@@ -52,7 +52,7 @@ light_e_t write_ctrl_reg (uint8_t data)
 {
 
 	char DATA[2];
-	DATA[0]=(COMMAND|CONTROL);
+	DATA[0]=(COMMAND_REG|CONTROL);
 	DATA[1]=data;
 	i2c_write(SLAVE_ADDRESS,DATA);	
 
@@ -74,7 +74,7 @@ light_e_t write_timing_reg (uint8_t data)
 {
 
 	char DATA[2];
-        DATA[0]=(COMMAND|TIMING);
+        DATA[0]=(COMMAND_REG|TIMING);
         DATA[1]=data;
         i2c_write(SLAVE_ADDRESS,DATA);
 

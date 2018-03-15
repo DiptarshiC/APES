@@ -13,10 +13,10 @@
 
 typedef enum
 {
-    LOGGER,
-    REMOTE,
-    TEMPERATURE,
-    LIGHT
+    M_LOGGER,
+    M_REMOTE,
+    M_TEMPERATURE,
+    M_LIGHT
 } main_source_t;
 
 typedef enum
@@ -25,7 +25,7 @@ typedef enum
     HEARTBEAT
 } main_id_t;
 
-typedef struct log_msg
+typedef struct main_msg
 {
     main_id_t id;
     main_source_t source;

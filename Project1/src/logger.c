@@ -106,7 +106,7 @@ void * logger(void * arg)
         pthread_exit(&retvalue);
     }
     p_main_msg->id = START_OK;
-    p_main_msg->source = LOGGER;
+    p_main_msg->source = M_LOGGER;
     if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_LOWEST))
     {
         log_str("(Logger) [ERROR]: Failed to send START_OK to Main.");
@@ -131,7 +131,7 @@ void * logger(void * arg)
                 if (strcmp(p_log_msg->str, "heartbeat"))
                 {
                     p_main_msg->id = HEARTBEAT;
-                    p_main_msg->source = LOGGER;
+                    p_main_msg->source = M_LOGGER;
                     if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t),
                                                                 PRIORITY_TWO) )
                     {
