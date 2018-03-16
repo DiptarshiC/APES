@@ -115,7 +115,7 @@ light_e_t write_irq_ctrl_reg (uint8_t data)
 {
 
         char DATA[2];
-        DATA[0]=(COMMAND|INTERRUPT);
+        DATA[0]=(COMMAND_REG|INTERRUPT);
         DATA[1]=data;
         i2c_write(SLAVE_ADDRESS,DATA);
 
@@ -137,9 +137,9 @@ light_e_t read_ctrl_reg (char  data[])
 {
         
 	
-	data[0]=(COMMAND|CONTROL);
+	data[0]=(COMMAND_REG|CONTROL);
         i2c_write(SLAVE_ADDRESS,data);
-	data[0]=(COMMAND|CONTROL);
+	data[0]=(COMMAND_REG|CONTROL);
         i2c_read(SLAVE_ADDRESS,data);
 
 	
@@ -160,9 +160,9 @@ light_e_t read_ctrl_reg (char  data[])
 light_e_t read_timing_reg (char  data[])
 {
  
-	data[0]=(COMMAND|TIMING);
+	data[0]=(COMMAND_REG|TIMING);
         i2c_write(SLAVE_ADDRESS,data);
-        data[0]=(COMMAND|TIMING);
+        data[0]=(COMMAND_REG|TIMING);
         i2c_read(SLAVE_ADDRESS,data);
 	
 }
@@ -194,9 +194,9 @@ light_e_t read_irq_thresh_reg (uint8_t channel, uint16_t * data);
 light_e_t read_irq_ctrl_reg (char  data[])
 {
 
-	data[0]=(COMMAND|INTERRUPT);
+	data[0]=(COMMAND_REG|INTERRUPT);
         i2c_write(SLAVE_ADDRESS,data);
-	data[0]=(COMMAND|INTERRUPT);
+	data[0]=(COMMAND_REG|INTERRUPT);
 	i2c_read(SLAVE_ADDRESS,data);
 }
 
@@ -214,9 +214,9 @@ light_e_t read_irq_ctrl_reg (char  data[])
 
 light_e_t read_id_reg (char data[])
 {
-	data[0]=(COMMAND|ID);
+	data[0]=(COMMAND_REG|ID);
         i2c_write(SLAVE_ADDRESS,data);
-	data[0]=(COMMAND|ID);
+	data[0]=(COMMAND_REG|ID);
 	i2c_read(SLAVE_ADDRESS,data);
 }
 
@@ -280,7 +280,7 @@ CH1=(uint16_t)ADC1H<<8;
 CH1=CH1|ADC1L;
 
 CH0=(uint16_t)ADC0H<<8;
-CH0=CH1|ADC0L;
+CH0=CH0|ADC0L;
 
 float ch1=0.0;
 float ch0=0.0;
