@@ -51,6 +51,16 @@ typedef enum
 
 }light_e_t;
 
+
+typedef struct light_msg
+{
+    time_t timestamp;
+    log_level_t level;
+    log_source_t source;
+    uint8_t str[MAX_STR_LEN];
+} light_msg_t;
+
+
 /**
 * @function write_cmd_reg
 *

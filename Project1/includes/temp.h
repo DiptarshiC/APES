@@ -43,6 +43,14 @@ typedef enum
 
 }temperature_e_t;
 
+typedef struct temp_msg
+{
+    time_t timestamp;
+    log_level_t level;
+    log_source_t source;
+    uint8_t str[MAX_STR_LEN];
+} log_temp_t;
+
 
 /**
 * @function write_ptr_reg

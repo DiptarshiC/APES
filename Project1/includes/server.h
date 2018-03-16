@@ -2,8 +2,7 @@
 *@file: server.h
 *
 *@description: This header file provides an abstraction
-*	 	for reading and writing values in the i2c
-*	 	temp sensor.
+*	 	remote server.
 *
 *@Date:2nd March 2017 
 *
