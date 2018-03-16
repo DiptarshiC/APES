@@ -98,15 +98,15 @@ int main(int argc, char * argv[])
     // log_mq_attr.mq_msgsize = sizeof(remote_msg_t);
     // mqd_t remote_mqd = mq_open(LOG_MQ, O_CREAT | O_WRONLY, 0666,
     //                                                         &remote_mq_attr);
-    // struct mq_attr light_mq_attr;
-    // log_mq_attr.mq_maxmsg = LIGHT_MAX_MSGS;
-    // log_mq_attr.mq_msgsize = sizeof(light_msg_t);
-    // mqd_t light_mqd = mq_open(LOG_MQ, O_CREAT | O_WRONLY, 0666,
-    //                                                         &light_mq_attr);
-    // struct mq_attr temp_mq_attr;
-    // log_mq_attr.mq_maxmsg = TEMP_MAX_MSGS;
-    // log_mq_attr.mq_msgsize = sizeof(temp_msg_t);
-    // mqd_t temp_mqd = mq_open(LOG_MQ, O_CREAT | O_WRONLY, 0666, &temp_mq_attr);
+     struct mq_attr light_mq_attr;
+     log_mq_attr.mq_maxmsg = LIGHT_MAX_MSGS;
+     log_mq_attr.mq_msgsize = sizeof(light_msg_t);
+     mqd_t light_mqd = mq_open(LOG_MQ, O_CREAT | O_WRONLY, 0666,
+                                                             &light_mq_attr);
+     struct mq_attr temp_mq_attr;
+     log_mq_attr.mq_maxmsg = TEMP_MAX_MSGS;
+     log_mq_attr.mq_msgsize = sizeof(temp_msg_t);
+     mqd_t temp_mqd = mq_open(LOG_MQ, O_CREAT | O_WRONLY, 0666, &temp_mq_attr);
 
     /* Start up Logger thread */
     struct log_thread_info * p_log_args = (struct log_thread_info *) 
