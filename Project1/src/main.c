@@ -21,7 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 /* Un-comment as remote gets implemented */
-// #include "../includes/remote.h"
+// #include "../includes/server.h"
 #include "../includes/light.h"
 #include "../includes/temp.h"
 #include "../includes/logger.h"
