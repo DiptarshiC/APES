@@ -17,7 +17,7 @@
 
 
 #define	SLAVE_ADDRESS		0x39
-#define COMMAND_REG			0x80
+#define COMMAND_REG		0x80
 #define COMMAND_WORD		0xA0
 #define	CONTROL			0x00
 #define	TIMING			0x01
