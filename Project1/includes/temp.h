@@ -5,7 +5,7 @@
 *	 	for reading and writing values in the i2c
 *	 	temp sensor.
 *
-*@Date:2nd March 2017 
+*@Date:2nd March 2017
 *
 *@Author:Diptarshi Chakraborty and Connor Shapiro
 */
@@ -62,6 +62,22 @@ typedef enum
 
 }temperature_e_t;
 
+typedef enum
+{
+    MAIN,
+    REMOTE,
+    TEMPERATURE,
+    LIGHT
+} log_source_t;
+
+typedef enum
+{
+    INFO,
+    COMMAND,
+    WARNING,
+    ERROR
+} log_level_t;
+
 typedef struct temp_msg
 {
     time_t timestamp;
@@ -76,8 +92,8 @@ typedef struct temp_msg
 *
 * @brief writes to temp sensor ptr reg
 *
-*  
-*      
+*
+*
 *
 * @param  uint8_t data:data to write to the pointer
 *                 register
@@ -92,8 +108,8 @@ temperature_e_t write_ptr_reg (uint8_t data);
 *
 * @brief writes into the config reg
 *
-* 
-*       
+*
+*
 *
 * @param  uint8_t data:data to write to the config
 *                 register

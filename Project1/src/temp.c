@@ -300,18 +300,150 @@ void *temp(void *args)
 	}
 	p_main_msg->id = START_OK;
 	p_main_msg->source = M_TEMPERATURE;
-	if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_LOWEST))
+	if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO))
 	{
         log_str("(Temperature) [ERROR]: Failed to send START_OK to Main.");
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
+	/* Allocate log_msg */
+	log_temp_t * p_log_msg = (log_temp_t *) malloc(sizeof(log_temp_t));
+
+
+	/* Main Loop */
+    bool b_exit = false;
+    while (!b_exit) // Do Logger things until Main orders a graceful exit.
+    {
+        mq_receive(temp_mq, p_log_msg, sizeof(log_temp_t), NULL); // Block empty
+
+        /* Check for COMMAND Messages, Handle them */
+        if (p_log_msg->level == COMMAND)
+        {
+            if (p_log_msg->source == MAIN)
+            {                       // Only allow Main thread to issue Commands
+                if (strcmp(p_log_msg->str, "heartbeat"))
+                {
+                    p_main_msg->id = HEARTBEAT;
+                    p_main_msg->source = M_TEMPERATURE;
+                    if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t),
+                                                                PRIORITY_TWO) )
+                    {
+                log_str("(Temperature) [ERROR]: Failed to send "
+                                                        "HEARTBEAT to Main.");
+                        int8_t retvalue = FAILURE;
+                        pthread_exit(&retvalue);
+                    }
+                }
+
+		else if (strcmp(p_log_msg->str, "exit"))
+                {
+                    b_exit = true;
+                    log_str("(Temperature) [INFO]: Received exit command from"
+                                                                    " Main.");
+                }
+                else
+                {
+                    log_str("(Temperature) [WARNING]: Received unexpected"
+                                                        " command from Main.");
+                }
+            }
 
 
 
+        }
+
+	/* If not COMMAND Message, Log the Message */
+        else
+        {   /* Prepare str_time */
+            time_t thetime = p_log_msg->timestamp;
+            uint8_t str_time[TIME_STR_SIZE];
+            if (time(&thetime) == FAILURE)
+            {
+                perror("Failed to get time.\n");  /* Use perror() instead of
+                                                   * some sort weird recursive
+                                                   * logging.
+                                                   */
+                *str_time = NULL; // Null terminate first character
+                return FAILURE;
+            }
+            strftime(str_time, TIME_STR_SIZE, '%T', localtime(&thetime));
+
+	/* Prepare str_source */
+            uint8_t str_source[MAX_SOURCE_LEN];
+            switch (p_log_msg->source)
+            {
+                case MAIN:
+                    strcopy(str_source, "Main");
+                break;
+
+                case REMOTE:
+                    strcopy(str_source, "Remote");
+                break;
+
+                default:
+                    log_str("(Temperature) [WARNING]: Received log from unknown "
+                                                                    "thread.");
+                    *str_source = NULL; // Null terminate first character
+                    break;
+            }
+
+		/* Prepare str_level */
+            uint8_t str_level[MAX_LEVEL_LEN];
+            switch (p_log_msg->level)
+            {
+                case INFO:
+                    strcpy(str_level, "INFO");
+                break;
+
+                case WARNING:
+                    strcpy(str_level, "WARNING");
+                break;
+
+                case ERROR:
+                    strcpy(str_level, "ERROR");
+                break;
+
+                default:
+                    log_str("(Temperature) [WARNING]: Received log of unknown "
+                                                                    "level.");
+                    *str_level = NULL;
+                break;
+            }
 
 
+		/* Log */
+            if (fprintf(gp_log_file, "%s - (%s) [%s]: %s\n", str_time,
+                            str_source, str_level, p_log_msg->str) < SUCCESS);
+            {
+                perror("Failed to write to logfile.\n");
+            }
+        }
+    }
 
+	/* Attempt to Graceful Exit */
+    if (mq_close(temp_mq))
+    {
+        log_str("(Temperature) [ERROR]: Failed to close Log message queue.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    if (mq_unlink(temp_mq))
+    {
+
+        log_str("(Temperature) [ERROR]: Failed to destroy temperature message queue.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    if (fclose(gp_log_file))
+    {
+        perror("(Temperature) [ERROR]: Failed to close logfile.\n");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    free(p_main_msg);
+    free(p_log_msg);
+    int8_t retvalue = SUCCESS;
+    pthread_exit(&retvalue);
 
 
 
