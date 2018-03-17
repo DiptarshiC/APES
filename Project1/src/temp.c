@@ -314,7 +314,7 @@ void *temp(void *args)
 			}
 
 		}
-		else if (p_temp_msg->id == TEMP_EXITCMD)
+		/*else if (p_temp_msg->id == TEMP_EXITCMD)
 		{
 			if (mq_close(temp_mq))
 			{
@@ -334,7 +334,7 @@ void *temp(void *args)
     			int8_t retvalue = SUCCESS;
                 // Log something with printf
 			 pthread_exit(&retvalue);
-		}
+		}*/
 	}
 
 	else if (p_temp_msg->source == T_REMOTE)
@@ -352,6 +352,40 @@ void *temp(void *args)
 
                 }
 	}
+	/*Attempt to do a graceful exit*/
+	 			if (mq_close(temp_mq))
+                        	{
+				log_msg_t * p_log_msg;
+        			p_log_msg->level = ERROR;
+        			p_log_msg->source = TEMP;
+        			time(&p_log_msg->timestamp);
+        			strcpy((char *) &p_log_msg->str,"failure to close temperature message queue");
+
+                		mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+                                int8_t retvalue = FAILURE;
+                                pthread_exit(&retvalue);
+                        	}
+                        	if (mq_unlink(temp_mq))
+                        	{
+
+				log_msg_t * p_log_msg;
+                                p_log_msg->level = ERROR;
+                                p_log_msg->source = TEMP;
+                                time(&p_log_msg->timestamp);
+                                strcpy((char *) &p_log_msg->str,"failure to unlink temperature message queue");
+
+
+                    		mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+                                int8_t retvalue = FAILURE;
+                                pthread_exit(&retvalue);
+                        	}
+
+                        free(p_main_msg);
+                        free(p_temp_msg);
+                        int8_t retvalue = SUCCESS;
+                printf("Exiting task\n");
+                         pthread_exit(&retvalue);
+
 }
 
 

@@ -420,7 +420,7 @@ void *light(void *args)
 			}
 
 		}
-		else if (p_light_msg->id == LIGHT_EXITCMD)
+		/*else if (p_light_msg->id == LIGHT_EXITCMD)
 		{
 			if (mq_close(light_mq))
 			{
@@ -437,7 +437,7 @@ void *light(void *args)
     			free(p_light_msg);
     			int8_t retvalue = SUCCESS;
 			 pthread_exit(&retvalue);
-		}
+		}*/
 	}
 
 	else if (p_light_msg->source == L_REMOTE)
@@ -455,6 +455,38 @@ void *light(void *args)
 
                 }
 	}
+			/*Attempt to do a graceful exit*/
+	 		if (mq_close(light_mq))
+                        {
+				log_msg_t * p_log_msg;
+                                p_log_msg->level = ERROR;
+                                p_log_msg->source = LIGHT;
+                                time(&p_log_msg->timestamp);
+                                strcpy((char *) &p_log_msg->str,"failure to close light message queue");
+                                mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+                                int8_t retvalue = FAILURE;
+                                pthread_exit(&retvalue);
+
+                        }
+                        if (mq_unlink(light_mq))
+                        {
+
+				log_msg_t * p_log_msg;
+                                p_log_msg->level = ERROR;
+                                p_log_msg->source = LIGHT;
+                                time(&p_log_msg->timestamp);
+                                strcpy((char *) &p_log_msg->str,"failure to unlink light message queue");
+                                mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+
+                                int8_t retvalue = FAILURE;
+                                pthread_exit(&retvalue);
+                        }
+
+                        free(p_main_msg);
+                        free(p_light_msg);
+                        int8_t retvalue = SUCCESS;
+                         pthread_exit(&retvalue);
+
 
 
 }

@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-/* Un-comment as remote gets implemented */
-// #include "../includes/server.h"
+
+#include "../includes/remote.h"
 #include "../includes/light.h"
 #include "../includes/temp.h"
 #include "../includes/logger.h"
