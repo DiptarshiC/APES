@@ -51,13 +51,23 @@ typedef enum
 
 }light_e_t;
 
+typedef enum
+{                       // These are the only two threads that should be messaging light
+    L_MAIN,
+    L_REMOTE
+} light_source_t;
 
-typedef struct light_msg
+typedef enum
 {
-    time_t timestamp;
-    log_level_t level;
-    log_source_t source;
-    uint8_t str[MAX_STR_LEN];
+    LIGHT_DATAREQ,       // ID of message from Remote to light asking for a temperature data message
+    LIGHT_HEARTBEATREQ,  // ID of message from Main to light asking for a heartbeat
+    LIGHT_EXITCMD        // ID of message from Main to light commanding a graceful exit
+} light_id_t;
+
+typedef struct temp_msg
+{
+    light_id_t id;
+    light_source_t source;
 } light_msg_t;
 
 

@@ -274,16 +274,10 @@ void *temp(void *args)
 	}
 
 
-	gp_log_file = fopen(p_targs->log_filename, "w");
-    	if (!gp_log_file)
-    	{
-        perror("Failed to open log file.\n");
-        int8_t retvalue = FAILURE;
-        pthread_exit(&retvalue);
-    	}
 
 
-	/* Let Main know that Logger startup went well */
+
+	/* Let Main know that Temperature startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
 	if (main_mq == FAILURE)
 	{
@@ -306,15 +300,15 @@ void *temp(void *args)
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
-	/* Allocate log_msg */
-	log_temp_t * p_log_msg = (log_temp_t *) malloc(sizeof(log_temp_t));
+	/* Allocate temp_msg */
+	temp_msg_t * p_log_msg = (temp_msg_t *) malloc(sizeof(temp_msg_t));
 
 
 	/* Main Loop */
     bool b_exit = false;
     while (!b_exit) // Do Logger things until Main orders a graceful exit.
     {
-        mq_receive(temp_mq, p_log_msg, sizeof(log_temp_t), NULL); // Block empty
+        mq_receive(temp_mq, p_log_msg, sizeof(temp_msg_t), NULL); // Block empty
 
         /* Check for COMMAND Messages, Handle them */
         if (p_log_msg->level == COMMAND)
