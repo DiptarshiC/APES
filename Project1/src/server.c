@@ -9,7 +9,9 @@
 *@Author:Diptarshi Chakraborty and Connor Shapiro
 */
 
-
+#include <mqueue.h>
+#include <pthread.h>
+#include <time.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <ctype.h>
@@ -24,7 +26,7 @@
 #include<arpa/inet.h> //inet_addr
 
 #include "../includes/i2c.h"
-//#include "../includes/temp.h"
+#include "../includes/temp.h"
 #include "../includes/logger.h"
 #include "../includes/light.h"
 #include "../includes/main.h"
@@ -35,6 +37,47 @@
 
 void *server()
 {
+
+
+	/* Let Main know that Temperature startup went well */
+	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
+	if (main_mq == FAILURE)
+	{
+
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+	main_msg_t * p_main_msg = (main_msg_t *) malloc(sizeof(main_msg_t));
+	if (!p_main_msg)
+	{
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+	p_main_msg->id = START_OK;
+	p_main_msg->source = M_REMOTE;
+	if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO))
+	{
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+	/* Allocate remote_msg */
+	remote_msg_t * p_remote_msg = (remote_msg_t *) malloc(sizeof(remote_msg_t));
+
+	/* Allocate temp_msg */
+	temp_msg_t * p_temp_msg = (temp_msg_t *) malloc(sizeof(temp_msg_t));
+
+	/*Opening temperature message queue*/ 
+	mqd_t temp_mq = mq_open(p_targs->temp_mq_name, O_WRONLY);
+
+	/* Allocate light_msg */
+	light_msg_t * p_light_msg = (light_msg_t *) malloc(sizeof(light_msg_t));
+
+	 /*Opening light message queue*/
+        mqd_t light_mq = mq_open(p_targs->light_mq_name, O_WRONLY);
+
+
+
+	
     int socket_desc , client_sock , c , read_size;
     struct sockaddr_in server , client;
     char client_message[2000];
@@ -77,15 +120,43 @@ void *server()
     }
     printf("Connection has been accepted\n");
 
-    //Receive a message from client
+    /*Receive a message from client.This is the main while loop*/
     while( (read_size = recv(client_sock , client_message , 2000 , 0)) > 0 )
     {
 	if ((client_message[0]=='T')||(client_message[0]=='t'))
         {
+
+	/*In this condition we shall send the temp thread a message*/
+
+	p_temp_mesg->source=T_REMOTE;
+	p_temp_mesg->id=TEMP_DATAREQ;
+
+	if (mq_send(temp_mq, p_temp_msg, sizeof(temp_msg_t), PRIORITY_TWO))
+		{
+        	int8_t retvalue = FAILURE;
+        	pthread_exit(&retvalue);
+		}
+	/*Here we shall receive a message from the temperature thread*/
+	mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
         strcpy(client_message, "The temperature is:");
         }
+
         else if((client_message[0]=='L')||(client_message[0]=='l'))
         {
+	 /*In this condition we shall send the light thread a message*/
+
+        p_light_mesg->source=L_REMOTE;
+        p_light_mesg->id=LIGHT_DATAREQ;
+
+        if (mq_send(light_mq, p_light_msg, sizeof(light_msg_t), PRIORITY_TWO))
+                {
+                int8_t retvalue = FAILURE;
+                pthread_exit(&retvalue);
+                }
+        /*Here we shall receive a message from the temperature thread*/
+        mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
+
+	
         strcpy(client_message, "The Luminosity is:");
         }
         else
