@@ -34,6 +34,25 @@
 *
 */
 
+#define MAX_MQ_NAME     20
+#define MAX_LOG_NAME    16
+#define MAX_STR_LEN     64
+#define LOG_MAX_MSGS    20
+
+
+
+
+struct temp_thread_info
+{
+    uint8_t log_mq_name[MAX_MQ_NAME];
+    uint8_t main_mq_name[MAX_MQ_NAME];
+    uint8_t temp_mq_name[MAX_MQ_NAME];
+    uint8_t server_mq_name[MAX_MQ_NAME];
+    uint8_t log_filename[MAX_LOG_NAME];
+};
+
+
+
 typedef enum
 {
 
@@ -200,7 +219,7 @@ temperature_e_t timeout (void);
 /**
 * @function convert_temperature
 *
-* @brief 
+* @brief
 *
 *
 *
@@ -211,6 +230,22 @@ temperature_e_t timeout (void);
 */
 
 float convert_temperature(void);
+
+
+/**
+* @function *temp
+*
+* @brief temperature task
+*
+*
+*
+*
+* @param  void *args
+*
+* @return void *
+*/
+
+void *temp(void *args);
 
 
 
