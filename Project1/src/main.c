@@ -144,13 +144,31 @@ int main(int argc, char * argv[])
     /* Main loop */
     while (!b_sigexit)
     {
-        /* Heartbeat */
+        /* Heartbeat to the logger*/
         log_msg_t * p_log_msg;
         p_log_msg->level = COMMAND;
         p_log_msg->source = MAIN;
         time(&p_log_msg->timestamp);
         strcpy((char *) &p_log_msg->str, "heartbeat");
-        mq_send(log_mqd, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+        mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+
+
+	 /* Heartbeat to temperature*/
+        temp_msg_t * p_temp_msg;
+        p_temp_msg->id = TEMP_HEARTBEATREQ;
+        p_log_msg->source = T_MAIN;
+        mq_send(temp_mq, (char *) p_log_msg, sizeof(temp_msg_t), PRIORITY_TWO);
+
+	
+         /* Heartbeat to light*/
+        light_msg_t * p_light_msg;
+        p_light_msg->id = LIGHT_HEARTBEATREQ;
+        p_light_msg->source = L_MAIN;
+        mq_send(light_mq, (char *) p_light_msg, sizeof(light_msg_t), PRIORITY_TWO);
+
+
+
+
         // Repeat above for other modules
         usleep(HEARTBEAT_TIME_US);
         for (i_threads = 0; i_threads < N_THREADS; i_threads++)
