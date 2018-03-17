@@ -25,14 +25,6 @@
 
 
 
-/**
-*@brief temperature_e_t is a specialized
-*	enum that is used to return
-*	error codes for the 
-*	temperature functions that 
-*	are declared in this file.
-*
-*/
 
 #define MAX_MQ_NAME     20
 #define MAX_LOG_NAME    16
@@ -48,11 +40,18 @@ struct temp_thread_info
     uint8_t main_mq_name[MAX_MQ_NAME];
     uint8_t temp_mq_name[MAX_MQ_NAME];
     uint8_t server_mq_name[MAX_MQ_NAME];
-    uint8_t log_filename[MAX_LOG_NAME];
 };
 
 
 
+/**
+*@brief temperature_e_t is a specialized
+*	enum that is used to return
+*	error codes for the 
+*	temperature functions that 
+*	are declared in this file.
+*
+*/
 typedef enum
 {
 
@@ -63,28 +62,23 @@ typedef enum
 }temperature_e_t;
 
 typedef enum
-{
-    MAIN,
-    REMOTE,
-    TEMPERATURE,
-    LIGHT
-} log_source_t;
+{                       // These are the only two threads that should be messaging Temp
+    T_MAIN,
+    T_REMOTE
+} temp_source_t;
 
 typedef enum
 {
-    INFO,
-    COMMAND,
-    WARNING,
-    ERROR
-} log_level_t;
+    TEMP_DATAREQ,       // ID of message from Remote to Temp asking for a temperature data message
+    TEMP_HEARTBEATREQ,  // ID of message from Main to Temp asking for a heartbeat
+    TEMP_EXITCMD        // ID of message from Main to Temp commanding a graceful exit
+} temp_id_t;
 
 typedef struct temp_msg
 {
-    time_t timestamp;
-    log_level_t level;
-    log_source_t source;
-    uint8_t str[MAX_STR_LEN];
-} log_temp_t;
+    temp_id_t id;
+    temp_source_t source;
+} temp_msg_t;
 
 
 /**
