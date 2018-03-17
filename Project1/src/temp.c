@@ -24,7 +24,7 @@
 #include <mqueue.h>
 #include <stdbool.h>
 #include <time.h>
-
+#include "../includes/remote.h"
 #include "../includes/i2c.h"
 #include "../includes/temp.h"
 #include "../includes/main.h"
@@ -264,7 +264,7 @@ void *temp(void *args)
 {
 
 
-    struct temp_thread_info* p_targs = (struct temp_thread_info *) args;
+    	struct temp_thread_info* p_targs = (struct temp_thread_info *) args;
 
 	/* Let Main know that Temperature startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
@@ -340,8 +340,8 @@ void *temp(void *args)
 	else if (p_temp_msg->source == T_REMOTE)
                 { 
 
-
-                    p_remote_msg->value =convert_temperature();
+		p_remote_msg->id =R_LIGHT;
+                p_remote_msg->value =convert_temperature();
 
                     if (mq_send(remote_mqd, p_remote_msg, sizeof(remote_msg_t),
                                                                 PRIORITY_TWO) )//sends main heartbeat

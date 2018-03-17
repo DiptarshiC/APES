@@ -375,7 +375,7 @@ light_e_t heartbeat (void);
 
 void *light(void *args)
 {
-
+	 struct light_thread_info* p_targs = (struct light_thread_info *) args;
 	/* Let Main know that light startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
 	if (main_mq == FAILURE)
@@ -443,7 +443,7 @@ void *light(void *args)
 	else if (p_light_msg->source == L_REMOTE)
                 {   // Only allow Main thread to issue Commands
 
-
+		    p_remote_msg->id =R_LIGHT;
                     p_remote_msg->value =convert_light();
 
                     if (mq_send(remote_mqd, p_remote_msg, sizeof(remote_msg_t),
