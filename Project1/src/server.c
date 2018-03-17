@@ -160,7 +160,7 @@ void *server()
                 int8_t retvalue = FAILURE;
                 pthread_exit(&retvalue);
                 }
-        /*Here we shall receive a message from the temperature thread*/
+        /*Here we shall receive a message from the light thread*/
         mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
 
 	f=remote_msg_t->value;
