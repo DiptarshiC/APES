@@ -203,19 +203,47 @@ temperature_e_t read_thi_reg (char data[])
 
 temperature_e_t timeout (void);
 
+
+/**
+* @function convert_temperature
+*
+* @brief
+*
+*
+*
+*
+* @param  void
+*
+* @return temperature_e_t
+*/
+
+float convert_temperature(void)
+{
+	  char data[2]={0};
+	  uint8_t LSB1;
+	  uint8_t MSB1;
+
+	  read_temperature_reg(data);
+	  float f=0;
+	  MSB1=data[0];
+          LSB1=data[1];
+	  int temp=0;
+	  temp = ((MSB << 8) | LSB) >> 4;
+	  c = temp*0.0625;
+       	  f = (1.8 * c) + 32;
+	  return f;
+}
 void main()
 {
 
 	char data[2]={0};
-	char data2[3]={0};	
+
 	MSB=0,
 	LSB=0;
 	int temp=0;
 	float f=0;
 	float c=0;
-	
-	
-	
+
 //	while(1)
 //	{
       

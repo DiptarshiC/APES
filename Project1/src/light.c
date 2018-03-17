@@ -258,8 +258,8 @@ light_e_t read_adc_reg (uint8_t channel, char data[])
 		data[0]=DATA[0];
                 data[1]=DATA[1];
 
-	}	
-	
+	}
+
 }
 /**
 * @function convert_light
@@ -267,11 +267,30 @@ light_e_t read_adc_reg (uint8_t channel, char data[])
 * @brief reads data from the adc reg
 *
 * @param void
-*                 
+*
 * @return float
 */
-float convert_light (uint8_t ADC1H,uint8_t ADC1L,uint8_t ADC0H,uint8_t ADC0L)
+float convert_light (void)
 {
+
+write_ctrl_reg(0x03);
+
+char data1[2];
+char data2[2];
+
+read_adc_reg(0,data1);
+read_adc_reg(1,data2);
+
+uint8_t ADC1H;
+uint8_t ADC1L;
+uint8_t ADC0H;
+uint8_t ADC0L;
+
+ADC1H=data2[1];
+ADC1L=data2[0];
+ADC0H=data1[1];
+ADC0L=data1[0];
+
 
 uint16_t CH1; 
 uint16_t CH0;
@@ -288,7 +307,7 @@ float ch0=0.0;
 ch1=CH1;
 ch0=CH0;
 float sensorlux;
-	
+
 	if(((ch1/ch0)<=0.50)&&((ch1/ch0)>0.0))
 	{
 	sensorlux=(0.0304*(ch0))-(0.062*(ch0)*(pow((ch1/ch0),1.4)));

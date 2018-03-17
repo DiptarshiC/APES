@@ -197,5 +197,23 @@ temperature_e_t read_thi_reg (char data[]);
 
 temperature_e_t timeout (void);
 
+/**
+* @function convert_temperature
+*
+* @brief 
+*
+*
+*
+*
+* @param  void
+*
+* @return temperature_e_t
+*/
+
+float convert_temperature(void);
+
+
+
+
 
 #endif /*__TEMP_H__ */
