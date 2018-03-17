@@ -35,6 +35,8 @@
     C socket server example
 */
 
+float f=0.0;
+char temp[20];
 void *server()
 {
 
@@ -138,7 +140,12 @@ void *server()
 		}
 	/*Here we shall receive a message from the temperature thread*/
 	mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
+
+	f=remote_msg_t->value;
+	gcvt(f, 8, temp);
         strcpy(client_message, "The temperature is:");
+	strcat(client_message,f);
+
         }
 
         else if((client_message[0]=='L')||(client_message[0]=='l'))
@@ -156,8 +163,10 @@ void *server()
         /*Here we shall receive a message from the temperature thread*/
         mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
 
-	
+	f=remote_msg_t->value;
+	gcvt(f, 8, temp);
         strcpy(client_message, "The Luminosity is:");
+	strcat(client_message,f);
         }
         else
         {
