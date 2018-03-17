@@ -33,7 +33,7 @@
     C socket server example
 */
 
-void main()
+void *server()
 {
     int socket_desc , client_sock , c , read_size;
     struct sockaddr_in server , client;
