@@ -12,6 +12,10 @@
 */
 
 
+#include <stdbool.h>
+#include <mqueue.h>
+#include <pthread.h>
+#include <time.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +31,7 @@
 #include "../includes/logger.h"
 
 #define	FAILURE		-1
-
+#define SUCCESS		0
 
 
 
@@ -330,7 +334,7 @@ void *temp(void *args)
                 {   // Only allow Main thread to issue Commands
 
 
-                    p_remote_msg->value =convert_temperature;
+                    p_remote_msg->value =convert_temperature();
 
                     if (mq_send(remote_mqd, p_remote_msg, sizeof(remote_msg_t),
                                                                 PRIORITY_TWO) )//sends main heartbeat

@@ -10,6 +10,10 @@
 *@Author:Diptarshi Chakraborty and Connor Shapiro
 */
 
+#include <stdbool.h>
+#include <mqueue.h>
+#include <pthread.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -21,6 +25,12 @@
 #include <math.h>
 #include "../includes/i2c.h"
 #include "../includes/light.h"
+#include "../includes/main.h"
+#include "../includes/remote.h"
+
+
+#define SUCCESS             0
+#define FAILURE             -1
 
 /**
 * @function write_cmd_reg
@@ -350,3 +360,101 @@ float sensorlux;
 light_e_t heartbeat (void);
 
 
+/**
+* @function *light
+*
+* @brief light task
+*
+*
+*
+*
+* @param  void *args
+*
+* @return void *
+*/
+
+void *light(void *args)
+{
+
+	/* Let Main know that light startup went well */
+	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
+	if (main_mq == FAILURE)
+	{
+
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+	main_msg_t * p_main_msg = (main_msg_t *) malloc(sizeof(main_msg_t));
+	if (!p_main_msg)
+	{
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+	p_main_msg->id = START_OK;
+	p_main_msg->source = M_LIGHT;
+	if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO))
+	{
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+	/* Allocate temp_msg */
+	light_msg_t * p_light_msg = (light_msg_t *) malloc(sizeof(light_msg_t));
+
+
+	/* Main Loop */
+	bool b_exit = false;
+	while (!b_exit) // Do Temperature things until Main orders a graceful exit.
+	{
+	mq_receive(light_mq, p_light_msg, sizeof(light_msg_t), NULL); // Block empty
+	if (p_light_msg->source == L_MAIN)
+	{
+
+		if (p_temp_msg->id == LIGHT_HEARTBEATREQ)
+		{
+			p_main_msg->id = HEARTBEAT;
+			p_main_msg->source = M_LIGHT;
+			if (mq_send(main_mqd, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO) )//sends main heartbeat
+			{
+				int8_t retvalue = FAILURE;
+				pthread_exit(&retvalue);
+			}
+
+		}
+		else if (p_light_msg->id == LIGHT_EXITCMD)
+		{
+			if (mq_close(light_mq))
+			{
+				int8_t retvalue = FAILURE;
+        			pthread_exit(&retvalue);
+    			}
+    			if (mq_unlink(light_mq))
+    			{
+        			int8_t retvalue = FAILURE;
+        			pthread_exit(&retvalue);
+    			}
+
+    			free(p_main_msg);
+    			free(p_light_msg);
+    			int8_t retvalue = SUCCESS;
+			 pthread_exit(&retvalue);
+		}
+	}
+
+	else if (p_light_msg->source == L_REMOTE)
+                {   // Only allow Main thread to issue Commands
+
+
+                    p_remote_msg->value =convert_light();
+
+                    if (mq_send(remote_mqd, p_remote_msg, sizeof(remote_msg_t),
+                                                                PRIORITY_TWO) )//sends main heartbeat
+                    {
+                        int8_t retvalue = FAILURE;
+                        pthread_exit(&retvalue);
+                    }
+
+                }
+	}
+
+
+}

@@ -267,6 +267,22 @@ float convert_light(uint8_t ADC1H,uint8_t ADC1L,uint8_t ADC0H,uint8_t ADC0L);
 light_e_t heartbeat (void);
 
 
+/**
+* @function *light
+*
+* @brief light task
+*
+*
+*
+*
+* @param  void *args
+*
+* @return void *
+*/
+
+void *light(void *args);
+
+
 
 
 
