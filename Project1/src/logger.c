@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include "../includes/main.h"
 #include "../includes/logger.h"
 
@@ -54,7 +55,7 @@ static int8_t log_str(uint8_t * string)
         return FAILURE;
     }
     uint8_t strtime[TIME_STR_SIZE];
-    strftime(strtime, TIME_STR_SIZE, '%T', localtime(&thetime));
+    strftime(strtime, TIME_STR_SIZE, "%T", localtime(&thetime));
     if (fprintf(gp_log_file, "%s - %s\n", strtime, string) < SUCCESS)
     {
         perror("Failed to write to logfile.\n");
@@ -171,7 +172,7 @@ void * logger(void * arg)
                                                    * some sort weird recursive
                                                    * logging.
                                                    */
-                *str_time = NULL; // Null terminate first character
+                *str_time = 0; // Null terminate first character
                 return FAILURE;
             }
             strftime(str_time, TIME_STR_SIZE, '%T', localtime(&thetime));
@@ -181,25 +182,25 @@ void * logger(void * arg)
             switch (p_log_msg->source) 
             {
                 case MAIN:
-                    strcopy(str_source, "Main");
+                    strcpy(str_source, "Main");
                 break;
 
                 case REMOTE:
-                    strcopy(str_source, "Remote");
+                    strcpy(str_source, "Remote");
                 break;
 
                 case TEMPERATURE:
-                    strcopy(str_source, "Temperature");
+                    strcpy(str_source, "Temperature");
                 break;
 
                 case LIGHT:
-                    strcopy(str_source, "Light");
+                    strcpy(str_source, "Light");
                 break;
 
                 default:
                     log_str("(Logger) [WARNING]: Received log from unknown "
                                                                     "thread.");
-                    *str_source = NULL; // Null terminate first character
+                    *str_source = 0; // Null terminate first character
                     break;
             }
 
@@ -222,7 +223,7 @@ void * logger(void * arg)
                 default:
                     log_str("(Logger) [WARNING]: Received log of unknown "
                                                                     "level.");
-                    *str_level = NULL;
+                    *str_level = 0;
                 break;
             }
 

@@ -241,7 +241,7 @@ float convert_temperature(void)
           LSB1=data[1];
 	  int temp=0;
 	  temp = ((MSB1 << 8) | LSB1) >> 4;
-	  c = temp*0.0625;
+	  float c = temp*0.0625;
        	  f = (1.8 * c) + 32;
 	  return f;
 }
@@ -264,19 +264,20 @@ void *temp(void *args)
 {
 
 
-
+    struct temp_thread_info* p_targs = (struct temp_thread_info *) args;
 
 	/* Let Main know that Temperature startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
 	if (main_mq == FAILURE)
 	{
-
+        // Log something here using perror
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
 	main_msg_t * p_main_msg = (main_msg_t *) malloc(sizeof(main_msg_t));
 	if (!p_main_msg)
 	{
+        // Log something here using perror
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
@@ -284,12 +285,15 @@ void *temp(void *args)
 	p_main_msg->source = M_TEMPERATURE;
 	if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO))
 	{
+        // Log something here using perror
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
 	/* Allocate temp_msg */
 	temp_msg_t * p_temp_msg = (temp_msg_t *) malloc(sizeof(temp_msg_t));
 
+    //Open temp_mq from p_targs
+    //Open log_mq
 
 	/* Main Loop */
 	bool b_exit = false;
@@ -303,7 +307,7 @@ void *temp(void *args)
 		{
 			p_main_msg->id = HEARTBEAT;
 			p_main_msg->source = M_TEMPERATURE;
-			if (mq_send(main_mqd, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO) )//sends main heartbeat
+			if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO) )//sends main heartbeat
 			{
 				int8_t retvalue = FAILURE;
 				pthread_exit(&retvalue);
@@ -314,11 +318,13 @@ void *temp(void *args)
 		{
 			if (mq_close(temp_mq))
 			{
+                // Log something to Logger
 				int8_t retvalue = FAILURE;
         			pthread_exit(&retvalue);
     			}
     			if (mq_unlink(temp_mq))
     			{
+                    // Log something to Logger
         			int8_t retvalue = FAILURE;
         			pthread_exit(&retvalue);
     			}
@@ -326,12 +332,13 @@ void *temp(void *args)
     			free(p_main_msg);
     			free(p_temp_msg);
     			int8_t retvalue = SUCCESS;
+                // Log something with printf
 			 pthread_exit(&retvalue);
 		}
 	}
 
 	else if (p_temp_msg->source == T_REMOTE)
-                {   // Only allow Main thread to issue Commands
+                { 
 
 
                     p_remote_msg->value =convert_temperature();
