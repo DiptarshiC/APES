@@ -135,14 +135,14 @@ light_e_t write_irq_ctrl_reg (uint8_t data)
 
 light_e_t read_ctrl_reg (char  data[])
 {
-        
-	
+
+
 	data[0]=(COMMAND_REG|CONTROL);
         i2c_write(SLAVE_ADDRESS,data);
 	data[0]=(COMMAND_REG|CONTROL);
         i2c_read(SLAVE_ADDRESS,data);
 
-	
+
 }
 
 /**
@@ -159,12 +159,12 @@ light_e_t read_ctrl_reg (char  data[])
 
 light_e_t read_timing_reg (char  data[])
 {
- 
+
 	data[0]=(COMMAND_REG|TIMING);
         i2c_write(SLAVE_ADDRESS,data);
         data[0]=(COMMAND_REG|TIMING);
         i2c_read(SLAVE_ADDRESS,data);
-	
+
 }
 /**
 * @function read_irq_thresh_reg
@@ -234,10 +234,10 @@ light_e_t read_id_reg (char data[])
 
 light_e_t read_adc_reg (uint8_t channel, char data[])
 {
-	
-	
+
+
 	char DATA[2];
-	
+
 	if(channel==0)
 
 	{
@@ -247,7 +247,7 @@ light_e_t read_adc_reg (uint8_t channel, char data[])
 		i2c_read(SLAVE_ADDRESS,DATA);
 		data[0]=DATA[0];
 		data[1]=DATA[1];
-		
+
 	}
 	else if(channel==1)
 	{

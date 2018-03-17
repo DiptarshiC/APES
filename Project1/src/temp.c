@@ -6,7 +6,7 @@
 *	 	for reading and writing values in the i2c
 *	 	temp sensor.
 *
-*@Date:2nd March 2017 
+*@Date:2nd March 2017
 *
 *@Author:Diptarshi Chakraborty and Connor Shapiro
 */
@@ -20,16 +20,16 @@
 #include "../includes/temp.h"
 
 
-uint8_t LSB;
-uint8_t MSB;
+
+
 
 /**
 * @function write_ptr_reg
 *
 * @brief writes to temp sensor ptr reg
 *
-*  
-*      
+*
+*
 *
 * @param  uint8_t data:data to write to the pointer
 *                 register
@@ -44,8 +44,8 @@ temperature_e_t write_ptr_reg (uint8_t data);
 *
 * @brief writes into the config reg
 *
-* 
-*       
+*
+*
 *
 * @param  uint8_t data:data to write to the config
 *                 register
@@ -112,13 +112,13 @@ temperature_e_t  write_thi_reg (uint8_t MSB,uint8_t LSB)
 *
 *
 * @param  uint8_t *data:ptr to store data
-*                 
+* 
 * @return temperature_e_t
 */
 
 temperature_e_t read_temperature_reg (char data[])
 {
-	
+
 	data[0]=(POINTER_REG| TEMP_REG_ADDR);
 	i2c_write( DEV_ADDR,data);
 	data[0]=(POINTER_REG| TEMP_REG_ADDR);
@@ -134,7 +134,7 @@ temperature_e_t read_temperature_reg (char data[])
 *
 *
 * @param  uint8_t data:pointer to store data
-*                 
+*
 *
 * @return temperature_e_t
 */
@@ -143,7 +143,6 @@ temperature_e_t read_config_reg (char data[])
 {
 	data[0]=(POINTER_REG| CONF_REG_ADDR);
         i2c_write( DEV_ADDR,data);
-	 	
         data[0]=(POINTER_REG| CONF_REG_ADDR);
         i2c_read( DEV_ADDR,data);
 }
@@ -228,7 +227,7 @@ float convert_temperature(void)
 	  MSB1=data[0];
           LSB1=data[1];
 	  int temp=0;
-	  temp = ((MSB << 8) | LSB) >> 4;
+	  temp = ((MSB1 << 8) | LSB1) >> 4;
 	  c = temp*0.0625;
        	  f = (1.8 * c) + 32;
 	  return f;
