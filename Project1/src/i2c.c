@@ -322,40 +322,7 @@ Credit:https://elixir.bootlin.com/linux/v4.9.78/source/Documentation/i2c/dev-int
 }
 
 
-/*
-void main()
-{
-	char buf[2]={0};
-	while(1)
-	{
-      
-	uint8_t *buf=(uint8_t*)malloc(2*sizeof(uint8_t));
-	i2c_read(0x48,buf);
-	int temp;
-	uint8_t MSB=0;
-	uint8_t LSB=0;
-	
-	MSB=*(buf);
-	LSB=*(buf+1);
-	
-	
-	float f, c;
 
-       /* Convert 12bit int using two's compliment 
-       /* Credit: http://bildr.org/2011/01/tmp102-arduino/ 
-       temp = ((MSB << 8) | LSB) >> 4;
-
-       c = temp*0.0625;
-       f = (1.8 * c) + 32;
-
-       printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
-
-	sleep(1);
-	}
-	
-}
-*/	
-	
 
 
 
