@@ -349,37 +349,4 @@ float sensorlux;
 */
 light_e_t heartbeat (void);
 
-void main()
-{
 
-	char data[2];
-	char data1[2];
-	char data2[2];
-	char data3[3];
-	printf("Now we shall check read/write functions\n");
-
-	printf("First ill do a write/read check on control register\n");
-	
-	write_ctrl_reg(0x03);
-	read_ctrl_reg(data);
-
-	printf("The value in the CONTROL register is %x \n",data[0]);
-
-	printf("Now i shall print the ADC values in a while loop\n");
-
-//	printf("ADC1H\tADC1L\tADC0H\tADC0L\n");
-	while(1)
-
-	{
-
-	write_ctrl_reg(0x03);
-        
-
-	read_adc_reg(0,data1);
-	read_adc_reg(1,data2);
-        //printf(" %d \t %d \t %d \t %d \n",data2[1],data2[0],data1[1],data1[0]);
-	printf("The value of sensorlux is %f\n",convert_light(data2[1],data2[0],data1[1],data1[0]));
-	sleep(2);	
-
-	}
-}

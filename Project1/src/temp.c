@@ -184,7 +184,7 @@ temperature_e_t read_thi_reg (char data[])
 	data[0]=(POINTER_REG| THIGH_REG_ADDR) ;
         i2c_write( DEV_ADDR,data);
 	data[0]=(POINTER_REG| THIGH_REG_ADDR) ;
-        i2c_read( DEV_ADDR,data);	
+        i2c_read( DEV_ADDR,data);
 }
 
 
@@ -233,60 +233,6 @@ float convert_temperature(void)
        	  f = (1.8 * c) + 32;
 	  return f;
 }
-void main()
-{
-
-	char data[2]={0};
-
-	MSB=0,
-	LSB=0;
-	int temp=0;
-	float f=0;
-	float c=0;
-
-//	while(1)
-//	{
-      
-	
-	read_temperature_reg(data);
-	//printf("data reg=%d \n",*(data));
-	//printf("data+1 reg=%d \n",*(data+1));
-	
-	MSB=data[0];
-	LSB=data[1];
-
-       /* Convert 12bit int using two's compliment */
-       /* Credit: http://bildr.org/2011/01/tmp102-arduino */
-       temp = ((MSB << 8) | LSB) >> 4;
-
-       c = temp*0.0625;
-       f = (1.8 * c) + 32;
-	char data1[1];
-       	printf("Temp Fahrenheit: %f Celsius: %f\n", f, c);
-
-	printf("Now to check read/write operations on the thigh register\n");
-	write_thi_reg(0xDA,0xBC);
-	read_thi_reg(data);
-	printf("data[0]:%x\n",data[0]);
-	printf("data[1]:%x\n",data[1]);
-
- 	printf("Now to check read/write operations on the tlow register\n");
-        write_tlow_reg(0xDA,0xBC);
-        read_tlow_reg(data);
-        printf("data[0]:%x\n",data[0]);
-        printf("data[1]:%x\n",data[1]);
-
-	printf("Now to check read/write operations on the config register\n");
-        write_conf_reg (0xBC,0xAD);
-        read_config_reg(data);
-        printf("data[0]:%x\n",data[0]);
- 	printf("data[1]:%x\n",data[1]);
 
 
 
-	
-//	sleep(1);
-//	}
-
-
-}
