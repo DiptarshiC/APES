@@ -16,8 +16,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <mqueue.h>
+#include <stdbool.h>
+#include <time.h>
+
 #include "../includes/i2c.h"
 #include "../includes/temp.h"
+
+
+
+
 
 
 
@@ -232,6 +241,85 @@ float convert_temperature(void)
        	  f = (1.8 * c) + 32;
 	  return f;
 }
+
+
+/**
+* @function *temp
+*
+* @brief temperature task
+*
+*
+*
+*
+* @param  void *args
+*
+* @return void *
+*/
+
+void *temp(void *args)
+{
+
+
+	/* Take in arguments from Main thread */
+	struct temp_thread_info * p_targs = (struct temp_thread_info *) arg;
+
+	 /* Open message queue and logfile */
+	mqd_t temp_mq = mq_open(p_targs->temp_mq_name, O_RDONLY);
+
+	if (temp_mq == FAILURE)
+	{
+        perror("Failed to open temp message queue.\n");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+	}
+
+
+	gp_log_file = fopen(p_targs->log_filename, "w");
+    	if (!gp_log_file)
+    	{
+        perror("Failed to open log file.\n");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    	}
+
+
+	 /* Let Main know that Logger startup went well */
+    mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
+    if (main_mq == FAILURE)
+    {
+        log_str("(Logger) [ERROR]: Failed to open Main message queue.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    main_msg_t * p_main_msg = (main_msg_t *) malloc(sizeof(main_msg_t));
+    if (!p_main_msg)
+    {
+        log_str("(Logger) [ERROR]: Failed to malloc for main_msg.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+    p_main_msg->id = START_OK;
+    p_main_msg->source = M_LOGGER;
+    if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_LOWEST))
+    {
+        log_str("(Logger) [ERROR]: Failed to send START_OK to Main.");
+        int8_t retvalue = FAILURE;
+        pthread_exit(&retvalue);
+    }
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
 
 
 
