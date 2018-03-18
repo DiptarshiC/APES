@@ -26,7 +26,7 @@
 #define PRIORITY_LOWEST     0
 #define PRIORITY_ONE        1
 #define PRIORITY_TWO        2
-// #define N_THREADS           4
+ // #define N_THREADS           4
 #define N_THREADS           1 /* Uncomment above and delete this line when all 
                                * threads are implemented with msg queues
                                */

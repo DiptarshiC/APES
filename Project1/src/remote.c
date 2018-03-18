@@ -38,7 +38,7 @@
 
 float f=0.0;
 char temp[20];
-void *server()
+void *remote()
 {
 
 	struct remote_thread_info* p_targs = (struct remote_thread_info *) args;
