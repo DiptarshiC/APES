@@ -17,6 +17,17 @@
 #define SUCCESS             0
 #define FAILURE            -1
 
+
+struct remote_thread_info
+{
+    uint8_t light_mq_name[MAX_MQ_NAME];
+    uint8_t main_mq_name[MAX_MQ_NAME];
+    uint8_t temp_mq_name[MAX_MQ_NAME];
+    uint8_t remote_mq_name[MAX_MQ_NAME};
+};
+
+
+
 typedef struct enum
 {
 	R_TEMP;

@@ -36,11 +36,26 @@
 /**
 *@brief temperature_e_t is a specialized
 *	enum that is used to return
-*	error codes for the 
-*	temperature functions that 
+*	error codes for the
+*	temperature functions that
 *	are declared in this file.
 *
 */
+
+
+
+#define MAX_MQ_NAME     20
+#define MAX_LOG_NAME    16
+#define MAX_STR_LEN     64
+#define LIGHT_MAX_MSGS  20
+
+
+struct light_thread_info
+{
+    uint8_t light_mq_name[MAX_MQ_NAME];
+    uint8_t main_mq_name[MAX_MQ_NAME];
+    uint8_t remote_mq_name[MAX_MQ_NAME};
+};
 
 typedef enum
 {
