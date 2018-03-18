@@ -161,7 +161,6 @@ int main(int argc, char * argv[])
     }
     strcpy(p_light_args->main_mq_name, MAIN_MQ);
     strcpy(p_light_args->light_mq_name, LIGHT_MQ);
-    strcpy(p_light_args->temp_mq_name, TEMPERATURE_MQ);
     strcpy(p_light_args->remote_mq_name,REMOTE_MQ);
     pthread_attr_t light_tattr;
     pthread_attr_init(&light_tattr);  // Default pthread attr
@@ -197,7 +196,7 @@ int main(int argc, char * argv[])
     strcpy(p_remote_args->remote_mq_name,REMOTE_MQ);
     pthread_attr_t remote _tattr;
     pthread_attr_init(&remote_tattr);  // Default pthread attr
-    pthread_t * light_thread;
+    pthread_t * remote_thread;
     if (pthread_create(remote_thread, &remote_tattr, remote, p_remote_args))
     {
         perror("(Main) [ERROR]: Could not create remote task.\n");
@@ -297,7 +296,7 @@ int main(int argc, char * argv[])
     }
 
     /*Cleanup of temp thread*/
-    log_msg_t * p_log_msg;
+    
     p_log_msg->level = COMMAND;
     p_log_msg->source = MAIN;
     time(&p_log_msg->timestamp);
@@ -315,7 +314,7 @@ int main(int argc, char * argv[])
 
 
     /*Cleanup of light thread*/
-    log_msg_t * p_log_msg;
+    
     p_log_msg->level = COMMAND;
     p_log_msg->source = MAIN;
     time(&p_log_msg->timestamp);
@@ -333,7 +332,7 @@ int main(int argc, char * argv[])
 
 
    /*Cleanup of remote thread*/
-    log_msg_t * p_log_msg;
+
     p_log_msg->level = COMMAND;
     p_log_msg->source = MAIN;
     time(&p_log_msg->timestamp);

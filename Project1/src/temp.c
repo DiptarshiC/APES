@@ -11,7 +11,7 @@
 *@Author:Diptarshi Chakraborty and Connor Shapiro
 */
 
-
+#include <string.h>
 #include <stdbool.h>
 #include <mqueue.h>
 #include <pthread.h>
@@ -268,6 +268,14 @@ void *temp(void *args)
 
 	/* Let Main know that Temperature startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
+	
+	mqd_t remote_mqd = mq_open(p_targs->remote_mq_name, O_WRONLY);
+
+	mqd_t log_mq= mq_open(p_targs->log_mq_name, O_WRONLY);
+
+	mqd_t temp_mq= mq_open(p_targs->temp_mq_name, O_WRONLY);
+
+	
 	if (main_mq == FAILURE)
 	{
         // Log something here using perror
@@ -291,6 +299,10 @@ void *temp(void *args)
 	}
 	/* Allocate temp_msg */
 	temp_msg_t * p_temp_msg = (temp_msg_t *) malloc(sizeof(temp_msg_t));
+
+	 /* Allocate remote_msg */
+        remote_msg_t * p_remote_msg = (remote_msg_t *) malloc(sizeof(remote_msg_t));
+
 
     //Open temp_mq from p_targs
     //Open log_mq
@@ -357,7 +369,7 @@ void *temp(void *args)
                         	{
 				log_msg_t * p_log_msg;
         			p_log_msg->level = ERROR;
-        			p_log_msg->source = TEMP;
+        			p_log_msg->source = TEMPERATURE;
         			time(&p_log_msg->timestamp);
         			strcpy((char *) &p_log_msg->str,"failure to close temperature message queue");
 
@@ -370,7 +382,7 @@ void *temp(void *args)
 
 				log_msg_t * p_log_msg;
                                 p_log_msg->level = ERROR;
-                                p_log_msg->source = TEMP;
+                                p_log_msg->source = TEMPERATURE;
                                 time(&p_log_msg->timestamp);
                                 strcpy((char *) &p_log_msg->str,"failure to unlink temperature message queue");
 

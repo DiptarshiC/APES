@@ -54,7 +54,7 @@ struct light_thread_info
 {
     uint8_t light_mq_name[MAX_MQ_NAME];
     uint8_t main_mq_name[MAX_MQ_NAME];
-    uint8_t remote_mq_name[MAX_MQ_NAME};
+    uint8_t remote_mq_name[MAX_MQ_NAME];
 };
 
 typedef enum
@@ -79,7 +79,7 @@ typedef enum
     LIGHT_EXITCMD        // ID of message from Main to light commanding a graceful exit
 } light_id_t;
 
-typedef struct temp_msg
+typedef struct light_msg
 {
     light_id_t id;
     light_source_t source;
@@ -268,7 +268,7 @@ light_e_t read_adc_reg (uint8_t channel, char data[]);
 *                 
 * @return float
 */
-float convert_light(uint8_t ADC1H,uint8_t ADC1L,uint8_t ADC0H,uint8_t ADC0L);
+float convert_light();
 
 /**
 * @function heatbeat

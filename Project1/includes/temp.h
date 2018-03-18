@@ -29,7 +29,7 @@
 #define MAX_MQ_NAME     20
 #define MAX_LOG_NAME    16
 #define MAX_STR_LEN     64
-#define LOG_MAX_MSGS    20
+#define TEMP_MAX_MSGS    20
 
 
 
