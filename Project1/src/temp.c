@@ -271,11 +271,16 @@ void *temp(void *args)
 	
 	mqd_t remote_mqd = mq_open(p_targs->remote_mq_name, O_WRONLY);
 
-	mqd_t log_mq= mq_open(p_targs->log_mq_name, O_WRONLY);
 
 	mqd_t temp_mq= mq_open(p_targs->temp_mq_name, O_WRONLY);
 
-	
+	mqd_t log_mq= mq_open(p_targs->log_mq_name, O_WRONLY);
+
+
+
+
+
+
 	if (main_mq == FAILURE)
 	{
         // Log something here using perror

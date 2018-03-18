@@ -28,6 +28,7 @@
 #include "../includes/light.h"
 #include "../includes/main.h"
 #include "../includes/remote.h"
+#include "../includes/logger.h"
 
 
 #define SUCCESS             0
@@ -379,6 +380,10 @@ void *light(void *args)
 	 struct light_thread_info* p_targs = (struct light_thread_info *) args;
 	/* Let Main know that light startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
+	mqd_t log_mq = mq_open(p_targs->log_mq_name, O_WRONLY);
+        mqd_t remote_mqd = mq_open(p_targs->remote_mq_name, O_WRONLY);
+
+
 	if (main_mq == FAILURE)
 	{
 
@@ -398,8 +403,12 @@ void *light(void *args)
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
-	/* Allocate temp_msg */
+	/* Allocate light_msg */
 	light_msg_t * p_light_msg = (light_msg_t *) malloc(sizeof(light_msg_t));
+
+	/* Allocate remote_msg */
+        remote_msg_t * p_remote_msg = (remote_msg_t *) malloc(sizeof(remote_msg_t));
+
 
 
 	/* Main Loop */
@@ -410,11 +419,11 @@ void *light(void *args)
 	if (p_light_msg->source == L_MAIN)
 	{
 
-		if (p_temp_msg->id == LIGHT_HEARTBEATREQ)
+		if (p_light_msg->id == LIGHT_HEARTBEATREQ)
 		{
 			p_main_msg->id = HEARTBEAT;
 			p_main_msg->source = M_LIGHT;
-			if (mq_send(main_mqd, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO) )//sends main heartbeat
+			if (mq_send(main_mq, p_main_msg, sizeof(main_msg_t), PRIORITY_TWO) )//sends main heartbeat
 			{
 				int8_t retvalue = FAILURE;
 				pthread_exit(&retvalue);

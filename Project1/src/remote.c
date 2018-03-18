@@ -37,7 +37,7 @@
 */
 
 float f=0.0;
-char temp[20];
+char t[20];
 void *remote()
 {
 
@@ -64,7 +64,7 @@ void *remote()
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}
-	/* Allocate remote_msg */
+	/* Opening remote_msg */
 	remote_msg_t * p_remote_msg = (remote_msg_t *) malloc(sizeof(remote_msg_t));
 
 	/* Allocate temp_msg */
@@ -79,9 +79,14 @@ void *remote()
 	 /*Opening light message queue*/
         mqd_t light_mq = mq_open(p_targs->light_mq_name, O_WRONLY);
 
+	 /*Opening remote  message queue*/
+        mqd_t remote_mq = mq_open(p_targs->remote_mq_name, O_WRONLY);
 
 
-	
+
+
+
+
     int socket_desc , client_sock , c , read_size;
     struct sockaddr_in server , client;
     char client_message[2000];
@@ -132,8 +137,8 @@ void *remote()
 
 	/*In this condition we shall send the temp thread a message*/
 
-	p_temp_mesg->source=T_REMOTE;
-	p_temp_mesg->id=TEMP_DATAREQ;
+	p_temp_msg->source=T_REMOTE;
+	p_temp_msg->id=TEMP_DATAREQ;
 
 	if (mq_send(temp_mq, p_temp_msg, sizeof(temp_msg_t), PRIORITY_TWO))
 		{
@@ -143,10 +148,10 @@ void *remote()
 	/*Here we shall receive a message from the temperature thread*/
 	mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
 
-	f=remote_msg_t->value;
-	gcvt(f, 8, temp);
+	f=p_remote_msg->value;
+	gcvt(f, 8, t);
         strcpy(client_message, "The temperature is:");
-	strcat(client_message,f);
+	strcat(client_message,t);
 
         }
 
@@ -154,8 +159,8 @@ void *remote()
         {
 	 /*In this condition we shall send the light thread a message*/
 
-        p_light_mesg->source=L_REMOTE;
-        p_light_mesg->id=LIGHT_DATAREQ;
+        p_light_msg->source=L_REMOTE;
+        p_light_msg->id=LIGHT_DATAREQ;
 
         if (mq_send(light_mq, p_light_msg, sizeof(light_msg_t), PRIORITY_TWO))
                 {
@@ -165,10 +170,10 @@ void *remote()
         /*Here we shall receive a message from the light thread*/
         mq_receive(remote_mq, p_remote_msg, sizeof(remote_msg_t), NULL); // Block empty
 
-	f=remote_msg_t->value;
-	gcvt(f, 8, temp);
+	f=p_remote_msg->value;
+	gcvt(f, 8, t);
         strcpy(client_message, "The Luminosity is:");
-	strcat(client_message,f);
+	strcat(client_message,t);
         }
         else
         {
@@ -182,26 +187,13 @@ void *remote()
 	/*Attempt to do a graceful exit*/
 	 		if (mq_close(remote_mq))
                         {
-				log_msg_t * p_log_msg;
-                                p_log_msg->level = ERROR;
-                                p_log_msg->source = REMOTE;
-                                time(&p_log_msg->timestamp);
-                                strcpy((char *) &p_log_msg->str,"failure to close remote message queue");
-                                mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+
                                 int8_t retvalue = FAILURE;
                                 pthread_exit(&retvalue);
 
                         }
                         if (mq_unlink(remote_mq))
-                        {
-
-				log_msg_t * p_log_msg;
-                                p_log_msg->level = ERROR;
-                                p_log_msg->source = REMOTE;
-                                time(&p_log_msg->timestamp);
-                                strcpy((char *) &p_log_msg->str,"failure to unlink remote message queue");
-                                mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
-
+			{
                                 int8_t retvalue = FAILURE;
                                 pthread_exit(&retvalue);
                         }

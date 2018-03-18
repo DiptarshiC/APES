@@ -55,6 +55,8 @@ struct light_thread_info
     uint8_t light_mq_name[MAX_MQ_NAME];
     uint8_t main_mq_name[MAX_MQ_NAME];
     uint8_t remote_mq_name[MAX_MQ_NAME];
+    uint8_t log_mq_name[MAX_MQ_NAME];
+
 };
 
 typedef enum

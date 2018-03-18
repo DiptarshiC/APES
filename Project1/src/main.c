@@ -132,6 +132,8 @@ int main(int argc, char * argv[])
     strcpy(p_temp_args->main_mq_name, MAIN_MQ);
     strcpy(p_temp_args->temp_mq_name, TEMPERATURE_MQ);
     strcpy(p_temp_args->remote_mq_name,REMOTE_MQ);
+   strcpy(p_temp_args->log_mq_name,LOG_MQ);
+
     pthread_attr_t temp_tattr;
     pthread_attr_init(&temp_tattr);  // Default pthread attr
     pthread_t * temp_thread;
@@ -162,6 +164,8 @@ int main(int argc, char * argv[])
     strcpy(p_light_args->main_mq_name, MAIN_MQ);
     strcpy(p_light_args->light_mq_name, LIGHT_MQ);
     strcpy(p_light_args->remote_mq_name,REMOTE_MQ);
+    strcpy(p_light_args->log_mq_name,LOG_MQ);
+
     pthread_attr_t light_tattr;
     pthread_attr_init(&light_tattr);  // Default pthread attr
     pthread_t * light_thread;
@@ -237,26 +241,26 @@ int main(int argc, char * argv[])
         p_log_msg->source = MAIN;
         time(&p_log_msg->timestamp);
         strcpy((char *) &p_log_msg->str, "heartbeat");
-        mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+        mq_send(log_mqd, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
 
 
 	 /* Heartbeat to temperature*/
         temp_msg_t * p_temp_msg;
         p_temp_msg->id = TEMP_HEARTBEATREQ;
         p_log_msg->source = T_MAIN;
-        mq_send(temp_mq, (char *) p_log_msg, sizeof(temp_msg_t), PRIORITY_TWO);
+        mq_send(temp_mqd, (char *) p_temp_msg, sizeof(temp_msg_t), PRIORITY_TWO);
 
 
          /* Heartbeat to light*/
         light_msg_t * p_light_msg;
         p_light_msg->id =  LIGHT_HEARTBEATREQ;
 	p_light_msg->source = L_MAIN;
-        mq_send(light_mq, (char *) p_light_msg, sizeof(light_msg_t), PRIORITY_TWO);
+        mq_send(light_mqd, (char *) p_light_msg, sizeof(light_msg_t), PRIORITY_TWO);
 
 	   /* Heartbeat to remote*/
         remote_msg_t * p_remote_msg;
         p_light_msg->id = R_MAIN;
-        mq_send(light_mq, (char *) p_light_msg, sizeof(light_msg_t), PRIORITY_TWO);
+        mq_send(remote_mqd, (char *) p_remote_msg, sizeof(remote_msg_t), PRIORITY_TWO);
 
 
 
