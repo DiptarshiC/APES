@@ -177,6 +177,35 @@ void *remote()
 
         write(client_sock , client_message , strlen(client_message));
 
+
+
+	/*Attempt to do a graceful exit*/
+	 		if (mq_close(remote_mq))
+                        {
+				log_msg_t * p_log_msg;
+                                p_log_msg->level = ERROR;
+                                p_log_msg->source = REMOTE;
+                                time(&p_log_msg->timestamp);
+                                strcpy((char *) &p_log_msg->str,"failure to close remote message queue");
+                                mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+                                int8_t retvalue = FAILURE;
+                                pthread_exit(&retvalue);
+
+                        }
+                        if (mq_unlink(remote_mq))
+                        {
+
+				log_msg_t * p_log_msg;
+                                p_log_msg->level = ERROR;
+                                p_log_msg->source = REMOTE;
+                                time(&p_log_msg->timestamp);
+                                strcpy((char *) &p_log_msg->str,"failure to unlink remote message queue");
+                                mq_send(log_mq, (char *) p_log_msg, sizeof(log_msg_t), PRIORITY_TWO);
+
+                                int8_t retvalue = FAILURE;
+                                pthread_exit(&retvalue);
+                        }
+
     }
 
     if(read_size == 0)
@@ -188,6 +217,11 @@ void *remote()
     {
         perror("recv failed");
     }
+
+	free(p_main_msg);
+        free(p_remote_msg);
+        int8_t retvalue = SUCCESS;
+        pthread_exit(&retvalue);
 
 
 }
