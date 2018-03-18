@@ -382,11 +382,13 @@ void *light(void *args)
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);
 	mqd_t log_mq = mq_open(p_targs->log_mq_name, O_WRONLY);
         mqd_t remote_mqd = mq_open(p_targs->remote_mq_name, O_WRONLY);
+	mqd_t light_mq = mq_open(p_targs->light_mq_name, O_WRONLY);
+
+
 
 
 	if (main_mq == FAILURE)
 	{
-
         int8_t retvalue = FAILURE;
         pthread_exit(&retvalue);
 	}

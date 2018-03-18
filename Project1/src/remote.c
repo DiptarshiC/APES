@@ -41,7 +41,7 @@ char t[20];
 void *remote()
 {
 
-	struct remote_thread_info* p_targs = (struct remote_thread_info *) args;
+	struct remote_thread_info* p_targs = (struct remote_thread_info *)args;
 
 	/* Let Main know that Temperature startup went well */
 	mqd_t main_mq = mq_open(p_targs->main_mq_name, O_WRONLY);

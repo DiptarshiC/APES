@@ -198,7 +198,7 @@ int main(int argc, char * argv[])
     strcpy(p_remote_args->light_mq_name, LIGHT_MQ);
     strcpy(p_remote_args->temp_mq_name, TEMPERATURE_MQ );
     strcpy(p_remote_args->remote_mq_name,REMOTE_MQ);
-    pthread_attr_t remote _tattr;
+    pthread_attr_t remote_tattr;
     pthread_attr_init(&remote_tattr);  // Default pthread attr
     pthread_t * remote_thread;
     if (pthread_create(remote_thread, &remote_tattr, remote, p_remote_args))
