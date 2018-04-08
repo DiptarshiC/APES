@@ -1,0 +1,1 @@
+"./croutine.obj" "./event_groups.obj" "./heap_4.obj" "./list.obj" "./main.obj" "./queue.obj" "./tasks.obj" "./timers.obj" "./tm4c1294ncpdt_startup_ccs.obj" "../tm4c1294ncpdt.cmd" -llibc.a -l"C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/ccs/Debug/driverlib.lib" 
