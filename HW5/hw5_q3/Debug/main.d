@@ -16,16 +16,30 @@ main.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/i
 main.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
 main.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdio.h
 main.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdarg.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/inc/hw_ints.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/inc/hw_memmap.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/debug.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/gpio.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/interrupt.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/pin_map.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/rom.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/rom_map.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/sysctl.h
-main.obj: C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/uart.h
+main.obj: ../inc/hw_ints.h
+main.obj: ../inc/hw_memmap.h
+main.obj: ../inc/hw_types.h
+main.obj: ../driverlib/debug.h
+main.obj: ../driverlib/gpio.h
+main.obj: ../driverlib/interrupt.h
+main.obj: ../driverlib/pin_map.h
+main.obj: ../driverlib/rom.h
+main.obj: ../driverlib/rom_map.h
+main.obj: ../driverlib/sysctl.h
+main.obj: ../driverlib/uart.h
+main.obj: ../FreeRTOS.h
+main.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stddef.h
+main.obj: ../FreeRTOSConfig.h
+main.obj: ../projdefs.h
+main.obj: ../portable.h
+main.obj: ../deprecated_definitions.h
+main.obj: ../portmacro.h
+main.obj: ../mpu_wrappers.h
+main.obj: ../task.h
+main.obj: ../list.h
+main.obj: ../semphr.h
+main.obj: ../queue.h
+main.obj: ../timers.h
 
 ../main.c: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdint.h: 
@@ -43,13 +57,27 @@ D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/str
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdio.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdarg.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/inc/hw_ints.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/inc/hw_memmap.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/debug.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/gpio.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/interrupt.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/pin_map.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/rom.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/rom_map.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/sysctl.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/uart.h: 
+../inc/hw_ints.h: 
+../inc/hw_memmap.h: 
+../inc/hw_types.h: 
+../driverlib/debug.h: 
+../driverlib/gpio.h: 
+../driverlib/interrupt.h: 
+../driverlib/pin_map.h: 
+../driverlib/rom.h: 
+../driverlib/rom_map.h: 
+../driverlib/sysctl.h: 
+../driverlib/uart.h: 
+../FreeRTOS.h: 
+D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stddef.h: 
+../FreeRTOSConfig.h: 
+../projdefs.h: 
+../portable.h: 
+../deprecated_definitions.h: 
+../portmacro.h: 
+../mpu_wrappers.h: 
+../task.h: 
+../list.h: 
+../semphr.h: 
+../queue.h: 
+../timers.h: 

@@ -1,34 +1,14 @@
-//*****************************************************************************
-//
-// blinky.c - Simple example to blink the on-board LED.
-//
-// Copyright (c) 2013-2016 Texas Instruments Incorporated.  All rights reserved.
-// Software License Agreement
-//
-// Texas Instruments (TI) is supplying this software for use solely and
-// exclusively on TI's microcontroller products. The software is owned by
-// TI and/or its suppliers, and is protected under applicable copyright
-// laws. You may not combine this software with "viral" open-source
-// software in order to form a larger program.
-//
-// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
-// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
-// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
-// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
-// DAMAGES, FOR ANY REASON WHATSOEVER.
-//
-// This is part of revision 2.1.3.156 of the EK-TM4C1294XL Firmware Package.
-//
-//*****************************************************************************
+
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <stdio.h>
+
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
 #include "driverlib/debug.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
@@ -38,61 +18,147 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 
+
+#include "FreeRTOS.h"
+#include "portmacro.h"
+#include "task.h"
+#include "portable.h"
+#include "semphr.h"
+#include "timers.h"
+#include "projdefs.h"
+
+
 //****************************************************************************
 
 // System clock rate in Hz.
 
 //****************************************************************************
-
 uint32_t g_ui32SysClock;
 
-void LEDonoff()
+BaseType_t timer_for_LED1;  //timer for LED1
+BaseType_t timer_for_LED2;  //timer for LED2
+uint32_t t1,t2;             //to store timing periods
+SemaphoreHandle_t sem_led1; //sempaphore to give to task for LED 1 in the call back function
+SemaphoreHandle_t sem_led2; //semaphore to give to task for LED 2 in a call back function
+
+
+void vLED1(void *pvParameters);//task for 2 HZ LED
+void vLED2(void *pvParameters);//task for 4 HZ LED
+void Timer_Callback(TimerHandle_t xTimer);
+
+void vLED1(void *pvParameters)
 {
-            volatile uint32_t ui32Loop;
+    const char *timer_name = "LED1";
+        BaseType_t led_state = pdFALSE;
+        TimerHandle_t timer;
+
+        sem_led1 = xSemaphoreCreateCounting(1, 0);
+
+        if(sem_led1 == NULL)
+            vTaskDelete(NULL);
+
+        timer_for_LED1 = 1;
+        timer = xTimerCreate(timer_name, pdMS_TO_TICKS(t1), pdTRUE, (void *)&timer_for_LED1, Timer_Callback);
+        if(timer == NULL)
+            vTaskDelete(NULL);
+
+        if(!xTimerStart(timer, portMAX_DELAY))
+            vTaskDelete(NULL);
 
 
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, GPIO_PIN_0);
+        MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
 
-
-            SysCtlDelay(10000000);
-
-
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0x0);
-
-
-            SysCtlDelay(10000000);
-}
-
-
-
-void UARTSendCharacter(const uint8_t *pui8Buffer, uint32_t ui32Count)
-{
-    // Loop while there are more characters to send.
-
-        while(ui32Count--)
-
+        while(1)
         {
+            xSemaphoreTake(sem_led1, portMAX_DELAY);
 
-            // Write the next character to the UART.
+            if(led_state)
+            {
+                GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, 0);
+                led_state = pdFALSE;
 
-            UARTCharPut(UART0_BASE, *pui8Buffer++);
+            }
+            else
+            {
+                GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_PIN_1);
+                led_state = pdTRUE;
 
+            }
         }
-
 }
 
+void vLED2(void *pvParameters)
+{
+    const char *timer_name = "LED2";
+            BaseType_t led_state = pdFALSE;
+            TimerHandle_t timer;
+
+            sem_led2 = xSemaphoreCreateCounting(1, 0);
+
+            if(sem_led2 == NULL)
+                vTaskDelete(NULL);
+
+            timer_for_LED2 = 2;
+            timer = xTimerCreate(timer_name, pdMS_TO_TICKS(t2), pdTRUE, (void *)&timer_for_LED2, Timer_Callback);
+            if(timer == NULL)
+                vTaskDelete(NULL);
+
+            if(!xTimerStart(timer, portMAX_DELAY))
+                vTaskDelete(NULL);
+
+
+            MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
+
+            while(1)
+            {
+                xSemaphoreTake(sem_led2, portMAX_DELAY);
+
+                if(led_state)
+                {
+                    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+                    led_state = pdFALSE;
+
+                }
+                else
+                {
+                    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, GPIO_PIN_0);
+                    led_state = pdTRUE;
+
+                }
+            }
+}
+
+void Timer_Callback(TimerHandle_t xTimer)
+{
+    BaseType_t *timer_id = (BaseType_t *) pvTimerGetTimerID(xTimer);
+    BaseType_t pxHigherPriorityTaskWoken = pdTRUE;
+
+    if(*timer_id == timer_for_LED1)
+    {
+           xSemaphoreGiveFromISR(sem_led1, &pxHigherPriorityTaskWoken);
+    }
+    else if(*timer_id == timer_for_LED2)
+    {
+           xSemaphoreGiveFromISR(sem_led2, &pxHigherPriorityTaskWoken);
+    }
+
+}
 int main(void)
 {
 
     volatile uint32_t ui32Loop;
 
-    char print_string[128];
+    t1 = 1000/4;//timing for LED1
+    t2 = 1000/8;//timing for LED2
 
-    uint32_t blink_count = 0;
 
     // Set the clocking to run directly from the crystal at 120MHz.
 
-     g_ui32SysClock = MAP_SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);
+     g_ui32SysClock = MAP_SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN
+
+                                                                | SYSCTL_USE_PLL
+
+                                                                | SYSCTL_CFG_VCO_480), 120000000);
 
 
 
@@ -103,62 +169,28 @@ int main(void)
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPION));
 
 
-    // Check if the peripheral access is enabled.
-    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
 
 
 
-    // Enable the peripherals used by this example.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    //making sure the peripherals are working
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-
-    // Enable processor interrupts.
-    IntMasterEnable();
-
-
-    // Set GPIO A0 and A1 as UART pins.
-
-    GPIOPinConfigure(GPIO_PA0_U0RX);
-    GPIOPinConfigure(GPIO_PA1_U0TX);
-    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-
-    // Configure the UART for 115,200, 8-N-1 operation.
-    UARTConfigSetExpClk(UART0_BASE, g_ui32SysClock, 115200,(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
-
-
-    // Enable the UART interrupt.
-    IntEnable(INT_UART0);
-    UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPION));
 
 
 
-    bzero(print_string, sizeof(print_string));
-    sprintf(print_string, "Diptarshi Chakraborty \t date:07/04/2018\r\n");
-
-    // Printing the above string.
-
-    UARTSendCharacter((uint8_t *) print_string, strlen(print_string));
 
 
 
-    while(1)
-    {
-
-        //setting a string to null
-        bzero(print_string, sizeof(print_string));
 
 
-        //copying a value to a string
-        sprintf(print_string, "Count: %u\r\n", ++blink_count);
+       /* Let us now create two tasks*/
+       xTaskCreate( vLED1, "LED1", 1000, NULL, 1, NULL );
+       xTaskCreate( vLED2, "LED2", 1000, NULL, 1, NULL );
 
 
-
-        // Printing the above string.
-        UARTSendCharacter((uint8_t *) print_string, strlen(print_string));
-
-       LEDonoff();
-    }
+       /* Start the scheduler so the tasks start executing. */
+       vTaskStartScheduler();
+       for( ;; );
+       return 0;
 }
 

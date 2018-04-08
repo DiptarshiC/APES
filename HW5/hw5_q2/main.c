@@ -1,26 +1,6 @@
-//*****************************************************************************
-//
-// blinky.c - Simple example to blink the on-board LED.
-//
-// Copyright (c) 2013-2016 Texas Instruments Incorporated.  All rights reserved.
-// Software License Agreement
-//
-// Texas Instruments (TI) is supplying this software for use solely and
-// exclusively on TI's microcontroller products. The software is owned by
-// TI and/or its suppliers, and is protected under applicable copyright
-// laws. You may not combine this software with "viral" open-source
-// software in order to form a larger program.
-//
-// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
-// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
-// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
-// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
-// DAMAGES, FOR ANY REASON WHATSOEVER.
-//
-// This is part of revision 2.1.3.156 of the EK-TM4C1294XL Firmware Package.
-//
-//*****************************************************************************
+
+
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -38,6 +18,14 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 
+void UARTSendCharacter(const uint8_t *pui8Buffer, uint32_t ui32Count);
+void LEDonoff();
+void Saysomething();
+
+char print_string[128];
+uint32_t blink_count;
+
+
 //****************************************************************************
 
 // System clock rate in Hz.
@@ -45,6 +33,24 @@
 //****************************************************************************
 
 uint32_t g_ui32SysClock;
+
+
+void Saysomething()
+{
+
+
+            //setting a string to null
+            bzero(print_string, sizeof(print_string));
+
+
+            //copying a value to a string
+            sprintf(print_string, "Count: %u\r\n", ++blink_count);
+
+
+
+            // Printing the above string.
+            UARTSendCharacter((uint8_t *) print_string, strlen(print_string));
+}
 
 void LEDonoff()
 {
@@ -86,9 +92,9 @@ int main(void)
 
     volatile uint32_t ui32Loop;
 
-    char print_string[128];
+    //char print_string[128];
 
-    uint32_t blink_count = 0;
+    blink_count = 0;
 
     // Set the clocking to run directly from the crystal at 120MHz.
 
@@ -146,17 +152,8 @@ int main(void)
     while(1)
     {
 
-        //setting a string to null
-        bzero(print_string, sizeof(print_string));
 
-
-        //copying a value to a string
-        sprintf(print_string, "Count: %u\r\n", ++blink_count);
-
-
-
-        // Printing the above string.
-        UARTSendCharacter((uint8_t *) print_string, strlen(print_string));
+        Saysomething();
 
        LEDonoff();
     }

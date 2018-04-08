@@ -12,7 +12,42 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./main.obj" \
 "./tm4c1294ncpdt_startup_ccs.obj" \
+"./driverlib/adc.obj" \
+"./driverlib/aes.obj" \
+"./driverlib/can.obj" \
+"./driverlib/comp.obj" \
+"./driverlib/cpu.obj" \
+"./driverlib/crc.obj" \
+"./driverlib/des.obj" \
+"./driverlib/eeprom.obj" \
+"./driverlib/emac.obj" \
+"./driverlib/epi.obj" \
+"./driverlib/epi_workaround_ccs.obj" \
+"./driverlib/flash.obj" \
+"./driverlib/fpu.obj" \
+"./driverlib/gpio.obj" \
+"./driverlib/hibernate.obj" \
+"./driverlib/i2c.obj" \
+"./driverlib/interrupt.obj" \
+"./driverlib/lcd.obj" \
+"./driverlib/mpu.obj" \
+"./driverlib/onewire.obj" \
+"./driverlib/pwm.obj" \
+"./driverlib/qei.obj" \
+"./driverlib/shamd5.obj" \
+"./driverlib/ssi.obj" \
+"./driverlib/sw_crc.obj" \
+"./driverlib/sysctl.obj" \
+"./driverlib/sysexc.obj" \
+"./driverlib/systick.obj" \
+"./driverlib/timer.obj" \
+"./driverlib/uart.obj" \
+"./driverlib/udma.obj" \
+"./driverlib/usb.obj" \
+"./driverlib/watchdog.obj" \
 "../tm4c1294ncpdt.cmd" \
+"../driverlib/ccs/Debug/driverlib.lib" \
+"../driverlib/rvmdk/driverlib.lib" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 -l"C:/ti/TivaWare_C_Series-2.1.3.156/driverlib/ccs/Debug/driverlib.lib" \
@@ -25,7 +60,17 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
+-include driverlib/subdir_vars.mk
+-include driverlib/ccs/Debug/subdir_vars.mk
+-include driverlib/ewarm/Exe/subdir_vars.mk
+-include driverlib/gcc/subdir_vars.mk
+-include driverlib/rvmdk/subdir_vars.mk
 -include subdir_rules.mk
+-include driverlib/subdir_rules.mk
+-include driverlib/ccs/Debug/subdir_rules.mk
+-include driverlib/ewarm/Exe/subdir_rules.mk
+-include driverlib/gcc/subdir_rules.mk
+-include driverlib/rvmdk/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -135,14 +180,14 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(A_SRCS) $(GEN_CMDS)
 	@$(MAKE) --no-print-directory -Onone "hw5_q2.out"
 
 # Tool invocations
-hw5_q2.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+hw5_q2.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(A_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"D:/Code Composer Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C1294NCPDT --define=TARGET_IS_TM4C129_RA1 -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"hw5_q2.map" --heap_size=0 --stack_size=512 -i"D:/Code Composer Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/lib" -i"D:/Code Composer Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="hw5_q2_linkInfo.xml" --rom_model -o "hw5_q2.out" $(ORDERED_OBJS)
+	"D:/Code Composer Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C1294NCPDT --define=TARGET_IS_TM4C129_RA1 -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"hw5_q2.map" --heap_size=0 --stack_size=512 -i"D:/Code Composer Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/lib" -i"C:/ti/TivaWare_C_Series-2.1.3.156/driverlib" -i"C:/ti/TivaWare_C_Series-2.1.3.156/inc" -i"D:/Code Composer Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="hw5_q2_linkInfo.xml" --rom_model -o "hw5_q2.out" $(ORDERED_OBJS) $(A_SRCS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
@@ -156,8 +201,9 @@ hw5_q2.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "tm4c1294ncpdt_startup_ccs.obj" 
-	-$(RM) "main.d" "tm4c1294ncpdt_startup_ccs.d" 
+	-$(RM) "main.obj" "tm4c1294ncpdt_startup_ccs.obj" "driverlib\adc.obj" "driverlib\aes.obj" "driverlib\can.obj" "driverlib\comp.obj" "driverlib\cpu.obj" "driverlib\crc.obj" "driverlib\des.obj" "driverlib\eeprom.obj" "driverlib\emac.obj" "driverlib\epi.obj" "driverlib\epi_workaround_ccs.obj" "driverlib\flash.obj" "driverlib\fpu.obj" "driverlib\gpio.obj" "driverlib\hibernate.obj" "driverlib\i2c.obj" "driverlib\interrupt.obj" "driverlib\lcd.obj" "driverlib\mpu.obj" "driverlib\onewire.obj" "driverlib\pwm.obj" "driverlib\qei.obj" "driverlib\shamd5.obj" "driverlib\ssi.obj" "driverlib\sw_crc.obj" "driverlib\sysctl.obj" "driverlib\sysexc.obj" "driverlib\systick.obj" "driverlib\timer.obj" "driverlib\uart.obj" "driverlib\udma.obj" "driverlib\usb.obj" "driverlib\watchdog.obj" 
+	-$(RM) "main.d" "tm4c1294ncpdt_startup_ccs.d" "driverlib\adc.d" "driverlib\aes.d" "driverlib\can.d" "driverlib\comp.d" "driverlib\cpu.d" "driverlib\crc.d" "driverlib\des.d" "driverlib\eeprom.d" "driverlib\emac.d" "driverlib\epi.d" "driverlib\flash.d" "driverlib\fpu.d" "driverlib\gpio.d" "driverlib\hibernate.d" "driverlib\i2c.d" "driverlib\interrupt.d" "driverlib\lcd.d" "driverlib\mpu.d" "driverlib\onewire.d" "driverlib\pwm.d" "driverlib\qei.d" "driverlib\shamd5.d" "driverlib\ssi.d" "driverlib\sw_crc.d" "driverlib\sysctl.d" "driverlib\sysexc.d" "driverlib\systick.d" "driverlib\timer.d" "driverlib\uart.d" "driverlib\udma.d" "driverlib\usb.d" "driverlib\watchdog.d" 
+	-$(RM) "driverlib\epi_workaround_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

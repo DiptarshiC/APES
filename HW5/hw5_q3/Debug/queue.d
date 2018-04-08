@@ -6,7 +6,7 @@ queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/linkage.h
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/sys/cdefs.h
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/FreeRTOS.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/FreeRTOS.h
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stddef.h
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdint.h
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/sys/stdint.h
@@ -15,14 +15,14 @@ queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_stdint.h
 queue.obj: D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/sys/_stdint.h
 queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/FreeRTOSConfig.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/projdefs.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/portable.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/deprecated_definitions.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portmacro.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/mpu_wrappers.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/task.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/list.h
-queue.obj: C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/queue.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/projdefs.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/portable.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/deprecated_definitions.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/portmacro.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/mpu_wrappers.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/task.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/list.h
+queue.obj: C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/queue.h
 
 C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/queue.c: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdlib.h: 
@@ -30,7 +30,7 @@ D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_ti
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/linkage.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/sys/cdefs.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/FreeRTOS.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/FreeRTOS.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stddef.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/stdint.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/sys/stdint.h: 
@@ -39,11 +39,11 @@ D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/mac
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_stdint.h: 
 D:/Code\ Composer\ Studio/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/sys/_stdint.h: 
 C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/FreeRTOSConfig.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/projdefs.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/portable.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/deprecated_definitions.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portmacro.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/mpu_wrappers.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/task.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/list.h: 
-C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/include/queue.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/projdefs.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/portable.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/deprecated_definitions.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/portmacro.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/mpu_wrappers.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/task.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/list.h: 
+C:/Users/Diptarshi/workspace_v8/HW5/hw5_q3/queue.h: 
