@@ -7,15 +7,15 @@
  *
  * In my application, below are the pin connections
  *
- * 5v                           ->          3.3v (Assuming there is a resistance connected)
+ * 5v          (white)           ->          5v
  *
- * data clock (yellow)          ->          PE4
+ * data clock  (yellow)          ->          PE4 as output
  *
- * Serial data (red)            ->          PC4
+ * Serial data (red)             ->          PC4 as input
  *
- * data latch (orange)          ->          PC5
+ * data latch  (orange)          ->          PC5 as output
  *
- * ground    (brown)            ->          GND
+ * ground      (brown)           ->          GND
  *
  */
 
