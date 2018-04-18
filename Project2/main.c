@@ -10,5 +10,10 @@ int main(void)
 {
 
     void enable_peripherals();
-	return 0;
+
+    while(1)
+    {
+        send_signal();
+    }
+
 }

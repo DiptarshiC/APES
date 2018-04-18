@@ -81,6 +81,10 @@ void enable_peripherals()
 
         GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4);
 
+
+
+
+
         /*Make the data clock high*/
 
         GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, GPIO_PIN_4);
@@ -101,7 +105,7 @@ void send_signal()
 
     /*Put that data latch pin to low*/
 
-    GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, 0);
 
     /*add a 6 us pulse*/
 
