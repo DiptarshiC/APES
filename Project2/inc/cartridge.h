@@ -8,6 +8,12 @@
 #ifndef INC_CARTRIDGE_H_
 #define INC_CARTRIDGE_H_
 
+typedef enum
+{
+    CART_E_OK,
+    CART_E_FAIL
+} cart_e_t;
+
 uint8_t read_rom_byte (uint32_t address);
 
 cart_e_t setup_cartridge (void);

@@ -148,9 +148,11 @@ cart_e_t setup_cartridge(void)
 
     /* Release reset */
     MAP_GPIOPinWrite(RESETn_HI);
+
+    return CART_E_OK;
 }
 
 cart_e_t dump_rom(uint8_t * buf)
 {
-
+    return CART_E_OK;
 }
