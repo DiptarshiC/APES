@@ -21,7 +21,8 @@ C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/list.c \
 C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/queue.c \
 C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/tasks.c \
 C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/timers.c \
-../tm4c1294ncpdt_startup_ccs.c 
+../tm4c1294ncpdt_startup_ccs.c \
+../uartstdio.c 
 
 C_DEPS += \
 ./croutine.d \
@@ -33,7 +34,8 @@ C_DEPS += \
 ./queue.d \
 ./tasks.d \
 ./timers.d \
-./tm4c1294ncpdt_startup_ccs.d 
+./tm4c1294ncpdt_startup_ccs.d \
+./uartstdio.d 
 
 OBJS += \
 ./croutine.obj \
@@ -46,7 +48,8 @@ OBJS += \
 ./queue.obj \
 ./tasks.obj \
 ./timers.obj \
-./tm4c1294ncpdt_startup_ccs.obj 
+./tm4c1294ncpdt_startup_ccs.obj \
+./uartstdio.obj 
 
 ASM_DEPS += \
 ./portasm.d 
@@ -62,7 +65,8 @@ OBJS__QUOTED += \
 "queue.obj" \
 "tasks.obj" \
 "timers.obj" \
-"tm4c1294ncpdt_startup_ccs.obj" 
+"tm4c1294ncpdt_startup_ccs.obj" \
+"uartstdio.obj" 
 
 C_DEPS__QUOTED += \
 "croutine.d" \
@@ -74,7 +78,8 @@ C_DEPS__QUOTED += \
 "queue.d" \
 "tasks.d" \
 "timers.d" \
-"tm4c1294ncpdt_startup_ccs.d" 
+"tm4c1294ncpdt_startup_ccs.d" \
+"uartstdio.d" 
 
 ASM_DEPS__QUOTED += \
 "portasm.d" 
@@ -89,7 +94,8 @@ C_SRCS__QUOTED += \
 "C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/queue.c" \
 "C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/tasks.c" \
 "C:/ti/TivaWare_C_Series-2.1.3.156/third_party/FreeRTOS/Source/timers.c" \
-"../tm4c1294ncpdt_startup_ccs.c" 
+"../tm4c1294ncpdt_startup_ccs.c" \
+"../uartstdio.c" 
 
 ASM_SRCS__QUOTED += \
 "../portasm.asm" 

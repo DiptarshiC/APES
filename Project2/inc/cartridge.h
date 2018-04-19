@@ -16,8 +16,8 @@ typedef enum
 
 uint8_t read_rom_byte (uint32_t address);
 
-cart_e_t setup_cartridge (void);
+void cart_e_t setup_cartridge (void);
 
-cart_e_t dump_rom (uint8_t * buf);
+void cart_e_t dump_rom (uint8_t * buf);
 
 #endif /* INC_CARTRIDGE_H_ */
