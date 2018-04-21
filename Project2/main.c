@@ -17,7 +17,6 @@
 #include "inc/FreeRTOS.h"
 #include "inc/portable.h"
 #include "inc/queue.h"
-#include "inc/portmacro.h"
 #include "inc/semphr.h"
 #include "inc/task.h"
 

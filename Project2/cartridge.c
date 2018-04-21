@@ -1,5 +1,5 @@
 /*
- * rom.c
+ * cartridge.c
  *
  *  Created on: Apr 12, 2018
  *      Author: Connor Shapiro
