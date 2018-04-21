@@ -18,6 +18,7 @@
 #include "inc/FreeRTOS.h"
 #include "inc/portable.h"
 #include "inc/queue.h"
+#include "inc/task.h"
 #include "inc/cartridge.h"
 
 #define FAIL            (-1)
@@ -99,7 +100,7 @@
 #define UPPER_NIBBLE    (0xF0)
 #define LOWER_NIBBLE    (0x0F)
 #define HIROM_VAL       (1)
-#define LOWROM_VAL     (0)
+#define LOWROM_VAL      (0)
 #define FASTROM_VAL     (3)
 
 typedef enum
@@ -111,7 +112,7 @@ typedef enum
 //extern QueueHandle_t xMROM_Queue;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
 static void vCartridge_init (void);
-static int8_t ucCart_addr_scheme (void);
+static int8_t cCart_addr_scheme (void);
 static uint8_t ucCart_speed (void);
 static uint8_t ucCart_size (void); // Returns cartridge MROM size (in Mebibits)
 static uint8_t ucCart_SRAM_size (void); // Returns SRAM size (in Kibibits)
@@ -152,7 +153,7 @@ void vCartridgeTask(void *pvParameters)
                 ucSize = MEBIBIT_2_BYTE * ucCart_size();
 
                 /* Dump HiROM, blocking until queue is emptied when full */
-                if (ucCart_addr_scheme == HIROM_VAL)
+                if (HIROM_VAL == cCart_addr_scheme())
                 {
                     for (uli_rom = 0; uli_rom < ucSize; uli_rom++)
                     {
@@ -161,7 +162,7 @@ void vCartridgeTask(void *pvParameters)
                     }
                 }
 
-                else if (ucCart_addr_scheme == LOWROM_VAL)
+                else if (LOWROM_VAL == cCart_addr_scheme())
                 {   // For LowROM reads, read the upper half of each bank
                     for (usi_bank = 0; usi_bank < (ucSize >> BANK_SHIFT);
                                                                     usi_bank++)
@@ -176,7 +177,7 @@ void vCartridgeTask(void *pvParameters)
                     }
                 }
 
-                else if (ucCart_addr_scheme == FAIL)
+                else if (FAIL == cCart_addr_scheme())
                 {
                     // Tell user to cycle cartridge
                 }
@@ -250,17 +251,17 @@ static void vCartridge_init(void)
     MAP_GPIOPinWrite(RESETn_HI);
 }
 
-static int8_t ucCart_addr_scheme(void)
+static int8_t cCart_addr_scheme(void)
 {
     /* Check if ROM is HiROM */
-    if ((ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) & LOWER_NIBBLE) ==
-                                                                    HIROM_VAL)
+    if (HIROM_VAL == (ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) &
+                                                                LOWER_NIBBLE))
     {
         return HIROM_VAL;
     }
     /* Check if ROM is LowROM */
-    else if ((ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) & LOWER_NIBBLE)
-                                                                == LOWROM_VAL)
+    else if (LOWROM_VAL == (ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) &
+                                                                LOWER_NIBBLE))
     {
         return LOWROM_VAL;
     }
@@ -274,8 +275,7 @@ static int8_t ucCart_addr_scheme(void)
 static uint8_t ucCart_speed(void)
 {
     /* Check if ROM is FastROM */
-    if ((ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) & UPPER_NIBBLE) ==
-                                                                FASTROM_VAL)
+    if (FASTROM_VAL == (ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) & UPPER_NIBBLE))
     {
         return FASTROM_DELAY;
     }

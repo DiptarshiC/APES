@@ -11,11 +11,11 @@
 #include "driverlib/sysctl.h"
 #include "SNES_Controller/controller.h"
 #include "inc/cartridge.h"
-#include "FreeRTOS.h"
-#include "portable.h"
-#include "queue.h"
-#include "portmacro.h"
-#include "task.h"
+#include "inc/FreeRTOS.h"
+#include "inc/portable.h"
+#include "inc/queue.h"
+#include "inc/portmacro.h"
+#include "inc/task.h"
 
 #define MHZ_120 (120000000)
 
