@@ -109,7 +109,7 @@ typedef enum
     CART_E_FAIL
 } cart_e_t;
 
-//extern QueueHandle_t xMROM_Queue;
+extern QueueHandle_t xMROM_Queue;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
 static void vCartridge_init (void);
 static int8_t cCart_addr_scheme (void);
