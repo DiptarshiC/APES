@@ -8,16 +8,20 @@
 #ifndef INC_CARTRIDGE_H_
 #define INC_CARTRIDGE_H_
 
-typedef enum
-{
-    CART_E_OK,
-    CART_E_FAIL
-} cart_e_t;
+/* Cartridge task parameters */
+#define CART_STACK_DEPTH    (1000)
+#define CART_PRIO           (1)
 
-uint8_t read_rom_byte (uint32_t address);
+/* Notification values which Transport task may send to Cartridge task */
+#define EXIT_MASK           (0x80)
+#define READ_MROM_MASK      (0x01)
+#define READ_SRAM_MASK      (0x02)
+#define WRITE_SRAM_MASK     (0x04)
 
-void cart_e_t setup_cartridge (void);
+/* MROM FIFO parameters */
+#define ROM_QUEUE_SIZE      (1)
+#define ROM_QUEUE_LENGTH    (2048)
 
-void cart_e_t dump_rom (uint8_t * buf);
+void vCartridgeTask (void * pvParameters);
 
 #endif /* INC_CARTRIDGE_H_ */
