@@ -15,9 +15,10 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
-#include "inc/cartridge.h"
+#include "inc/FreeRTOS.h"
 #include "inc/portable.h"
-#include "queue.h"
+#include "inc/queue.h"
+#include "inc/cartridge.h"
 
 #define FAIL            (-1)
 #define CLEAR_ALL       (0xFFFFFFFF)
@@ -107,7 +108,7 @@ typedef enum
     CART_E_FAIL
 } cart_e_t;
 
-extern QueueHandle_t xMROM_Queue;
+//extern QueueHandle_t xMROM_Queue;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
 static void vCartridge_init (void);
 static int8_t ucCart_addr_scheme (void);
@@ -156,7 +157,7 @@ void vCartridgeTask(void *pvParameters)
                     for (uli_rom = 0; uli_rom < ucSize; uli_rom++)
                     {
                         ucData = ucRead_rom_byte(uli_rom, ucSpeed);
-                        xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
+//                        xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
                     }
                 }
 
@@ -170,7 +171,7 @@ void vCartridgeTask(void *pvParameters)
                         {
                             ucData = ucRead_rom_byte(((usi_bank * LO_PAGE_SIZE)
                                                          + uli_rom), ucSpeed);
-                            xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
+//                            xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
                         }
                     }
                 }
@@ -249,7 +250,7 @@ static void vCartridge_init(void)
     MAP_GPIOPinWrite(RESETn_HI);
 }
 
-static uint8_t ucCart_addr_scheme(void)
+static int8_t ucCart_addr_scheme(void)
 {
     /* Check if ROM is HiROM */
     if ((ucRead_rom_byte(ROM_SCHEME_ADDR, SLOWROM_DELAY) & LOWER_NIBBLE) ==
