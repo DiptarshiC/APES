@@ -13,7 +13,7 @@
  *
  * data clock  (yellow)          ->          PE4 as output
  *
- * Serial data (red)             ->          PC4 as input
+ * Serial data (red)             ->          PL3 as input
  *
  * data latch  (orange)          ->          PC5 as output
  *
@@ -30,7 +30,7 @@
 #include "inc/controller.h"
 
 
-uint16_t read_value=0;
+int32_t read_value=0;
 
 void enable_peripherals()
 {
@@ -48,6 +48,10 @@ void enable_peripherals()
         /* Enable the GPIO port C */
 
         SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+
+        /* Enable the GPIO port L */
+
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);
 
 
         /* Check if the peripheral access is enabled. */
@@ -78,11 +82,11 @@ void enable_peripherals()
 
 
         /*
-         Enable the GPIO pin PC4 as input for serial data
+         Enable the GPIO pin PL3 as input for serial data
          enable the GPIO pin for digital function.
         */
 
-        GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4);
+        GPIOPinTypeGPIOInput(GPIO_PORTL_BASE, GPIO_PIN_3);
 
 
 
@@ -118,12 +122,12 @@ void send_signal()
 
 /***********************************************************************************************************/
 
-//1
+//0
 
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)>>4;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))>>3))&0x0FFF;//since i am using pin 4
 
 /*add a 6 us pulse*/
 
@@ -143,13 +147,36 @@ SysCtlDelay(US_6_DELAY);
 
 /***********************************************************************************************************/
 
+//1
+
+/*Make serial clock low*/
+
+GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))>>2)|read_value)&0x0FFF;//since i am using pin 4
+
+/*add a 6 us pulse*/
+
+SysCtlDelay(US_6_DELAY);
+
+/*Make serial clock high*/
+
+GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, GPIO_PIN_4);
+
+/*add a 6 us pulse*/
+
+SysCtlDelay(US_6_DELAY);
+
+/***********************************************************************************************************/
+
+
+/***********************************************************************************************************/
+
 //2
 
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)>>3)|read_value;//since i am using pin 4
-
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))>>1)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -172,7 +199,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)>>2)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))>>0)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -195,7 +222,8 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)>>1)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<1)|read_value)&0x0FFF;//since i am using pin 4
+
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -218,7 +246,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4))|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<2)|read_value)&0x0FFF;//since i am using pin 4
 
 /*add a 6 us pulse*/
 
@@ -242,8 +270,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<1)|read_value;//since i am using pin 4
-
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<3)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -266,7 +293,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<2)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<4)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -289,7 +316,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<3)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<5)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -312,7 +339,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<4)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<6)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -335,7 +362,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<5)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<7)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -358,7 +385,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<6)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<8)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -381,7 +408,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<7)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<9)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -404,7 +431,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<8)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<10)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -427,7 +454,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<9)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<11)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);
@@ -450,30 +477,7 @@ SysCtlDelay(US_6_DELAY);
 /*Make serial clock low*/
 
 GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<10)|read_value;//since i am using pin 4
-/*add a 6 us pulse*/
-
-SysCtlDelay(US_6_DELAY);
-
-/*Make serial clock high*/
-
-GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, GPIO_PIN_4);
-
-/*add a 6 us pulse*/
-
-SysCtlDelay(US_6_DELAY);
-
-/***********************************************************************************************************/
-
-
-/***********************************************************************************************************/
-
-//16
-
-/*Make serial clock low*/
-
-GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_4, 0);
-read_value=(GPIOPinRead(GPIO_PORTC_BASE,GPIO_PIN_4)<<11)|read_value;//since i am using pin 4
+read_value=((~(0xFFF7|(GPIOPinRead(GPIO_PORTL_BASE,GPIO_PIN_3)))<<12)|read_value)&0x0FFF;//since i am using pin 4
 /*add a 6 us pulse*/
 
 SysCtlDelay(US_6_DELAY);

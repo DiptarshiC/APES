@@ -11,7 +11,7 @@
  *
  * data clock  (yellow)          ->          PE4 as output
  *
- * Serial data (red)             ->          PC4 as input
+ * Serial data (red)             ->          PL3 as input
  *
  * data latch  (orange)          ->          PC5 as output
  *
