@@ -94,6 +94,7 @@
 #define ROM_SCHEME_ADDR (0xFFD5)    // Contains ROM access speed and addressing scheme
 #define ROM_TYPE_ADDR   (0xFFD6)    // Information about what components the cartridge has
 #define ROM_SIZE_ADDR   (0xFFD7)
+#define SRAM_SIZE_ADDR  (0xFFD8)
 #define MEBIBIT_2_BYTE  (131072)
 #define BANK_SHIFT      (15)
 #define LO_PAGE_SIZE    (0x8000)
@@ -287,5 +288,5 @@ static uint8_t ucCart_size(void)
 
 static uint8_t ucCart_SRAM_size(void)
 {
-    return (1 << (ucRead_rom_byte(ROM_SIZE_ADDR, SLOWROM_DELAY) + 3));
+    return (1 << (ucRead_rom_byte(SRAM_SIZE_ADDR, SLOWROM_DELAY) + 3));
 }
