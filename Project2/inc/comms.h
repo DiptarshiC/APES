@@ -1,10 +1,11 @@
 /* 
- * comms.h
+ *  comms.h
  * 
- * SPI or I2C FreeRTOS Communications Task
+ *  SPI or I2C FreeRTOS Communications Task
  * 
  *  Created on: Apr 21, 2018
- *      Authors: Connor Shapiro & Diptarshi Chakraborty
+ *
+ *  Authors: Connor Shapiro & Diptarshi Chakraborty
  */
 
 #ifndef INC_COMMS_H_
