@@ -15,7 +15,8 @@
 #define COMMS_PRIO              (1)
 
 /* Comms FIFO parameters */
-#define COMMS_QUEUE_SIZE        (512)
+#define COMMS_QUEUE_PL_SIZE     (512)
+#define COMMS_QUEUE_SIZE        (COMMS_QUEUE_PL_SIZE + 6)
 #define COMMS_QUEUE_LENGTH      (8)
 
 typedef enum
@@ -35,7 +36,7 @@ typedef struct
     task_e_t dest;
     task_e_t source;
     size_t size;
-    uint8_t ucPayload[COMMS_QUEUE_SIZE];
+    uint8_t ucPayload[COMMS_QUEUE_PL_SIZE];
 } comm_packet_t;
 
 #endif /* INC_COMMS_H_ */

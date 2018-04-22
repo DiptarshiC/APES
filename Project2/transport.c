@@ -40,7 +40,7 @@ void vTransportTask(void *pvParameters)
     uint32_t ulNotificationValue;
     xport_state_t xState;
     uint32_t ulPacket_size;
-    uint8_t pucROM_buffer[COMMS_QUEUE_SIZE];
+    uint8_t pucROM_buffer[COMMS_QUEUE_PL_SIZE];
     comm_packet_t xPacketTransport;
 
     xTaskExit = pdFALSE;
@@ -62,7 +62,7 @@ void vTransportTask(void *pvParameters)
                 {
                     xTaskNotify(xTaskGetHandle("Cartridge I/O Task"), 
                                                     READ_MROM_MASK, eNoAction);
-                    memset(pucROM_buffer, 0, COMMS_QUEUE_SIZE);
+                    memset(pucROM_buffer, 0, COMMS_QUEUE_PL_SIZE);
                     ulPacket_size = 0;
                     xState = SENDING_GAME;
                 }
@@ -91,9 +91,9 @@ void vTransportTask(void *pvParameters)
                                                 ulPacket_size), ZERO_TICKS))
                 {
                     ulPacket_size++;
-                    if (COMMS_QUEUE_SIZE == ulPacket_size)
+                    if (COMMS_QUEUE_PL_SIZE == ulPacket_size)
                     {
-                        xPacketTransport
+                        xPacketTransport.
                         ulPacket_size = 0;
                     }
                 }
