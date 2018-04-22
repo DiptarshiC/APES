@@ -35,7 +35,7 @@ typedef struct
 {
     task_e_t dest;
     task_e_t source;
-    size_t size;
+    uint32_t size;
     uint8_t ucPayload[COMMS_QUEUE_PL_SIZE];
 } comm_packet_t;
 

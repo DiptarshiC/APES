@@ -13,12 +13,20 @@
 #include "inc/portable.h"
 #include "inc/queue.h"
 #include "inc/task.h"
+#include "inc/semphr.h"
+#include "inc/timers.h"
 #include "inc/cartridge.h"
 #include "inc/comms.h"
 #include "inc/transport.h"
 
-#define CLEAR_ALL   (0xFFFFFFFF)
-#define ZERO_TICKS  (0)
+#define CLEAR_NONE      (0x00000000)
+#define CLEAR_ALL       (0xFFFFFFFF)
+#define ZERO_TICKS      (0)
+#define MS_17           (17)
+#define TIMER_C         ((void *)0)
+#define BITS_8          (8)
+#define CONTROL_MASK    (0x00000FFF)
+#define LOWER_BYTE      (0xFF)
 
 typedef enum
 {
@@ -33,6 +41,11 @@ typedef enum
 
 extern QueueHandle_t xMROM_Queue;
 extern QueueHandle_t xTransport_Queue;
+extern QueueHandle_t xComms_Queue;
+extern SemaphoreHandle_t xComms_QueueSemaphore;
+extern SemaphoreHandle_t xController_TimerSemaphore;
+TimerHandle_t xTimerController;
+void vTimerController (TimerHandle_t xTimer);
 
 void vTransportTask(void *pvParameters)
 {
@@ -42,6 +55,8 @@ void vTransportTask(void *pvParameters)
     uint32_t ulPacket_size;
     uint8_t pucROM_buffer[COMMS_QUEUE_PL_SIZE];
     comm_packet_t xPacketTransport;
+    uint32_t uli_payload;
+    uint16_t usControl_value;
 
     xTaskExit = pdFALSE;
 
@@ -81,8 +96,30 @@ void vTransportTask(void *pvParameters)
                     }
                     else if (ulNotificationValue & ROM_DUMP_COMPLETE_MASK)
                     {
-                        // Ensure empty queue and send packet
+                        /* Empty anything left in queue, send final packet */
+                        while (xQueueReceive(xMROM_Queue, (pucROM_buffer + 
+                                                ulPacket_size), ZERO_TICKS))
+                        {
+                            ulPacket_size++;
+                        }
+                        xPacketTransport.dest = BB_ROMFILE;
+                        xPacketTransport.source = TIVA_XPORT;
+                        xPacketTransport.size = ulPacket_size;
+                        for (uli_payload = 0; uli_payload < ulPacket_size;
+                                                                uli_payload++)
+                        {
+                            *(xPacketTransport.ucPayload + uli_payload) =
+                                            *(pucROM_buffer + uli_payload);
+                        }
+                        xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
+                        xQueueSend(xComms_Queue, &xPacketTransport,
+                                                                portMAX_DELAY);
+                        xSemaphoreGive(xComms_QueueSemaphore);
                         ulPacket_size = 0;
+                        xTimerController = xTimerCreate("60Hz Timer",
+                                                pdMS_TO_TICKS(MS_17), pdTRUE,
+                                                    TIMER_C, vTimerController);
+                        usControl_value = 0;
                         xState = SENDING_CONTROLLER;
                     }
                 }
@@ -93,15 +130,52 @@ void vTransportTask(void *pvParameters)
                     ulPacket_size++;
                     if (COMMS_QUEUE_PL_SIZE == ulPacket_size)
                     {
-                        xPacketTransport.
+                        xPacketTransport.dest = BB_ROMFILE;
+                        xPacketTransport.source = TIVA_XPORT;
+                        xPacketTransport.size = ulPacket_size;
+                        for (uli_payload = 0; uli_payload < ulPacket_size;
+                                                                uli_payload++)
+                        {
+                            *(xPacketTransport.ucPayload + uli_payload) =
+                                            *(pucROM_buffer + uli_payload);
+                        }
+                        xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
+                        xQueueSend(xComms_Queue, &xPacketTransport,
+                                                                portMAX_DELAY);
+                        xSemaphoreGive(xComms_QueueSemaphore);
                         ulPacket_size = 0;
                     }
                 }
-
             break;
 
             case SENDING_CONTROLLER:
+                /* Send out controller value on ~60Hz timer */
+                xSemaphoreTake(xController_TimerSemaphore, portMAX_DELAY);
 
+                /* Check for exit command */
+                if (xTaskNotifyWait(CLEAR_NONE, CLEAR_NONE,
+                                            &ulNotificationValue, ZERO_TICKS))
+                {
+                    if (ulNotificationValue & EXIT_MASK)
+                    {
+                        xTaskExit = pdTRUE;
+                    }
+                    else    // Put Mailbox value in packet
+                    {
+                        usControl_value = ulNotificationValue & CONTROL_MASK;
+                        xPacketTransport.dest = BB_CONTROL;
+                        xPacketTransport.source = TIVA_XPORT;
+                        xPacketTransport.size = sizeof(usControl_value);
+                        *xPacketTransport.ucPayload =
+                                        (uint8_t)(usControl_value >> BITS_8);
+                        *(xPacketTransport.ucPayload + 1) =
+                                    (uint8_t)(usControl_value & LOWER_BYTE);
+                        xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
+                        xQueueSend(xComms_Queue, &xPacketTransport,
+                                                                portMAX_DELAY);
+                        xSemaphoreGive(xComms_QueueSemaphore);
+                    }
+                }
             break;
 
             default:
@@ -112,4 +186,10 @@ void vTransportTask(void *pvParameters)
 
     /* Graceful Exit */
     vTaskDelete(NULL);
+}
+
+void vTimerController(TimerHandle_t xTimer)
+{
+    BaseType_t * pxGiveSuccess;
+    xSemaphoreGiveFromISR(xController_TimerSemaphore, pxGiveSuccess);
 }
