@@ -103,12 +103,6 @@
 #define LOWROM_VAL      (0)
 #define FASTROM_VAL     (3)
 
-typedef enum
-{
-    CART_E_OK,
-    CART_E_FAIL
-} cart_e_t;
-
 extern QueueHandle_t xMROM_Queue;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
 static void vCartridge_init (void);
@@ -129,10 +123,10 @@ void vCartridgeTask(void *pvParameters)
 
     /* Get ready for operations and enter task loop */
     vCartridge_init();
-    xTaskExit = false;
+    xTaskExit = pdFALSE;
 
     /* Cartridge Task main loop */
-    while(!xTaskExit)
+    while (!xTaskExit)
     {
         /* Block until a notification is received */
         xTaskNotifyWait(CLEAR_ALL, CLEAR_ALL, &ulNotificationValue,
@@ -141,7 +135,7 @@ void vCartridgeTask(void *pvParameters)
         /* If notification was for graceful exit, do so ignoring other cmds */
         if (ulNotificationValue & EXIT_MASK)
         {
-            xTaskExit = true;
+            xTaskExit = pdTRUE;
         }
 
         else
@@ -158,7 +152,7 @@ void vCartridgeTask(void *pvParameters)
                     for (uli_rom = 0; uli_rom < ucSize; uli_rom++)
                     {
                         ucData = ucRead_rom_byte(uli_rom, ucSpeed);
-//                        xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
+                       xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
                     }
                 }
 
@@ -172,7 +166,7 @@ void vCartridgeTask(void *pvParameters)
                         {
                             ucData = ucRead_rom_byte(((usi_bank * LO_PAGE_SIZE)
                                                          + uli_rom), ucSpeed);
-//                            xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
+                           xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
                         }
                     }
                 }

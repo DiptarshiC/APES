@@ -20,7 +20,7 @@
 
 /* MROM FIFO parameters */
 #define ROM_QUEUE_SIZE      (1)
-#define ROM_QUEUE_LENGTH    (2048)
+#define ROM_QUEUE_LENGTH    (1024)
 
 void vCartridgeTask (void * pvParameters);
 
