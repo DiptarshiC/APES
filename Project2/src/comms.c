@@ -32,10 +32,14 @@
 #include "inc/task.h"
 #include "inc/comms.h"
 
-
+#ifdef UART
 void initialize_UART();
+void send_over_UART (uint8_t array[], uint32_t length);
+#elif SPI
+#endif
 
 extern QueueHandle_t xComms_Queue;
+
 
 vCommunicationsTask(void *pvParameters)
 {
@@ -53,9 +57,9 @@ vCommunicationsTask(void *pvParameters)
            xQueueReceive(xComms_Queue, ucUARTTxBuffer, portMAX_DELAY);
 
 #ifdef UART
-    send_over_UART(ucUARTTxBuffer,COMMS_QUEUE_SIZE) ;
-#elif   SPI
-    send_over_SPI(ucUARTTxBuffer,COMMS_QUEUE_SIZE) ;
+           send_over_UART(ucUARTTxBuffer,COMMS_QUEUE_SIZE) ;
+#elif  SPI
+           send_over_SPI(ucUARTTxBuffer,COMMS_QUEUE_SIZE) ;
 #endif
 
 
@@ -110,7 +114,7 @@ void initialize_UART()
 
 /*void initialize_SPI()
 {
-    /*
+
      Set the clocking to run directly from the external crystal/oscillator.
      The SYSCTL_XTAL_ value must be changed to match the value of the
      crystal on your board.
