@@ -10,7 +10,7 @@
 
 /* Cartridge task parameters */
 #define CART_STACK_DEPTH    (1000)
-#define CART_PRIO           (1)
+#define CART_PRIO           (2)
 
 /* Notification values which Transport task may send to Cartridge task */
 #define EXIT_MASK           (0x80)

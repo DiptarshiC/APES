@@ -31,6 +31,8 @@ QueueHandle_t xTransport_Queue; //Incoming packets from Comms ISR go here
 SemaphoreHandle_t xLogger_QueueSemaphore;//Sync device for Logger_q enqueues
 SemaphoreHandle_t xComms_QueueSemaphore;  //Sync device for xComm_Queue enqueues
 SemaphoreHandle_t xController_TimerSemaphore;//60 Hz Controller poll
+TaskHandle_t xCartridgeTask;
+TaskHandle_t xTransportTask;
 
 int main(void)
 {
@@ -50,13 +52,13 @@ int main(void)
 
     /* Create tasks */
     xTaskCreate(vCartridgeTask, "Cartridge I/O Task", CART_STACK_DEPTH, NULL,
-                                                            CART_PRIO, NULL);
+                                                            CART_PRIO, &xCartridgeTask);
 //    xTaskCreate(vControllerTask, "Controller Input Task", CONTROL_STACK_DEPTH,
 //                                                    NULL, CONTROL_PRIO, NULL);
-   xTaskCreate(vTransportTask, "Transport Layer Task", XPORT_STACK_DEPTH,
-                                                   NULL, XPORT_PRIO, NULL);
-//    xTaskCreate(vCommunicationsTask, "Communications Task", COMMS_STACK_DEPTH,
-//                                                    NULL, COMMS_PRIO, NULL);
+    xTaskCreate(vTransportTask, "Transport Layer Task", XPORT_STACK_DEPTH,
+                                                   NULL, XPORT_PRIO, &xTransportTask);
+    xTaskCreate(vCommunicationsTask, "Communications Task", COMMS_STACK_DEPTH,
+                                                    NULL, COMMS_PRIO, NULL);
 //    xTaskCreate(vLoggerTask, "Logger Task", LOGGER_STACK_DEPTH, NULL,
 //                                                            LOGGER_PRIO, NULL);
     vTaskStartScheduler();
@@ -71,6 +73,6 @@ int main(void)
 static void vSystem_init(void)
 {
     /* Configure sysclock to max (120MHz) */
-    MAP_SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN
+    volatile uint32_t dummy = MAP_SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN
                               | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, MHZ_120);
 }

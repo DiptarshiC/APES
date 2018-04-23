@@ -19,6 +19,7 @@
 #include "inc/portable.h"
 #include "inc/queue.h"
 #include "inc/task.h"
+#include "inc/transport.h"
 #include "inc/cartridge.h"
 
 #define FAIL            (-1)
@@ -105,6 +106,7 @@
 #define FASTROM_VAL     (3)
 
 extern QueueHandle_t xMROM_Queue;
+extern TaskHandle_t xTransportTask;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
 static void vCartridge_init (void);
 static int8_t cCart_addr_scheme (void);
@@ -117,7 +119,7 @@ void vCartridgeTask(void *pvParameters)
     bool xTaskExit;
     uint32_t ulNotificationValue;
     uint8_t ucSpeed;
-    uint8_t ucSize;
+    uint32_t ulSize;
     uint32_t uli_rom;
     uint16_t usi_bank;
     uint8_t ucData;
@@ -145,21 +147,22 @@ void vCartridgeTask(void *pvParameters)
             {
                 /* Get ROM speed & size */
                 ucSpeed = ucCart_speed();
-                ucSize = MEBIBIT_2_BYTE * ucCart_size();
+                ulSize = MEBIBIT_2_BYTE * ucCart_size();
 
                 /* Dump HiROM, blocking until queue is emptied when full */
                 if (HIROM_VAL == cCart_addr_scheme())
                 {
-                    for (uli_rom = 0; uli_rom < ucSize; uli_rom++)
+                    for (uli_rom = 0; uli_rom < ulSize; uli_rom++)
                     {
                         ucData = ucRead_rom_byte(uli_rom, ucSpeed);
                        xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
                     }
+                    xTaskNotify(xTransportTask, ROM_DUMP_COMPLETE_MASK, eSetBits);
                 }
 
                 else if (LOWROM_VAL == cCart_addr_scheme())
                 {   // For LowROM reads, read the upper half of each bank
-                    for (usi_bank = 0; usi_bank < (ucSize >> BANK_SHIFT);
+                    for (usi_bank = 0; usi_bank < (ulSize >> BANK_SHIFT);
                                                                     usi_bank++)
                     {
                         for (uli_rom = LO_PAGE_SIZE; uli_rom < 
@@ -170,6 +173,7 @@ void vCartridgeTask(void *pvParameters)
                            xQueueSend(xMROM_Queue, &ucData, portMAX_DELAY);
                         }
                     }
+                    xTaskNotify(xTransportTask, ROM_DUMP_COMPLETE_MASK, eSetBits);
                 }
 
                 else if (FAIL == cCart_addr_scheme())

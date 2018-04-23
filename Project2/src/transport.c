@@ -44,6 +44,7 @@ extern QueueHandle_t xTransport_Queue;
 extern QueueHandle_t xComms_Queue;
 extern SemaphoreHandle_t xComms_QueueSemaphore;
 extern SemaphoreHandle_t xController_TimerSemaphore;
+extern TaskHandle_t xCartridgeTask;
 TimerHandle_t xTimerController;
 void vTimerController (TimerHandle_t xTimer);
 
@@ -59,6 +60,7 @@ void vTransportTask(void *pvParameters)
     uint16_t usControl_value;
 
     xTaskExit = pdFALSE;
+    xState = WAITING_TO_START;
 
     /* Transport Task main loop */
     while (!xTaskExit)
@@ -75,12 +77,11 @@ void vTransportTask(void *pvParameters)
                 }
                 else if (ulNotificationValue & ROM_DUMP_INIT_MASK)
                 {
-                    xTaskNotify(xTaskGetHandle("Cartridge I/O Task"), 
-                                                    READ_MROM_MASK, eNoAction);
+                    xTaskNotify(xCartridgeTask, READ_MROM_MASK, eSetBits);
                     memset(pucROM_buffer, 0, COMMS_QUEUE_PL_SIZE);
                     ulPacket_size = 0;
                     xState = SENDING_GAME;
-                }
+//                }
             break;
 
             case SENDING_GAME:
@@ -103,7 +104,7 @@ void vTransportTask(void *pvParameters)
                             ulPacket_size++;
                         }
                         xPacketTransport.dest = BB_ROMFILE;
-                        xPacketTransport.source = TIVA_XPORT;
+                        xPacketTransport.source = TIVA_CART;
                         xPacketTransport.size = ulPacket_size;
                         for (uli_payload = 0; uli_payload < ulPacket_size;
                                                                 uli_payload++)
@@ -131,7 +132,7 @@ void vTransportTask(void *pvParameters)
                     if (COMMS_QUEUE_PL_SIZE == ulPacket_size)
                     {
                         xPacketTransport.dest = BB_ROMFILE;
-                        xPacketTransport.source = TIVA_XPORT;
+                        xPacketTransport.source = TIVA_CART;
                         xPacketTransport.size = ulPacket_size;
                         for (uli_payload = 0; uli_payload < ulPacket_size;
                                                                 uli_payload++)
@@ -164,7 +165,7 @@ void vTransportTask(void *pvParameters)
                     {
                         usControl_value = ulNotificationValue & CONTROL_MASK;
                         xPacketTransport.dest = BB_CONTROL;
-                        xPacketTransport.source = TIVA_XPORT;
+                        xPacketTransport.source = TIVA_CONTROL;
                         xPacketTransport.size = sizeof(usControl_value);
                         *xPacketTransport.ucPayload =
                                         (uint8_t)(usControl_value >> BITS_8);

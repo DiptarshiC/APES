@@ -40,6 +40,7 @@ typedef struct
     uint8_t ucPayload[COMMS_QUEUE_PL_SIZE];
 } comm_packet_t;
 
+void vCommunicationsTask (void *pvParameters);
 
 
 #endif /* INC_COMMS_H_ */
