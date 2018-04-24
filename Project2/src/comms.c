@@ -19,6 +19,7 @@
  */
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
@@ -36,44 +37,112 @@
 #include "inc/queue.h"
 #include "inc/task.h"
 #include "inc/semphr.h"
+#include "inc/transport.h"
 #include "inc/comms.h"
 
-#define MHZ_120 (120000000)
+#ifdef UART
+#define BAUD_115200             (115200)
+#elif defined(SPI)
+#endif
+#define CHKSUM_SIZE             (4)
+#define MHZ_120                 (120000000)
+#define ONE_SECOND              (1000)
+
+typedef enum
+{
+    SEND_GAME,
+    GAME_CHKSUM_GOOD,
+    GAME_CHKSUM_BAD,
+    SEND_CONTROL,
+    CHKSUM_GOOD,
+    CHKSUM_BAD
+} bb_comms_t;
+
+typedef enum
+{
+    WAITING_TO_START,   // First state after bootup
+    SENDING_GAME,       // Second state, sending game but not controller
+    SENDING_CONTROLLER  // Third state, only sending controller
+                        /* Task can transition from third state to second state
+                         * or out to exit. First state can only transition to 
+                         * second state or exit, second to third or exit.
+                         */
+} comms_state_t;
 
 #ifdef UART
 void initialize_UART();
 void send_over_UART (uint8_t array[], uint32_t length);
 #elif defined(SPI)
+void initialize_SPI();
+void SPI_sent_packet (unit8_t array[], uint32_t length);
 #endif
 
+extern TaskHandle_t xTransportTask;
 extern SemaphoreHandle_t xComms_QueueSemaphore;
 extern QueueHandle_t xComms_Queue;
 
 void vCommunicationsTask(void *pvParameters)
 {
 
-        initialize_UART();
-        bool xTaskExit;
-        uint8_t ucUARTTxBuffer[COMMS_QUEUE_SIZE];
+    initialize_UART();
+    bool xTaskExit;
+    comm_packet_t * pxPacketTransport;
+    uint32_t ulPacketSize;
+    comms_state_t xState;
 
-        xTaskExit = pdFALSE;
+    xTaskExit = pdFALSE;
+    xState = WAITING_TO_START;
+    while (!xTaskExit)
+    {
+        switch (xState)
+        {
+            case WAITING_TO_START:
+                /* Poll UART for SEND_GAME command, blocking when no UART Rx */
+                while (SEND_GAME != (bb_comms_t)MAP_UARTCharGet(UART5_BASE));        
+                xSemaphoreGive(xComms_QueueSemaphore);
+                xTaskNotify(xTransportTask, ROM_DUMP_INIT_MASK, eSetBits);
+                pxPacketTransport = malloc(COMMS_QUEUE_SIZE);
+                xState = SENDING_GAME;
+            break;
 
-       while(!xTaskExit)
-       {
-           /*puts data from the comms queue into a buffer*/
-
-           xSemaphoreGive(xComms_QueueSemaphore);
-           xQueueReceive(xComms_Queue, ucUARTTxBuffer, portMAX_DELAY);
-
+            case SENDING_GAME:
+                /*puts data from the comms queue into a buffer*/            
+                if (xQueueReceive(xComms_Queue, pxPacketTransport, pdMS_TO_TICKS(ONE_SECOND)))
+                {
+                    ulPacketSize = pxPacketTransport->ulSize + COMMS_QUEUE_OVERHEAD;
 #ifdef UART
-           send_over_UART(ucUARTTxBuffer,COMMS_QUEUE_SIZE) ;
+                    send_over_UART((uint8_t *)pxPacketTransport, ulPacketSize) ;
 #elif defined(SPI)
-           send_over_SPI(ucUARTTxBuffer,COMMS_QUEUE_SIZE) ;
+                    send_over_SPI((uint8_t *)pxPacketTransport, ulPacketSize) ;
 #endif
+                }
+                if (SEND_CONTROL == (bb_comms_t)MAP_UARTCharGetNonBlocking(UART5_BASE))
+                {
+                    xState = SENDING_CONTROLLER;
+                }
+            break;
 
+            case SENDING_CONTROLLER:                
+                /*puts data from the comms queue into a buffer*/            
+                xQueueReceive(xComms_Queue, pxPacketTransport, portMAX_DELAY);
+                ulPacketSize = pxPacketTransport->ulSize + COMMS_QUEUE_OVERHEAD;
+#ifdef UART
+                send_over_UART((uint8_t *)pxPacketTransport, ulPacketSize) ;
+#elif defined(SPI)
+                send_over_SPI((uint8_t *)pxPacketTransport, ulPacketSize) ;
+#endif
+                if (SEND_GAME == (bb_comms_t)MAP_UARTCharGetNonBlocking(UART5_BASE))
+                {
+                    xState = SENDING_GAME;
+                }
+            break;
 
-
-       }
+            default:
+                xState = WAITING_TO_START;
+            break;
+        }
+    }
+    free (pxPacketTransport);
 }
 
 
@@ -112,7 +181,8 @@ void initialize_UART()
           instead of a function call.
         */
 
-        MAP_UARTConfigSetExpClk(UART5_BASE, MHZ_120, 115200,(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+        MAP_UARTConfigSetExpClk(UART5_BASE, MHZ_120, BAUD_115200,
+           (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
 
 }
@@ -126,31 +196,50 @@ void initialize_UART()
 
     uint32_t ui32SysClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
                                                       SYSCTL_OSC_MAIN |
-                                                      SYSCTL_USE_OSC), 12000000);
-
-
-
-
-
-
-
-
+                                                      SYSCTL_USE_OSC), MHZ_120);
 
 }*/
 #elif defined(UART)
-void send_over_UART(uint8_t array[],uint32_t length)
+void send_over_UART(uint8_t * array,uint32_t length)
 {
     uint32_t index;
+    uint32_t ulChecksum;
+    bool retry_needed;
 
-    for(index=0;index<length;index++)
+    /* Calculate a 16-bit checksum from comm_packet (incl. size, dest, src) */
+    ulChecksum = 0;
+    for (index = 0; index < length; index++)
     {
-        /*
-        Write the same character using the blocking write function.This
-        function will not return until there was space in the FIFO and
-        the character is written.
-        */
+        /* Simple additive checksum */
+        ulChecksum += *(array + index);
+    }
 
-        MAP_UARTCharPut(UART5_BASE,array[index]);
+    retry_needed = pdTRUE;
+    while (retry_needed)
+    {
+        /* Send checksum */
+        for (index = 0; index < CHKSUM_SIZE; index++)
+        {
+            MAP_UARTCharPut(UART5_BASE, *(&ulChecksum + index));
+        }
+
+        /* Send packet */
+        for(index=0; index < length;index++)
+        {
+            /*
+            Write the same character using the blocking write function.This
+            function will not return until there was space in the FIFO and
+            the character is written.
+            */
+
+            MAP_UARTCharPut(UART5_BASE,*(array + index));
+        }
+
+        /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
+        if (CHKSUM_GOOD == (bb_comms_t)MAP_UARTCharGet(UART5_BASE))
+        {
+            retry_needed = pdFALSE;
+        }
     }
 }
 #endif

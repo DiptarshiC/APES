@@ -17,7 +17,8 @@
 
 /* Comms FIFO parameters */
 #define COMMS_QUEUE_PL_SIZE     (512)
-#define COMMS_QUEUE_SIZE        (COMMS_QUEUE_PL_SIZE + 6)
+#define COMMS_QUEUE_OVERHEAD    (8)
+#define COMMS_QUEUE_SIZE        (COMMS_QUEUE_PL_SIZE + COMMS_QUEUE_OVERHEAD)
 #define COMMS_QUEUE_LENGTH      (8)
 
 typedef enum
@@ -27,16 +28,17 @@ typedef enum
     TIVA_LOGGER,
     TIVA_XPORT,
     TIVA_COMMS,
-    BB_COMMS,
+    BB_ROMFILE,
     BB_CONTROL,
-    BB_ROMFILE
+    BB_LOGGER,
+    BB_COMMS
 } task_e_t;
 
 typedef struct
 {
-    task_e_t dest;
-    task_e_t source;
-    uint32_t size;
+    task_e_t xDest;
+    task_e_t xSource;
+    uint32_t ulSize;
     uint8_t ucPayload[COMMS_QUEUE_PL_SIZE];
 } comm_packet_t;
 

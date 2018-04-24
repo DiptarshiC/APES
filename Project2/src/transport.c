@@ -69,8 +69,8 @@ void vTransportTask(void *pvParameters)
         {
             case WAITING_TO_START:
                 /* Wait for command to send game data, prioritizing exit cmd */
-                xTaskNotifyWait(CLEAR_ALL, CLEAR_ALL, &ulNotificationValue,
-                                                                portMAX_DELAY);
+                xTaskNotifyWait(CLEAR_NONE, EXIT_MASK | ROM_DUMP_INIT_MASK,
+                                        &ulNotificationValue, portMAX_DELAY);
                 if (ulNotificationValue & EXIT_MASK)
                 {
                     xTaskExit = pdTRUE;
@@ -81,15 +81,15 @@ void vTransportTask(void *pvParameters)
                     memset(pucROM_buffer, 0, COMMS_QUEUE_PL_SIZE);
                     ulPacket_size = 0;
                     xState = SENDING_GAME;
-//                }
+                }
             break;
 
             case SENDING_GAME:
                 /* Check for a command, if no command send data until queue
                  * is empty then loop back to command check
                  */
-                if (xTaskNotifyWait(CLEAR_ALL, CLEAR_ALL, &ulNotificationValue,
-                                                                    ZERO_TICKS))
+                if (xTaskNotifyWait(CLEAR_ALL, EXIT_MASK |
+                    ROM_DUMP_COMPLETE_MASK, &ulNotificationValue, ZERO_TICKS))
                 {
                     if (ulNotificationValue & EXIT_MASK)
                     {
@@ -103,9 +103,9 @@ void vTransportTask(void *pvParameters)
                         {
                             ulPacket_size++;
                         }
-                        xPacketTransport.dest = BB_ROMFILE;
-                        xPacketTransport.source = TIVA_CART;
-                        xPacketTransport.size = ulPacket_size;
+                        xPacketTransport.xDest = BB_ROMFILE;
+                        xPacketTransport.xSource = TIVA_CART;
+                        xPacketTransport.ulSize = ulPacket_size;
                         for (uli_payload = 0; uli_payload < ulPacket_size;
                                                                 uli_payload++)
                         {
@@ -131,9 +131,9 @@ void vTransportTask(void *pvParameters)
                     ulPacket_size++;
                     if (COMMS_QUEUE_PL_SIZE == ulPacket_size)
                     {
-                        xPacketTransport.dest = BB_ROMFILE;
-                        xPacketTransport.source = TIVA_CART;
-                        xPacketTransport.size = ulPacket_size;
+                        xPacketTransport.xDest = BB_ROMFILE;
+                        xPacketTransport.xSource = TIVA_CART;
+                        xPacketTransport.ulSize = ulPacket_size;
                         for (uli_payload = 0; uli_payload < ulPacket_size;
                                                                 uli_payload++)
                         {
@@ -154,7 +154,7 @@ void vTransportTask(void *pvParameters)
                 xSemaphoreTake(xController_TimerSemaphore, portMAX_DELAY);
 
                 /* Check for exit command */
-                if (xTaskNotifyWait(CLEAR_NONE, CLEAR_NONE,
+                if (xTaskNotifyWait(CLEAR_NONE, EXIT_MASK | ROM_DUMP_INIT_MASK,
                                             &ulNotificationValue, ZERO_TICKS))
                 {
                     if (ulNotificationValue & EXIT_MASK)
@@ -164,9 +164,9 @@ void vTransportTask(void *pvParameters)
                     else    // Put Mailbox value in packet
                     {
                         usControl_value = ulNotificationValue & CONTROL_MASK;
-                        xPacketTransport.dest = BB_CONTROL;
-                        xPacketTransport.source = TIVA_CONTROL;
-                        xPacketTransport.size = sizeof(usControl_value);
+                        xPacketTransport.xDest = BB_CONTROL;
+                        xPacketTransport.xSource = TIVA_CONTROL;
+                        xPacketTransport.ulSize = sizeof(usControl_value);
                         *xPacketTransport.ucPayload =
                                         (uint8_t)(usControl_value >> BITS_8);
                         *(xPacketTransport.ucPayload + 1) =

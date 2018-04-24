@@ -53,6 +53,8 @@ void enable_peripherals();
  */
 void send_signal();
 
+void vControllerTask (void *pvParameters);
+
 
 
 #endif /* SNES_CONTROLLER_CONTROLLER_H_ */

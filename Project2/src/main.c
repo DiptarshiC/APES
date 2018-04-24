@@ -25,13 +25,14 @@
 static void vSystem_init (void);
 
 QueueHandle_t xMROM_Queue;//FIFO for MROM data to be sent Cartridge->Transport
-//QueueHandle_t xLogger_Queue;//Transport, Cartridge, Controller, Comms logs here
 QueueHandle_t xComms_Queue;  //Outgoing packets from Transport & Logger go here
 QueueHandle_t xTransport_Queue; //Incoming packets from Comms ISR go here
 SemaphoreHandle_t xLogger_QueueSemaphore;//Sync device for Logger_q enqueues
 SemaphoreHandle_t xComms_QueueSemaphore;  //Sync device for xComm_Queue enqueues
 SemaphoreHandle_t xController_TimerSemaphore;//60 Hz Controller poll
 TaskHandle_t xCartridgeTask;
+TaskHandle_t xControllerTask;
+TaskHandle_t xLoggerTask;
 TaskHandle_t xTransportTask;
 
 int main(void)
@@ -52,15 +53,15 @@ int main(void)
 
     /* Create tasks */
     xTaskCreate(vCartridgeTask, "Cartridge I/O Task", CART_STACK_DEPTH, NULL,
-                                                            CART_PRIO, &xCartridgeTask);
+                                                CART_PRIO, &xCartridgeTask);
 //    xTaskCreate(vControllerTask, "Controller Input Task", CONTROL_STACK_DEPTH,
-//                                                    NULL, CONTROL_PRIO, NULL);
+//                                          NULL, CONTROL_PRIO, xControllerTask);
     xTaskCreate(vTransportTask, "Transport Layer Task", XPORT_STACK_DEPTH,
-                                                   NULL, XPORT_PRIO, &xTransportTask);
+                                            NULL, XPORT_PRIO, &xTransportTask);
     xTaskCreate(vCommunicationsTask, "Communications Task", COMMS_STACK_DEPTH,
                                                     NULL, COMMS_PRIO, NULL);
 //    xTaskCreate(vLoggerTask, "Logger Task", LOGGER_STACK_DEPTH, NULL,
-//                                                            LOGGER_PRIO, NULL);
+//                                                    LOGGER_PRIO, &xLoggerTask);
     vTaskStartScheduler();
 
     while (pdTRUE)
@@ -73,6 +74,6 @@ int main(void)
 static void vSystem_init(void)
 {
     /* Configure sysclock to max (120MHz) */
-    volatile uint32_t dummy = MAP_SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN
-                              | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, MHZ_120);
+    MAP_SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL
+                                                | SYSCTL_CFG_VCO_480, MHZ_120);
 }
