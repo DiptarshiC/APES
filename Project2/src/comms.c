@@ -142,7 +142,10 @@ void vCommunicationsTask(void *pvParameters)
             break;
         }
     }
+
+    /* Graceful Exit */
     free (pxPacketTransport);
+    vTaskDelete(NULL);
 }
 
 

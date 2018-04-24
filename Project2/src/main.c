@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
+#include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
-#include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 #include "inc/controller.h"
 #include "inc/cartridge.h"
@@ -26,9 +26,9 @@ static void vSystem_init (void);
 
 QueueHandle_t xMROM_Queue;//FIFO for MROM data to be sent Cartridge->Transport
 QueueHandle_t xComms_Queue;  //Outgoing packets from Transport & Logger go here
-QueueHandle_t xTransport_Queue; //Incoming packets from Comms ISR go here
 SemaphoreHandle_t xLogger_QueueSemaphore;//Sync device for Logger_q enqueues
 SemaphoreHandle_t xComms_QueueSemaphore;  //Sync device for xComm_Queue enqueues
+SemaphoreHandle_t xTransport_MailboxSemaphore;
 SemaphoreHandle_t xController_TimerSemaphore;//60 Hz Controller poll
 TaskHandle_t xCartridgeTask;
 TaskHandle_t xControllerTask;
@@ -43,19 +43,19 @@ int main(void)
     /* Create queues */
     xMROM_Queue = xQueueCreate(ROM_QUEUE_LENGTH, ROM_QUEUE_SIZE);
 //    xLogger_Queue = xQueueCreate(LOGGER_QUEUE_LENGTH, LOGGER_QUEUE_SIZE);
-   xComms_Queue = xQueueCreate(COMMS_QUEUE_LENGTH, COMMS_QUEUE_SIZE);
-   xTransport_Queue = xQueueCreate(XPORT_QUEUE_LENGTH, XPORT_QUEUE_SIZE);
+    xComms_Queue = xQueueCreate(COMMS_QUEUE_LENGTH, COMMS_QUEUE_SIZE);
 
     /* Create synchronization devices */
     xLogger_QueueSemaphore = xSemaphoreCreateBinary();
     xComms_QueueSemaphore = xSemaphoreCreateBinary();
+    xTransport_MailboxSemaphore = xSemaphoreCreateBinary();
     xController_TimerSemaphore = xSemaphoreCreateBinary();
 
     /* Create tasks */
     xTaskCreate(vCartridgeTask, "Cartridge I/O Task", CART_STACK_DEPTH, NULL,
                                                 CART_PRIO, &xCartridgeTask);
-//    xTaskCreate(vControllerTask, "Controller Input Task", CONTROL_STACK_DEPTH,
-//                                          NULL, CONTROL_PRIO, xControllerTask);
+    xTaskCreate(vControllerTask, "Controller Input Task", CONTROL_STACK_DEPTH,
+                                          NULL, CONTROL_PRIO, xControllerTask);
     xTaskCreate(vTransportTask, "Transport Layer Task", XPORT_STACK_DEPTH,
                                             NULL, XPORT_PRIO, &xTransportTask);
     xTaskCreate(vCommunicationsTask, "Communications Task", COMMS_STACK_DEPTH,
@@ -64,10 +64,7 @@ int main(void)
 //                                                    LOGGER_PRIO, &xLoggerTask);
     vTaskStartScheduler();
 
-    while (pdTRUE)
-    {
-        // Do nothing
-    }
+    while (pdTRUE); // Do nothing
 
 }
 

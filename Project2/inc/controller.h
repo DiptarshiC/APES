@@ -23,35 +23,14 @@
 #define SNES_CONTROLLER_CONTROLLER_H_
 
 
-/**************************************************************************************************/
-#define US_12_DELAY     (480-20)
+/* Cartridge task parameters */
+#define CONTROL_STACK_DEPTH    (1000)
+#define CONTROL_PRIO           (2)
 
-#define US_6_DELAY      (240-20)
+#define US_12_DELAY     (480 - 20)
+#define US_6_DELAY      (240 - 20)
+#define EXIT_MASK       (0x80)
 
-#define MS_16_466_DELAY (658640 - 20)
-
-
-/**************************************************************************************************/
-/*variable to read the input*/
-
-
-
-/**************************************************************************************************/
-
-
-/**
- * This function below will enable all the gpio
- * peripherals used for the clocking, data latching and
- * input of the game console.
- */
-void enable_peripherals();
-
-/**
- * This function shall actually latch all the signals from
- * the SNES controller onto the TIVA board
- *
- */
-void send_signal();
 
 void vControllerTask (void *pvParameters);
 

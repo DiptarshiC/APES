@@ -23,6 +23,7 @@
 #include "inc/cartridge.h"
 
 #define FAIL            (-1)
+#define CLEAR_NONE      (0x00000000)
 #define CLEAR_ALL       (0xFFFFFFFF)
 #define FASTROM_DELAY   (5)
 #define SLOWROM_DELAY   (8)
@@ -132,7 +133,7 @@ void vCartridgeTask(void *pvParameters)
     while (!xTaskExit)
     {
         /* Block until a notification is received */
-        xTaskNotifyWait(CLEAR_ALL, CLEAR_ALL, &ulNotificationValue,
+        xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL, &ulNotificationValue,
                                                                 portMAX_DELAY);
 
         /* If notification was for graceful exit, do so ignoring other cmds */

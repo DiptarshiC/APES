@@ -17,6 +17,7 @@
 #include "inc/timers.h"
 #include "inc/cartridge.h"
 #include "inc/comms.h"
+#include "inc/controller.h"
 #include "inc/transport.h"
 
 #define CLEAR_NONE      (0x00000000)
@@ -40,13 +41,14 @@ typedef enum
 } xport_state_t;
 
 extern QueueHandle_t xMROM_Queue;
-extern QueueHandle_t xTransport_Queue;
 extern QueueHandle_t xComms_Queue;
 extern SemaphoreHandle_t xComms_QueueSemaphore;
 extern SemaphoreHandle_t xController_TimerSemaphore;
+extern SemaphoreHandle_t xTransport_MailboxSemaphore;
 extern TaskHandle_t xCartridgeTask;
-TimerHandle_t xTimerController;
-void vTimerController (TimerHandle_t xTimer);
+extern TaskHandle_t xControllerTask;
+extern TimerHandle_t xTimerController;
+extern void vTimerController (void *pvParameters);
 
 void vTransportTask(void *pvParameters)
 {
@@ -69,7 +71,7 @@ void vTransportTask(void *pvParameters)
         {
             case WAITING_TO_START:
                 /* Wait for command to send game data, prioritizing exit cmd */
-                xTaskNotifyWait(CLEAR_NONE, EXIT_MASK | ROM_DUMP_INIT_MASK,
+                xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL | ROM_DUMP_INIT_MASK,
                                         &ulNotificationValue, portMAX_DELAY);
                 if (ulNotificationValue & EXIT_MASK)
                 {
@@ -88,7 +90,7 @@ void vTransportTask(void *pvParameters)
                 /* Check for a command, if no command send data until queue
                  * is empty then loop back to command check
                  */
-                if (xTaskNotifyWait(CLEAR_ALL, EXIT_MASK |
+                if (xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL |
                     ROM_DUMP_COMPLETE_MASK, &ulNotificationValue, ZERO_TICKS))
                 {
                     if (ulNotificationValue & EXIT_MASK)
@@ -150,15 +152,14 @@ void vTransportTask(void *pvParameters)
             break;
 
             case SENDING_CONTROLLER:
-                /* Send out controller value on ~60Hz timer */
-                xSemaphoreTake(xController_TimerSemaphore, portMAX_DELAY);
-
+                xSemaphoreTake(xTransport_MailboxSemaphore, portMAX_DELAY);
                 /* Check for exit command */
-                if (xTaskNotifyWait(CLEAR_NONE, EXIT_MASK | ROM_DUMP_INIT_MASK,
+                if (xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL | ROM_DUMP_INIT_MASK,
                                             &ulNotificationValue, ZERO_TICKS))
                 {
                     if (ulNotificationValue & EXIT_MASK)
                     {
+                        xTaskNotify(xControllerTask, EXIT_MASK, eSetBits);
                         xTaskExit = pdTRUE;
                     }
                     else    // Put Mailbox value in packet
@@ -187,10 +188,4 @@ void vTransportTask(void *pvParameters)
 
     /* Graceful Exit */
     vTaskDelete(NULL);
-}
-
-void vTimerController(TimerHandle_t xTimer)
-{
-    BaseType_t * pxGiveSuccess;
-    xSemaphoreGiveFromISR(xController_TimerSemaphore, pxGiveSuccess);
 }
