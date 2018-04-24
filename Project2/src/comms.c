@@ -50,11 +50,11 @@
 
 typedef enum
 {
-    SEND_GAME,
-    GAME_CHKSUM_GOOD,
-    GAME_CHKSUM_BAD,
-    SEND_CONTROL,
-    CHKSUM_GOOD,
+    SEND_GAME,          // First command from the BB, this initiates TIVA ops
+    GAME_CHKSUM_GOOD,   // After a full gamefile has been received by BB
+    GAME_CHKSUM_BAD,    //it respond with GOOD or BAD using game's chksum bytes
+    SEND_CONTROL,       // Command BB uses to let TIVA know to control_sends
+    CHKSUM_GOOD,        /* Every packet sent gets a GOOD or BAD response */
     CHKSUM_BAD
 } bb_comms_t;
 
@@ -71,10 +71,10 @@ typedef enum
 
 #ifdef UART
 void initialize_UART();
-void send_over_UART (uint8_t array[], uint32_t length);
+void send_over_UART (uint8_t * array, uint32_t length);
 #elif defined(SPI)
 void initialize_SPI();
-void SPI_sent_packet (unit8_t array[], uint32_t length);
+void SPI_sent_packet (uint8_t * array, uint32_t length);
 #endif
 
 extern TaskHandle_t xTransportTask;
@@ -203,7 +203,7 @@ void initialize_UART()
 
 }*/
 #elif defined(UART)
-void send_over_UART(uint8_t * array,uint32_t length)
+void send_over_UART(uint8_t *array,uint32_t length)
 {
     uint32_t index;
     uint32_t ulChecksum;
