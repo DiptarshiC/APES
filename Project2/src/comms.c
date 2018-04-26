@@ -13,8 +13,14 @@
  *
  *  For SPI our pins are
  *
+ *  PF1 as TX
+ *  PF0 as RX
+ *  PF2 as CLK
+ *  PF3 as  FSS
  *
- *
+ *  Polarity 0|
+ *            --------->    SSI_FRF_MOTO_MODE_0
+ *  Phase    0|
  *
  */
 
@@ -181,18 +187,47 @@ void initialize_UART()
 
 }
 #ifdef SPI
-/*void initialize_SPI()
+void initialize_SPI()
 {
 
      Set the clocking to run directly from the external crystal/oscillator.
      The SYSCTL_XTAL_ value must be changed to match the value of the
      crystal on your board.
 
-    uint32_t ui32SysClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
+     uint32_t ui32SysClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
                                                       SYSCTL_OSC_MAIN |
                                                       SYSCTL_USE_OSC), MHZ_120);
 
-}*/
+     //Enabling the SSI3 Peripheral
+
+     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI3);
+
+     //For using SSI3, PORT F[3:0], so we shall initialize it
+
+     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+    //Pin Muxing
+    GPIOPinConfigure(GPIO_PF2_SSI1CLK);
+    GPIOPinConfigure(GPIO_PF3_SSI1FSS);
+    GPIOPinConfigure(GPIO_PF0_SSI1RX);
+    GPIOPinConfigure(GPIO_PF1_SSI1TX);
+
+    //Configuring GPIO pins as SSI
+
+    GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_3 | GPIO_PIN_2 | GPIO_PIN_1 | GPIO_PIN_0);
+
+    //Initializing SPI as slave.Bit rate 90000
+
+    SSIConfigSetExpClk(SSI3_BASE, ui32SysClock, SSI_FRF_MOTO_MODE_0,
+                       SSI_MODE_SLAVE, 90000, 8);
+
+
+    // Enabling the SSI3 module.
+
+    SSIEnable(SSI0_BASE);
+
+
+}
 #elif defined(UART)
 void send_over_UART(uint8_t *array,uint32_t length)
 {
@@ -237,4 +272,49 @@ void send_over_UART(uint8_t *array,uint32_t length)
     }
 }
 #endif
-//void send_over_spi();
+
+void send_over_spi(uint8_t *array,uint32_t length)
+{
+    uint32_t index;
+        uint32_t ulChecksum;
+        bool retry_needed;
+
+        /* Calculate a 16-bit checksum from comm_packet (incl. size, dest, src) */
+        ulChecksum = 0;
+        for (index = 0; index < length; index++)
+        {
+            /* Simple additive checksum */
+            ulChecksum += *(array + index);
+        }
+
+        retry_needed = pdTRUE;
+        while (retry_needed)
+        {
+            /* Send checksum */
+            for (index = 0; index < CHKSUM_SIZE; index++)
+            {
+                MAP_SSIDataPut(SSI3_BASE, *(&ulChecksum + index));
+            }
+
+            /* Send packet */
+            for(index=0; index < length;index++)
+            {
+                /*
+                Write the same character using the blocking write function.This
+                function will not return until there was space in the FIFO and
+                the character is written.
+                */
+
+                MAP_SSIDataPut(SSI3_BASE,*(array + index));
+            }
+            uint8_t * data;
+
+
+            /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
+            MAP_SSIDataGet(SSI3_BASE,data);
+            if (CHKSUM_GOOD == (bb_comms_t)(*data));
+            {
+                retry_needed = pdFALSE;
+            }
+        }
+}
