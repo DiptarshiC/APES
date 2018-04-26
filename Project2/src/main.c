@@ -13,6 +13,7 @@
 #include "inc/cartridge.h"
 //#include "inc/logger.h"
 #include "inc/comms.h"
+#include "inc/API.h"
 #include "inc/transport.h"
 #include "inc/FreeRTOS.h"
 #include "inc/portable.h"

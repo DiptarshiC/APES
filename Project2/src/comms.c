@@ -38,6 +38,7 @@
 #include "inc/task.h"
 #include "inc/semphr.h"
 #include "inc/transport.h"
+#include "inc/API.h"
 #include "inc/comms.h"
 
 #ifdef UART
@@ -47,16 +48,6 @@
 #define CHKSUM_SIZE             (4)
 #define MHZ_120                 (120000000)
 #define ONE_SECOND              (1000)
-
-typedef enum
-{
-    SEND_GAME,          // First command from the BB, this initiates TIVA ops
-    GAME_CHKSUM_GOOD,   // After a full gamefile has been received by BB
-    GAME_CHKSUM_BAD,    //it respond with GOOD or BAD using game's chksum bytes
-    SEND_CONTROL,       // Command BB uses to let TIVA know to control_sends
-    CHKSUM_GOOD,        /* Every packet sent gets a GOOD or BAD response */
-    CHKSUM_BAD
-} bb_comms_t;
 
 typedef enum
 {

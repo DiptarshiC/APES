@@ -16,7 +16,7 @@
 #include "inc/semphr.h"
 #include "inc/timers.h"
 #include "inc/cartridge.h"
-#include "inc/comms.h"
+#include "inc/API.h"
 #include "inc/controller.h"
 #include "inc/transport.h"
 
