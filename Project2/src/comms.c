@@ -224,7 +224,7 @@ void initialize_SPI()
 
     // Enabling the SSI3 module.
 
-    SSIEnable(SSI0_BASE);
+    SSIEnable(SSI3_BASE);
 
 
 }
