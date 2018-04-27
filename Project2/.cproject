@@ -83,6 +83,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="BB|test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="BB/inc"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
