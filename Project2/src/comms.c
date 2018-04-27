@@ -95,7 +95,7 @@ void vCommunicationsTask(void *pvParameters)
         {
             case WAITING_TO_START:
                 /* Poll UART for SEND_GAME command, blocking when no UART Rx */
-                while (SEND_GAME != (bb_comms_t)MAP_UARTCharGet(UART5_BASE));        
+                while (SEND_GAME != MAP_UARTCharGet(UART5_BASE));
                 xSemaphoreGive(xComms_QueueSemaphore);
                 xTaskNotify(xTransportTask, ROM_DUMP_INIT_MASK, eSetBits);
                 pxPacketTransport = malloc(COMMS_QUEUE_SIZE);
@@ -113,7 +113,7 @@ void vCommunicationsTask(void *pvParameters)
                     send_over_SPI((uint8_t *)pxPacketTransport, ulPacketSize) ;
 #endif
                 }
-                if (SEND_CONTROL == (bb_comms_t)MAP_UARTCharGetNonBlocking(UART5_BASE))
+                if (SEND_CONTROL == MAP_UARTCharGetNonBlocking(UART5_BASE))
                 {
                     xState = SENDING_CONTROLLER;
                 }
@@ -128,7 +128,7 @@ void vCommunicationsTask(void *pvParameters)
 #elif defined(SPI)
                 send_over_SPI((uint8_t *)pxPacketTransport, ulPacketSize) ;
 #endif
-                if (SEND_GAME == (bb_comms_t)MAP_UARTCharGetNonBlocking(UART5_BASE))
+                if (SEND_GAME == MAP_UARTCharGetNonBlocking(UART5_BASE))
                 {
                     xState = SENDING_GAME;
                 }
@@ -235,7 +235,7 @@ void send_over_UART(uint8_t *array,uint32_t length)
     uint32_t ulChecksum;
     bool retry_needed;
 
-    /* Calculate a 16-bit checksum from comm_packet (incl. size, dest, src) */
+    /* Calculate a 32-bit checksum from comm_packet (incl. size, dest, src) */
     ulChecksum = 0;
     for (index = 0; index < length; index++)
     {
@@ -264,8 +264,8 @@ void send_over_UART(uint8_t *array,uint32_t length)
             MAP_UARTCharPut(UART5_BASE,*(array + index));
         }
 
-        /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
-        if (CHKSUM_GOOD == (bb_comms_t)MAP_UARTCharGet(UART5_BASE))
+        /* Wait for 1 byte response (0x59 good sum, 0xD4 bad) */
+        if (CHKSUM_GOOD == MAP_UARTCharGet(UART5_BASE))
         {
             retry_needed = pdFALSE;
         }
@@ -311,8 +311,8 @@ void send_over_spi(uint8_t *array,uint32_t length)
 
 
             /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
-            MAP_SSIDataGet(SSI3_BASE,data);
-            if (CHKSUM_GOOD == (bb_comms_t)(*data));
+//            MAP_SSIDataGet(SSI3_BASE,data);
+            if (CHKSUM_GOOD == *data);
             {
                 retry_needed = pdFALSE;
             }

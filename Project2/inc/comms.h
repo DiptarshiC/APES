@@ -12,7 +12,7 @@
 #define INC_COMMS_H_
 
 /* Communications task parameters */
-#define COMMS_STACK_DEPTH       (1000)
+#define COMMS_STACK_DEPTH       (4096)
 #define COMMS_PRIO              (1)
 
 

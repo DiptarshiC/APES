@@ -17,15 +17,13 @@
 #define COMMS_QUEUE_SIZE        (COMMS_QUEUE_PL_SIZE + COMMS_QUEUE_OVERHEAD)
 #define COMMS_QUEUE_LENGTH      (8)
 
-typedef enum
-{
-    SEND_GAME,          // First command from the BB, this initiates TIVA ops
-    GAME_CHKSUM_GOOD,   // After a full gamefile has been received by BB
-    GAME_CHKSUM_BAD,    //it respond with GOOD or BAD using game's chksum bytes
-    SEND_CONTROL,       // Command BB uses to let TIVA know to control_sends
-    CHKSUM_GOOD,        /* Every packet sent gets a GOOD or BAD response */
-    CHKSUM_BAD
-} bb_comms_t;
+/* BB->TIVA Command Values */
+#define SEND_GAME               (0xA1)  // First command from the BB, this initiates TIVA ops
+#define GAME_CHKSUM_GOOD        (0x59)  // After a full gamefile has been received by BB
+#define GAME_CHKSUM_BAD         (0xD4)  //it respond with GOOD or BAD using game's chksum bytes
+#define SEND_CONTROL            (0x93)  // Command BB uses to let TIVA know to control_sends
+#define CHKSUM_GOOD             (0x87)  /* Every packet sent gets a GOOD or BAD response */
+#define CHKSUM_BAD              (0x5A)
 
 typedef enum
 {
@@ -44,7 +42,7 @@ typedef struct
 {
     task_e_t xDest;
     task_e_t xSource;
-    uint16_t usPadding;
+    uint16_t usPadding; // Ensure consistent packet member alignment
     uint32_t ulSize;
     uint8_t ucPayload[COMMS_QUEUE_PL_SIZE];
 } comm_packet_t;

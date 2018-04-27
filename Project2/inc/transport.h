@@ -9,7 +9,7 @@
 #define INC_TRANSPORT_H_
 
 /* Cartridge task parameters */
-#define XPORT_STACK_DEPTH    (1000)
+#define XPORT_STACK_DEPTH    (1024)
 #define XPORT_PRIO           (1)
 
 /* Notification values which may be sent to Transport Task */

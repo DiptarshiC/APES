@@ -19,8 +19,8 @@
 #define WRITE_SRAM_MASK     (0x04)
 
 /* MROM FIFO parameters */
-#define ROM_QUEUE_SIZE      (1)
-#define ROM_QUEUE_LENGTH    (1024)
+#define ROM_QUEUE_SIZE      (512)
+#define ROM_QUEUE_LENGTH    (4)
 
 void vCartridgeTask (void * pvParameters);
 
