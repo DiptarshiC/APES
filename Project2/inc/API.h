@@ -27,6 +27,7 @@
 
 typedef enum
 {
+    TIVA_INIT,
     TIVA_CART,
     TIVA_CONTROL,
     TIVA_LOGGER,

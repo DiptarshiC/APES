@@ -65,8 +65,10 @@ void vLoggerTask(void *pvParameters)
 {
     bool xTaskExit;
     uint8_t index;
+    uint8_t index1;
     xTaskExit = pdFALSE;
 
+    comm_packet_t *mypacket;
     while(!xTaskExit)
     {
         uint32_t  ulNotification_Value;
@@ -80,6 +82,30 @@ void vLoggerTask(void *pvParameters)
             if((ulNotification_Value)&(BITMASK))
             {
                 //Do  logging
+                mypacket->xDest=BB_LOGGER;
+                                 if(index==0)
+                                 {
+                                     mypacket->xSource=TIVA_INIT;
+                                 }
+                                 else if(index==1||index==2)
+                                 {
+                                     mypacket->xSource=TIVA_CONTROL;
+                                 }
+                                 else if(index==3||index==4)
+                                 {
+                                     mypacket->xSource=TIVA_CART;
+                                 }
+                                 else if(index==5||index==6)
+                                 {
+                                     mypacket->xSource=TIVA_XPORT;
+                                 }
+
+                                 mypacket->ulSize=4;
+
+                                 for(index1=0;index1<4;index1++)
+                                 {
+                                         mypacket->ucPayload[index1]=message[index][index1];
+                                 }
 
 
             }
