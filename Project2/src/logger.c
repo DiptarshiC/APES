@@ -59,7 +59,8 @@ char message[32][4]={
                 {'Y','T','B','A'},//Yet to be allotted
               };
 
-
+extern QueueHandle_t xComms_Queue;
+extern SemaphoreHandle_t xComms_QueueSemaphore;
 
 void vLoggerTask(void *pvParameters)
 {
@@ -106,6 +107,10 @@ void vLoggerTask(void *pvParameters)
                                  {
                                          mypacket->ucPayload[index1]=message[index][index1];
                                  }
+
+                                 xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
+                                 xQueueSend(xComms_Queue, mypacket,portMAX_DELAY);
+                                 xSemaphoreGive(xComms_QueueSemaphore);
 
 
             }
