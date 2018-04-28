@@ -18,10 +18,13 @@
 #define EXPECETED_ARGC      (2)
 #define FAILURE             (-1)
 #define SUCCESS             (0)
+#define FOUR_BYTES          (4)
 #ifdef UART
     #define UART1               ("/dev/ttyS1")
-    #define READ_ELEMENT(x)     (read(fd_serial, &x, sizeof(x)))
     #define WRITE_OUT_COMMAND() (write(fd_serial, &outgoing_cmd, sizeof(outgoing_cmd)))
+    #define VMAX                (255)
+    #define HALF_SECOND         (5)
+    #define FOURTEEN_BYTES      (14)
 #elif defined(SPI)
     #define READ_ELEMENT(x)     ()
     #define WRITE_OUT_COMMAND() ()
@@ -55,7 +58,8 @@ int main(int argc, char *argv[])
     bool good_gamefile;
     uint8_t outgoing_cmd;
     uint32_t inc_checksum;      // inc = incoming
-    comm_packet_t * p_inc_packet;
+    comm_packet_t inc_packet;
+    uint8_t p_buf_packet[COMMS_QUEUE_SIZE + sizeof(inc_checksum)];
     uint32_t i_pl;
 
     /* Check parameters */
@@ -66,7 +70,7 @@ int main(int argc, char *argv[])
     }
 
     state = WAITING_TO_START;
-    p_inc_packet = malloc(COMMS_QUEUE_SIZE);
+
     graceful_exit = false;
     while (!graceful_exit)
     {
@@ -90,16 +94,29 @@ int main(int argc, char *argv[])
                     while (!good_packet)    // Packet loop
                     {
                         /* Receive packet */
-                        READ_ELEMENT(inc_checksum);
-                        READ_ELEMENT(p_inc_packet->xDest);
-                        READ_ELEMENT(p_inc_packet->xSource);
-                        READ_ELEMENT(p_inc_packet->usPadding);
-                        READ_ELEMENT(p_inc_packet->ulSize);
-                        read(fd_serial, &p_inc_packet->ucPayload,
-                                                        p_inc_packet->ulSize);
+                        read(fd_serial, p_buf_packet, COMMS_QUEUE_SIZE + sizeof(inc_checksum));
+
+                        /* Split out packet items - start with checksum */
+                        for (i_pl = 0; i_pl < FOUR_BYTES; i_pl++)
+                        {
+                            *((uint8_t *)&inc_checksum + i_pl) = *((uint8_t *)p_buf_packet + i_pl);
+                        }
+
+                        /* Then non-payload comm_packet_t */
+                        for (i_pl = 0; i_pl < COMMS_QUEUE_OVERHEAD; i_pl++)
+                        {
+                            *((uint8_t *)&inc_packet + i_pl) = p_buf_packet[i_pl + sizeof(inc_checksum)];
+                        }
+
+                        /* Finally, payload */
+                        for (i_pl = 0; i_pl < inc_packet.ulSize; i_pl++)
+                        {
+                            *((uint8_t *)&inc_packet + i_pl + COMMS_QUEUE_OVERHEAD) = p_buf_packet[i_pl + sizeof(inc_checksum) + COMMS_QUEUE_OVERHEAD];
+                        }
+
                         /* Evaluate checksum */
-                        good_packet = packet_checksum_pass(inc_checksum,
-                                                                    p_inc_packet);
+                        good_packet = packet_checksum_pass(inc_checksum, &inc_packet);
+
                         /* If bad, request re-send of TIVA's buffered packet */
                         if (!good_packet)
                         {
@@ -113,7 +130,9 @@ int main(int argc, char *argv[])
                     outgoing_cmd = GAME_CHKSUM_GOOD;
                     WRITE_OUT_COMMAND();
                 }
-                // Need to add a way to revert to beginning of game dump if bad cartridge checksum, this will require changes to TIVA fw
+                /* Need to add a way to revert to beginning of game dump if bad
+                 * cartridge checksum, this will require changes to TIVA fw
+                 */
                 state = RECEIVING_CONTROLLER;
                 outgoing_cmd = SEND_CONTROL;
                 WRITE_OUT_COMMAND();
@@ -131,7 +150,7 @@ int main(int argc, char *argv[])
     }
 
     /* Graceful Exit */
-    free(p_inc_packet);
+    
 }
 
 static bool packet_checksum_pass(uint32_t checksum, comm_packet_t * p_packet)
@@ -158,7 +177,7 @@ static int8_t comms_init(int * p_fd)
 {
 #ifdef UART
     // Need to pass fd in by reference
-    *p_fd = open(UART1, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    *p_fd = open(UART1, O_RDWR | O_NOCTTY);
     if (*p_fd < SUCCESS)
     {
         return FAILURE;
@@ -167,9 +186,13 @@ static int8_t comms_init(int * p_fd)
     /* Setup UART session with termios */
     struct termios session;
     tcgetattr(*p_fd, &session);
-    session.c_iflag = IGNPAR;
+    session.c_iflag = IGNBRK;
     session.c_cflag = B115200 | CS8 | CREAD | CLOCAL;
-    tcflush(*p_fd, TCIOFLUSH);
+    session.c_lflag = 0;         // Non-canonical blocking mode
+    session.c_cc[VMIN] = 0;         // Can't read more than 255 bytes in one read()
+    session.c_cc[VTIME] = 100; // Longest burst SHOULD only take 
+                                       // 0.2 seconds, give it up to 0.5
+    tcflush(*p_fd, TCIFLUSH);
     tcsetattr(*p_fd, TCSANOW, &session);
 
 #elif defined(SPI)
