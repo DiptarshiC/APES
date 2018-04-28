@@ -36,8 +36,6 @@ TaskHandle_t xControllerTask;
 TaskHandle_t xLoggerTask;
 TaskHandle_t xTransportTask;
 
-void vApplicationStackOverflowHook (TaskHandle_t xTask, signed char *pcTaskName);
-
 int main(void)
 {
     /* Startup config */
@@ -76,9 +74,4 @@ static void vSystem_init(void)
     /* Configure sysclock to max (120MHz) */
     MAP_SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL
                                                 | SYSCTL_CFG_VCO_480, MHZ_120);
-}
-
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName)
-{
-    while(pdTRUE);
 }

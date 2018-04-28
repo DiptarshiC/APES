@@ -9,7 +9,7 @@
 #define INC_CARTRIDGE_H_
 
 /* Cartridge task parameters */
-#define CART_STACK_DEPTH    (1000)
+#define CART_STACK_DEPTH    (2048)
 #define CART_PRIO           (2)
 
 /* Notification values which Transport task may send to Cartridge task */
@@ -19,8 +19,8 @@
 #define WRITE_SRAM_MASK     (0x04)
 
 /* MROM FIFO parameters */
-#define ROM_QUEUE_SIZE      (512)
-#define ROM_QUEUE_LENGTH    (4)
+#define ROM_QUEUE_SIZE      (1)
+#define ROM_QUEUE_LENGTH    (512)
 
 void vCartridgeTask (void * pvParameters);
 

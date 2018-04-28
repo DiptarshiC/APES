@@ -25,7 +25,7 @@
 
 /* Cartridge task parameters */
 #define CONTROL_STACK_DEPTH    (1000)
-#define CONTROL_PRIO           (2)
+#define CONTROL_PRIO           (1)
 
 #define US_12_DELAY     (480 - 20)
 #define US_6_DELAY      (240 - 20)

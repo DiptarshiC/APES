@@ -17,10 +17,6 @@
 #define ROM_DUMP_INIT_MASK  (0x40)
 #define ROM_DUMP_COMPLETE_MASK (0x20)
 
-/* Transport FIFO parameters */
-#define XPORT_QUEUE_SIZE      (1)
-#define XPORT_QUEUE_LENGTH    (16)
-
 void vTransportTask (void * pvParameters);
 
 #endif /* INC_TRANSPORT_H_ */

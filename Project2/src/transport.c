@@ -23,6 +23,8 @@
 #define CLEAR_NONE      (0x00000000)
 #define CLEAR_ALL       (0xFFFFFFFF)
 #define ZERO_TICKS      (0)
+#define ONE_TICK        (1)
+#define TWO_TICKS       (2)
 #define MS_17           (17)
 #define TIMER_C         ((void *)0)
 #define BITS_8          (8)
@@ -91,7 +93,7 @@ void vTransportTask(void *pvParameters)
                  * is empty then loop back to command check
                  */
                 if (xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL |
-                    ROM_DUMP_COMPLETE_MASK, &ulNotificationValue, ZERO_TICKS))
+                    ROM_DUMP_COMPLETE_MASK, &ulNotificationValue, ONE_TICK))
                 {
                     if (ulNotificationValue & EXIT_MASK)
                     {
@@ -101,7 +103,7 @@ void vTransportTask(void *pvParameters)
                     {
                         /* Empty anything left in queue, send final packet */
                         while (xQueueReceive(xMROM_Queue, (pucROM_buffer + 
-                                                ulPacket_size), ZERO_TICKS))
+                                                ulPacket_size), ONE_TICK))
                         {
                             ulPacket_size++;
                         }
@@ -128,7 +130,7 @@ void vTransportTask(void *pvParameters)
                 }
                 /* Iterate the size as each ROM byte gets read in from queue */
                 while (xQueueReceive(xMROM_Queue, (pucROM_buffer +
-                                                ulPacket_size), ZERO_TICKS))
+                                                ulPacket_size), ONE_TICK))
                 {
                     ulPacket_size++;
                     if (COMMS_QUEUE_PL_SIZE == ulPacket_size)
@@ -155,7 +157,7 @@ void vTransportTask(void *pvParameters)
                 xSemaphoreTake(xTransport_MailboxSemaphore, portMAX_DELAY);
                 /* Check for exit command */
                 if (xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL | ROM_DUMP_INIT_MASK,
-                                            &ulNotificationValue, ZERO_TICKS))
+                                            &ulNotificationValue, ONE_TICK))
                 {
                     if (ulNotificationValue & EXIT_MASK)
                     {

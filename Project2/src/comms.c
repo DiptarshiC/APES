@@ -83,10 +83,9 @@ void vCommunicationsTask(void *pvParameters)
 
     initialize_UART();
     bool xTaskExit;
-    comm_packet_t * pxPacketTransport;
     uint32_t ulPacketSize;
     comms_state_t xState;
-
+    comm_packet_t xPacketTransport;
     xTaskExit = pdFALSE;
     xState = WAITING_TO_START;
     while (!xTaskExit)
@@ -98,19 +97,18 @@ void vCommunicationsTask(void *pvParameters)
                 while (SEND_GAME != MAP_UARTCharGet(UART5_BASE));
                 xSemaphoreGive(xComms_QueueSemaphore);
                 xTaskNotify(xTransportTask, ROM_DUMP_INIT_MASK, eSetBits);
-                pxPacketTransport = malloc(COMMS_QUEUE_SIZE);
                 xState = SENDING_GAME;
             break;
 
             case SENDING_GAME:
                 /*puts data from the comms queue into a buffer*/            
-                if (xQueueReceive(xComms_Queue, pxPacketTransport, pdMS_TO_TICKS(ONE_SECOND)))
+                if (xQueueReceive(xComms_Queue, &xPacketTransport, pdMS_TO_TICKS(ONE_SECOND)))
                 {
-                    ulPacketSize = pxPacketTransport->ulSize + COMMS_QUEUE_OVERHEAD;
+                    ulPacketSize = xPacketTransport.ulSize + COMMS_QUEUE_OVERHEAD;
 #ifdef UART
-                    send_over_UART((uint8_t *)pxPacketTransport, ulPacketSize) ;
+                    send_over_UART((uint8_t *)&xPacketTransport, ulPacketSize) ;
 #elif defined(SPI)
-                    send_over_SPI((uint8_t *)pxPacketTransport, ulPacketSize) ;
+                    send_over_SPI((uint8_t *)&xPacketTransport, ulPacketSize) ;
 #endif
                 }
                 if (SEND_CONTROL == MAP_UARTCharGetNonBlocking(UART5_BASE))
@@ -121,15 +119,16 @@ void vCommunicationsTask(void *pvParameters)
 
             case SENDING_CONTROLLER:                
                 /*puts data from the comms queue into a buffer*/            
-                xQueueReceive(xComms_Queue, pxPacketTransport, portMAX_DELAY);
-                ulPacketSize = pxPacketTransport->ulSize + COMMS_QUEUE_OVERHEAD;
+                xQueueReceive(xComms_Queue, &xPacketTransport, portMAX_DELAY);
+                ulPacketSize = xPacketTransport.ulSize + COMMS_QUEUE_OVERHEAD;
 #ifdef UART
-                send_over_UART((uint8_t *)pxPacketTransport, ulPacketSize) ;
+                send_over_UART((uint8_t *)&xPacketTransport, ulPacketSize) ;
 #elif defined(SPI)
-                send_over_SPI((uint8_t *)pxPacketTransport, ulPacketSize) ;
+                send_over_SPI((uint8_t *)&xPacketTransport, ulPacketSize) ;
 #endif
                 if (SEND_GAME == MAP_UARTCharGetNonBlocking(UART5_BASE))
                 {
+                    xTaskNotify(xTransportTask, ROM_DUMP_INIT_MASK, eSetBits);
                     xState = SENDING_GAME;
                 }
             break;
@@ -141,7 +140,6 @@ void vCommunicationsTask(void *pvParameters)
     }
 
     /* Graceful Exit */
-    free (pxPacketTransport);
     vTaskDelete(NULL);
 }
 
@@ -228,6 +226,53 @@ void initialize_SPI()
 
 
 }
+
+
+void send_over_spi(uint8_t *array,uint32_t length)
+{
+    uint32_t index;
+        uint32_t ulChecksum;
+        bool retry_needed;
+
+        /* Calculate a 16-bit checksum from comm_packet (incl. size, dest, src) */
+        ulChecksum = 0;
+        for (index = 0; index < length; index++)
+        {
+            /* Simple additive checksum */
+            ulChecksum += *(array + index);
+        }
+
+        retry_needed = pdTRUE;
+        while (retry_needed)
+        {
+            /* Send checksum */
+            for (index = 0; index < CHKSUM_SIZE; index++)
+            {
+                MAP_SSIDataPut(SSI3_BASE, *(&ulChecksum + index));
+            }
+
+            /* Send packet */
+            for(index=0; index < length;index++)
+            {
+                /*
+                Write the same character using the blocking write function.This
+                function will not return until there was space in the FIFO and
+                the character is written.
+                */
+
+                MAP_SSIDataPut(SSI3_BASE,*(array + index));
+            }
+            uint8_t * data;
+
+
+            /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
+            MAP_SSIDataGet(SSI3_BASE,data);
+            if (CHKSUM_GOOD == *data);
+            {
+                retry_needed = pdFALSE;
+            }
+        }
+}
 #elif defined(UART)
 void send_over_UART(uint8_t *array,uint32_t length)
 {
@@ -273,48 +318,3 @@ void send_over_UART(uint8_t *array,uint32_t length)
 }
 #endif
 
-void send_over_spi(uint8_t *array,uint32_t length)
-{
-    uint32_t index;
-        uint32_t ulChecksum;
-        bool retry_needed;
-
-        /* Calculate a 16-bit checksum from comm_packet (incl. size, dest, src) */
-        ulChecksum = 0;
-        for (index = 0; index < length; index++)
-        {
-            /* Simple additive checksum */
-            ulChecksum += *(array + index);
-        }
-
-        retry_needed = pdTRUE;
-        while (retry_needed)
-        {
-            /* Send checksum */
-            for (index = 0; index < CHKSUM_SIZE; index++)
-            {
-                MAP_SSIDataPut(SSI3_BASE, *(&ulChecksum + index));
-            }
-
-            /* Send packet */
-            for(index=0; index < length;index++)
-            {
-                /*
-                Write the same character using the blocking write function.This
-                function will not return until there was space in the FIFO and
-                the character is written.
-                */
-
-                MAP_SSIDataPut(SSI3_BASE,*(array + index));
-            }
-            uint8_t * data;
-
-
-            /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
-//            MAP_SSIDataGet(SSI3_BASE,data);
-            if (CHKSUM_GOOD == *data);
-            {
-                retry_needed = pdFALSE;
-            }
-        }
-}

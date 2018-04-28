@@ -39,6 +39,7 @@
 #define CLEAR_NONE      (0x00000000)
 #define CLEAR_ALL       (0xFFFFFFFF)
 #define ZERO_TICKS      (0)
+#define ONE_TICK        (1)
 #define MAILBOX_SHIFT   (4)
 
 extern TaskHandle_t xTransportTask;
@@ -63,7 +64,7 @@ void vControllerTask(void *pvParameters)
     while (!xTaskExit)
     {
         if (xTaskNotifyWait(CLEAR_NONE, CLEAR_ALL, &ulNotificationValue,
-                                                                   ZERO_TICKS))
+                            ONE_TICK))
         {
             if (ulNotificationValue & EXIT_MASK)
             {
