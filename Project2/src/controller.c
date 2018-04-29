@@ -35,6 +35,7 @@
 #include "inc/semphr.h"
 #include "inc/logger.h"
 #include "inc/controller.h"
+#include "inc/logger.h"
 
 #define BUTTONS_MASK    (0x0FFF)
 #define CLEAR_NONE      (0x00000000)

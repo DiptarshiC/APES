@@ -22,6 +22,7 @@
 #include "inc/transport.h"
 #include "inc/logger.h"
 #include "inc/cartridge.h"
+#include "inc/logger.h"
 
 #define FAIL            (-1)
 #define CLEAR_NONE      (0x00000000)

@@ -20,6 +20,7 @@
 #include "inc/controller.h"
 #include "inc/logger.h"
 #include "inc/transport.h"
+#include "inc/logger.h"
 
 #define CLEAR_NONE      (0x00000000)
 #define CLEAR_ALL       (0xFFFFFFFF)
