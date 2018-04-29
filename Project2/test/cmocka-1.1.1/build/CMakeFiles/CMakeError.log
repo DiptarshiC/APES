@@ -1,0 +1,19 @@
+Determining if the include file io.h exists failed with the following output:
+Change Dir: /media/APES/Project2/test/cmocka-1.1.1/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d9860/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d9860.dir/build.make CMakeFiles/cmTC_d9860.dir/build
+make[1]: Entering directory '/media/APES/Project2/test/cmocka-1.1.1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d9860.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -std=gnu99 -pedantic -pedantic-errors -Wall -Wextra -Wshadow -Wmissing-prototypes -Wdeclaration-after-statement -Wunused -Wfloat-equal -Wpointer-arith -Wwrite-strings -Wformat-security -Wmissing-format-attribute -Wundef -Wstrict-prototypes -fPIC -fstack-protector -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64    -o CMakeFiles/cmTC_d9860.dir/CheckIncludeFile.c.o   -c /media/APES/Project2/test/cmocka-1.1.1/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/media/APES/Project2/test/cmocka-1.1.1/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:16: fatal error: io.h: No such file or directory
+ #include <io.h>
+                ^
+compilation terminated.
+CMakeFiles/cmTC_d9860.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_d9860.dir/CheckIncludeFile.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_d9860.dir/CheckIncludeFile.c.o] Error 1
+make[1]: Leaving directory '/media/APES/Project2/test/cmocka-1.1.1/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_d9860/fast' failed
+make: *** [cmTC_d9860/fast] Error 2
+
+
