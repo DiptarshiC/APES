@@ -22,6 +22,7 @@
 #include "inc/task.h"
 
 #define MHZ_120 (120000000)
+#define NOTIFY_START_TO_LOGGER  0x0001
 
 static void vSystem_init (void);
 
@@ -38,6 +39,8 @@ TaskHandle_t xTransportTask;
 
 int main(void)
 {
+
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     /* Startup config */
     vSystem_init();
 

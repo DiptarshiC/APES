@@ -30,6 +30,9 @@
 #define BITS_8          (8)
 #define CONTROL_MASK    (0x00000FFF)
 #define LOWER_BYTE      (0xFF)
+#define NOTIFY_START_TO_LOGGER  (0x0001<<5)
+#define NOTIFY_END_TO_LOGGER    (0x0001<<6)
+
 
 typedef enum
 {
@@ -66,6 +69,7 @@ void vTransportTask(void *pvParameters)
     xTaskExit = pdFALSE;
     xState = WAITING_TO_START;
 
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     /* Transport Task main loop */
     while (!xTaskExit)
     {
@@ -193,6 +197,7 @@ void vTransportTask(void *pvParameters)
         }
     }
 
+    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
     /* Graceful Exit */
     vTaskDelete(NULL);
 }

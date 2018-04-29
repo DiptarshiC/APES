@@ -105,7 +105,8 @@
 #define HIROM_VAL       (1)
 #define LOWROM_VAL      (0)
 #define FASTROM_VAL     (3)
-
+#define NOTIFY_START_TO_LOGGER  (0x0001<<3)
+#define NOTIFY_END_TO_LOGGER    (0x0001<<4)
 extern QueueHandle_t xMROM_Queue;
 extern TaskHandle_t xTransportTask;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
@@ -129,6 +130,7 @@ void vCartridgeTask(void *pvParameters)
     vCartridge_init();
     xTaskExit = pdFALSE;
 
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     /* Cartridge Task main loop */
     while (!xTaskExit)
     {
@@ -185,6 +187,7 @@ void vCartridgeTask(void *pvParameters)
         }
     }
 
+    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
     /* Exit Task */
     vTaskDelete(NULL);
 }

@@ -22,6 +22,8 @@
 #include "inc/transport.h"
 #include "inc/logger.h"
 
+#define NOTIFY_START_TO_LOGGER  (0x0001<<8)
+#define NOTIFY_END_TO_LOGGER    (0x0001<<9)
 
 
 char message[32][4]={
@@ -70,6 +72,8 @@ void vLoggerTask(void *pvParameters)
     xTaskExit = pdFALSE;
 
     comm_packet_t *mypacket;
+
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     while(!xTaskExit)
     {
         uint32_t  ulNotification_Value;
@@ -123,6 +127,9 @@ void vLoggerTask(void *pvParameters)
 
 
     }
+
+    /* Graceful exit */
+    vTaskDelete(NULL);
 }
 
 

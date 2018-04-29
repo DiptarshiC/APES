@@ -41,6 +41,9 @@
 #define ZERO_TICKS      (0)
 #define ONE_TICK        (1)
 #define MAILBOX_SHIFT   (4)
+#define NOTIFY_START_TO_LOGGER  (0x0001<<1)
+#define NOTIFY_END_TO_LOGGER    (0x0001<<2)
+
 
 extern TaskHandle_t xTransportTask;
 TimerHandle_t xTimerController;
@@ -60,6 +63,7 @@ void vControllerTask(void *pvParameters)
 
     xTaskExit = pdFALSE;
 
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     /* Controller Task main loop */
     while (!xTaskExit)
     {
@@ -81,6 +85,8 @@ void vControllerTask(void *pvParameters)
         xSemaphoreGive(xTransport_MailboxSemaphore);
     }
 
+
+    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
     /* Graceful exit */
     vTaskDelete(NULL);
 }
