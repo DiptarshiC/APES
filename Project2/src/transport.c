@@ -102,7 +102,7 @@ void vTransportTask(void *pvParameters)
                     else if (ulNotificationValue & ROM_DUMP_COMPLETE_MASK)
                     {
                         /* Empty anything left in queue, send final packet */
-                        while (xQueueReceive(xMROM_Queue, (pucROM_buffer + 
+                        while (xQueueReceive(xMROM_Queue, (pucROM_buffer +
                                                 ulPacket_size), ONE_TICK))
                         {
                             ulPacket_size++;
@@ -124,6 +124,7 @@ void vTransportTask(void *pvParameters)
                         xTimerController = xTimerCreate("60Hz Timer",
                                                 pdMS_TO_TICKS(MS_17), pdTRUE,
                                                     TIMER_C, vTimerController);
+                        xTimerStart(xTimerController, ZERO_TICKS);
                         usControl_value = 0;
                         xState = SENDING_CONTROLLER;
                     }

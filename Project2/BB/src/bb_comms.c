@@ -28,13 +28,14 @@
 #define SUCCESS             (0)
 #define ONE_BYTE            (1)
 #define BITS_EIGHT          (8)
+#define BITS_THIRTYTWO      (32)
 #define FOUR_BYTES          (4)
 #define UART1               ("/dev/ttyS1")
 #define SPI0                ("/dev/spidev0.0")
 #define VMAX                (255)
 #define HALF_SECOND         (5)
 #define FOURTEEN_BYTES      (14)
-#define KHZ_500             (500000)
+#define KHZ_50              (50000)
 #define CS_ON               ("0")
 #define CS_OFF              ("1")
 
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
         .rx_buf = (uint32_t)p_buf_packet,
         .len = COMMS_QUEUE_SIZE + sizeof(inc_checksum),
         .delay_usecs = 0,
-        .speed_hz = KHZ_500,
+        .speed_hz = KHZ_50,
         .bits_per_word = BITS_EIGHT,
         .cs_change = true
     };
@@ -116,29 +117,10 @@ int main(int argc, char *argv[])
                 {
                     return FAILURE;
                 }
-
-// #ifdef SPI
-//                 /* Open CS_n file handles */
-//                 CS0_fd = fopen(CS0, "r+");
-//     #ifdef TWO_CONTROLLERS
-//                 CS1_fd = fopen(CS1, "r+");
-//                 if (!(CS0_fd && CS1_fd))
-//     #else
-//                 if (!(CS0_fd))
-//     #endif  // TWO_CONTROLLERS
-//                 {
-//                     perror("Failed to open CS file descriptor.\n");
-//                     return FAILURE;
-//                 }
-// #endif  // SPI
                 
                 state = DUMPING_GAME;
                 outgoing_cmd = SEND_GAME;
-//                fwrite(CS_ON, sizeof(uint8_t), 1, CS0_fd); // Only ever send GAME command to first TIVA
-//                fflush(CS0_fd);
                 WRITE_OUT_COMMAND();
-//                fwrite(CS_OFF, sizeof(uint8_t), 1, CS0_fd);
-//                fflush(CS0_fd);
             break;
 
             case DUMPING_GAME:
@@ -152,12 +134,17 @@ int main(int argc, char *argv[])
 #ifdef UART
                         read(fd_comm, p_buf_packet, COMMS_QUEUE_SIZE + sizeof(inc_checksum));
 #elif defined(SPI)
+                        /* Receive checksum */
+                        // rx_params.rx_buf = &inc_checksum;
+                        // rx_params.len = 1;
+                        // rx_params. bits_per_word = BITS_THIRTYTWO;
+                        usleep(2000000);
                         ioctl(fd_comm, SPI_IOC_MESSAGE(1), &rx_params);
 #endif  // UART/SPI
                         /* Split out packet items - start with checksum */
                         for (i_pl = 0; i_pl < FOUR_BYTES; i_pl++)
                         {
-                            *((uint8_t *)&inc_checksum + i_pl) = *((uint8_t *)p_buf_packet + i_pl);
+                            *((uint8_t *)&inc_checksum + i_pl) = p_buf_packet[i_pl];
                         }
 
                         /* Then non-payload comm_packet_t */
@@ -261,8 +248,8 @@ static int8_t comms_init(int * p_fd)
     tcsetattr(*p_fd, TCSANOW, &session);
 
 #elif defined(SPI)
-    uint32_t spi_mode;
-    uint32_t size;
+    uint8_t spi_mode;
+    uint8_t size;
     uint32_t speed;
     *p_fd = open(SPI0, O_RDWR);
 
@@ -271,42 +258,25 @@ static int8_t comms_init(int * p_fd)
         perror("Failed to open SPI0\n");
         return FAILURE;
     }
-    spi_mode = 0;
-    size = BITS_EIGHT;
-    speed = KHZ_500;
+    spi_mode = SPI_MODE_0;
+    size = 0;
+    speed = KHZ_50;
     /* Modes */
     if (FAILURE == ioctl(*p_fd, SPI_IOC_WR_MODE, &spi_mode))
     {
         perror("Failed to set SPI output mode\n");
         return FAILURE;
     }
-    if (FAILURE == ioctl(*p_fd, SPI_IOC_RD_MODE, &spi_mode))
-    {
-        perror("Failed to set SPI input mode\n");
-        return FAILURE;
-    }
-
     /* Transaction Size */
     if (FAILURE == ioctl(*p_fd, SPI_IOC_WR_BITS_PER_WORD, &size))
     {
         perror("Failed to set output transaction size\n");
         return FAILURE;
     }
-    if (FAILURE == ioctl(*p_fd, SPI_IOC_RD_BITS_PER_WORD, &size))
-    {
-        perror("Failed to set input transactino size\n");
-        return FAILURE;
-    }
-
     /* Transaction Speed */
     if (FAILURE == ioctl(*p_fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed))
     {
         perror("Failed to set output speed\n");
-        return FAILURE;
-    }
-    if (FAILURE == ioctl(*p_fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed))
-    {
-        perror("Failed to set input speed\n");
         return FAILURE;
     }
 }
@@ -320,7 +290,7 @@ static int8_t send_byte_SPI(int * p_fd, uint8_t command)
         .rx_buf = (uint32_t)NULL,
         .len = ONE_BYTE,
         .delay_usecs = 0,
-        .speed_hz = KHZ_500,
+        .speed_hz = KHZ_50,
         .bits_per_word = BITS_EIGHT,
         .cs_change = true
     };

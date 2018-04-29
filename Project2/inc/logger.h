@@ -20,5 +20,6 @@
 #define LOG_QUEUE_SIZE      (1)
 #define LOG_QUEUE_LENGTH    (1024)
 
+void vLoggerTask (void * pvParameters);
 
 #endif /* INC_LOGGER_H_ */

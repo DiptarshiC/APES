@@ -11,7 +11,7 @@
 #include "driverlib/sysctl.h"
 #include "inc/controller.h"
 #include "inc/cartridge.h"
-//#include "inc/logger.h"
+#include "inc/logger.h"
 #include "inc/comms.h"
 #include "inc/API.h"
 #include "inc/transport.h"
@@ -43,11 +43,9 @@ int main(void)
 
     /* Create queues */
     xMROM_Queue = xQueueCreate(ROM_QUEUE_LENGTH, ROM_QUEUE_SIZE);
-//    xLogger_Queue = xQueueCreate(LOGGER_QUEUE_LENGTH, LOGGER_QUEUE_SIZE);
     xComms_Queue = xQueueCreate(COMMS_QUEUE_LENGTH, COMMS_QUEUE_SIZE);
 
     /* Create synchronization devices */
-    xLogger_QueueSemaphore = xSemaphoreCreateBinary();
     xComms_QueueSemaphore = xSemaphoreCreateBinary();
     xTransport_MailboxSemaphore = xSemaphoreCreateBinary();
     xController_TimerSemaphore = xSemaphoreCreateBinary();
@@ -61,8 +59,8 @@ int main(void)
                                             NULL, XPORT_PRIO, &xTransportTask);
     xTaskCreate(vCommunicationsTask, "Communications Task", COMMS_STACK_DEPTH,
                                                     NULL, COMMS_PRIO, NULL);
-//    xTaskCreate(vLoggerTask, "Logger Task", LOGGER_STACK_DEPTH, NULL,
-//                                                    LOGGER_PRIO, &xLoggerTask);
+    xTaskCreate(vLoggerTask, "Logger Task", LOG_STACK_DEPTH, NULL,
+                                                    LOG_PRIO, &xLoggerTask);
     vTaskStartScheduler();
 
     while (pdTRUE); // Do nothing

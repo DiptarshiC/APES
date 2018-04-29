@@ -47,14 +47,12 @@
 #include "inc/API.h"
 #include "inc/comms.h"
 
-#ifdef UART
-#define BAUD_115200             (115200)
-#elif defined(SPI)
-#define LSB_MASK                (0x000000FF)
-#define KHZ_40                  (40000)
-#define ONE_BYTE                (8)
-#endif
 
+#define BAUD_115200             (115200)
+#define LSB_MASK                (0x000000FF)
+#define KHZ_4                   (4000)
+#define ONE_BYTE                (8)
+#define FOUR_BYTES              (32)
 #define CHKSUM_SIZE             (4)
 #define MHZ_120                 (120000000)
 #define ONE_SECOND              (1000)
@@ -116,7 +114,7 @@ void vCommunicationsTask(void *pvParameters)
             break;
 
             case SENDING_GAME:
-                /*puts data from the comms queue into a buffer*/            
+                /*puts data from the comms queue into a buffer*/
                 if (xQueueReceive(xComms_Queue, &xPacketTransport, pdMS_TO_TICKS(ONE_SECOND)))
                 {
                     ulPacketSize = xPacketTransport.ulSize + COMMS_QUEUE_OVERHEAD;
@@ -137,8 +135,8 @@ void vCommunicationsTask(void *pvParameters)
                 }
             break;
 
-            case SENDING_CONTROLLER:                
-                /*puts data from the comms queue into a buffer*/            
+            case SENDING_CONTROLLER:
+                /*puts data from the comms queue into a buffer*/
                 xQueueReceive(xComms_Queue, &xPacketTransport, portMAX_DELAY);
                 ulPacketSize = xPacketTransport.ulSize + COMMS_QUEUE_OVERHEAD;
 #ifdef UART
@@ -189,11 +187,14 @@ void initialize_SPI()
 
     //Initializing SPI as slave.Bit rate 90000
     MAP_SSIConfigSetExpClk(SSI3_BASE, MHZ_120, SSI_FRF_MOTO_MODE_0,
-                                           SSI_MODE_SLAVE, KHZ_40, ONE_BYTE);
+                                           SSI_MODE_SLAVE, KHZ_4, ONE_BYTE);
 
 
     // Enabling the SSI3 module.
     MAP_SSIEnable(SSI3_BASE);
+
+    /* Put out dummy byte */
+//    SSIDataPut(SSI3_BASE, 0);
 }
 
 
@@ -217,8 +218,9 @@ void send_over_SPI(uint8_t *pucArray, uint32_t ulLength)
         /* Send checksum */
         for (ulIndex = 0; ulIndex < CHKSUM_SIZE; ulIndex++)
         {
-            MAP_SSIDataPut(SSI3_BASE, *(&ulChecksum + ulIndex));
+            MAP_SSIDataPut(SSI3_BASE, *((uint8_t *)&ulChecksum + 3 - ulIndex));
         }
+//        SSIDataPut(SSI3_BASE, ulChecksum);
 
         /* Send packet */
         for(ulIndex = 0; ulIndex < ulLength; ulIndex++)
@@ -234,7 +236,7 @@ void send_over_SPI(uint8_t *pucArray, uint32_t ulLength)
 
         uint32_t ucData;
         /* Wait for 1 byte response (0xAA good sum, 0x55 bad) */
-        SSIDataGet(SSI3_BASE, &ucData);
+        MAP_SSIDataGet(SSI3_BASE, &ucData);
         if (CHKSUM_GOOD == (uint8_t)(LSB_MASK & ucData));
         {
             xRetry_needed = pdFALSE;

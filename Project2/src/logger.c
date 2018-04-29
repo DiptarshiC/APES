@@ -90,7 +90,11 @@ void vLoggerTask(void *pvParameters)
                                  }
                                  else if(index==1||index==2)
                                  {
-                                     mypacket->xSource=TIVA_CONTROL;
+#ifdef CONTROLLER_1
+                                     mypacket->xSource=TIVA_CONTROL0;
+#elif defined(CONTROLLER_0)
+                                     mypacket->xSource=TIVA_CONTROL1;
+#endif
                                  }
                                  else if(index==3||index==4)
                                  {
