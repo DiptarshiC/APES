@@ -1,4 +1,4 @@
-obj-m+=bb_comms.o
+obj-m+=bb_lkm_controller.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) modules
