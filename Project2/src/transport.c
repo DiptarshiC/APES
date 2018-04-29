@@ -168,7 +168,11 @@ void vTransportTask(void *pvParameters)
                     {
                         usControl_value = ulNotificationValue & CONTROL_MASK;
                         xPacketTransport.xDest = BB_CONTROL;
-                        xPacketTransport.xSource = TIVA_CONTROL;
+#ifdef CONTROLLER_1
+                        xPacketTransport.xSource = TIVA_CONTROL0;
+#elif defined(CONTROLLER_2)
+                        xPacketTransport.xSource = TIVA_CONTROL1;
+#endif
                         xPacketTransport.ulSize = sizeof(usControl_value);
                         *xPacketTransport.ucPayload =
                                         (uint8_t)(usControl_value >> BITS_8);
