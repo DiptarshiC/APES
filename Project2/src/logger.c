@@ -71,11 +71,35 @@ void vLoggerTask(void *pvParameters)
     uint8_t index1;
     xTaskExit = pdFALSE;
 
+
+
+
+
+    comm_packet_t *logger_packet;
+
+
+
     comm_packet_t *mypacket;
 
     //xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
     while(!xTaskExit)
     {
+        //Here i create a packet exclusively for the logger task
+        logger_packet->xDest=BB_LOGGER;
+        logger_packet->xSource=TIVA_LOGGER;
+        logger_packet->ulSize=4;
+        for(index1=0;index1<4;index1++)
+        {
+            logger_packet->ucPayload[index1]=message[7][index1];
+        }
+        xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
+        xQueueSend(xComms_Queue, logger_packet,portMAX_DELAY);
+        xSemaphoreGive(xComms_QueueSemaphore);
+
+
+
+
+
         uint32_t  ulNotification_Value;
         uint32_t BITMASK=0x0001;
 
