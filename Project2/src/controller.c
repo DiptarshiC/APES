@@ -65,7 +65,7 @@ void vControllerTask(void *pvParameters)
 
     xTaskExit = pdFALSE;
 
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
     /* Controller Task main loop */
     while (!xTaskExit)
     {
@@ -88,7 +88,7 @@ void vControllerTask(void *pvParameters)
     }
 
 
-    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
+    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
     /* Graceful exit */
     vTaskDelete(NULL);
 }

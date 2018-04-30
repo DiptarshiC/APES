@@ -64,7 +64,7 @@ int main(void)
     xTaskCreate(vLoggerTask, "Logger Task", LOG_STACK_DEPTH, NULL,
                                                     LOG_PRIO, &xLoggerTask);
     vTaskStartScheduler();
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
 
     while (pdTRUE); // Do nothing
 

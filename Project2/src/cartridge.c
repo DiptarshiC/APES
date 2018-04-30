@@ -132,7 +132,7 @@ void vCartridgeTask(void *pvParameters)
     vCartridge_init();
     xTaskExit = pdFALSE;
 
-//    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
+   xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
     /* Cartridge Task main loop */
     while (!xTaskExit)
     {
@@ -189,7 +189,7 @@ void vCartridgeTask(void *pvParameters)
         }
     }
 
-//    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
+    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
     /* Exit Task */
     vTaskDelete(NULL);
 }

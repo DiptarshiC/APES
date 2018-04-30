@@ -73,7 +73,7 @@ void vLoggerTask(void *pvParameters)
 
     comm_packet_t *mypacket;
 
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
+    //xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
     while(!xTaskExit)
     {
         uint32_t  ulNotification_Value;

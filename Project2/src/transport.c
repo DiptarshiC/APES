@@ -71,7 +71,7 @@ void vTransportTask(void *pvParameters)
     xTaskExit = pdFALSE;
     xState = WAITING_TO_START;
 
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
     /* Transport Task main loop */
     while (!xTaskExit)
     {
@@ -199,7 +199,7 @@ void vTransportTask(void *pvParameters)
         }
     }
 
-    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
+    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
     /* Graceful Exit */
     vTaskDelete(NULL);
 }
