@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #ifdef UART
     #include <termios.h>
@@ -22,8 +23,10 @@
 
 #include "../../inc/API.h"
 #include "../inc/bb_comms.h"
+#include "../inc/bb_logger.h"
 
-#define EXPECETED_ARGC      (2)
+#define PIPE_NAME           ("/tmp/project2_pipe")
+#define EXPECTED_ARGC       (2)
 #define FAILURE             (-1)
 #define SUCCESS             (0)
 #define ONE_BYTE            (1)
@@ -56,6 +59,13 @@ typedef enum
                              * second state or exit, second to third or exit.
                              */
 } bb_comms_state_t;
+
+static volatile bool b_sigexit;
+
+static void sigint_handler(int signum)
+{
+    b_sigexit = true;
+}
 
 #ifdef SPI
 static const char CS0[] = "/sys/class/gpio/gpio48/value";
@@ -99,11 +109,45 @@ int main(int argc, char *argv[])
     uint32_t i_pl;
 
     /* Check parameters */
-    if (argc != EXPECETED_ARGC)
+    if (argc != EXPECTED_ARGC)
     {
         printf("Usage: %s \"path/to/dumpfile\"\n", argv[0]);
         return FAILURE;
     }
+
+    const char * name = PIPE_NAME;
+    int pipe_fd;
+    
+    /* Set up capability for application graceful exit */
+    struct sigaction act;
+    act.sa_handler = sigint_handler;
+    if (sigemptyset(&act.sa_mask))
+    {
+        perror("(Main) [ERROR]: Failed to set empty sigaction mask.\n");
+        return FAILURE;
+    }
+    act.sa_flags = SA_RESETHAND;
+    if (sigaction(SIGINT, &act, NULL))
+    {
+        perror("(Main) [ERROR]: Failed to set up custom SIGINT handler.\n");
+        return FAILURE;
+    }
+
+    /* Start up Logger task using thread below */
+    uint8_t log_args;
+    pthread_attr_t log_tattr;
+    pthread_attr_init(&log_tattr);  // Default pthread attr
+    pthread_t * log_thread;
+    if (pthread_create(log_thread, &log_tattr, logger, &log_args))
+    {
+        perror("(Main) [ERROR]: Could not create Logger.\n");
+        return FAILURE;
+    }
+    else
+    {
+        printf("(Main) [INFO]: Created Logger.\n");
+    }
+
 
     state = WAITING_TO_START;
 
@@ -202,7 +246,10 @@ int main(int argc, char *argv[])
     fclose(CS1_fd);
     #endif // TWO_CONTROLLERS
 #endif  // SPI
-    
+    int32_t * log_ret;
+    // Tell logger to exit, via pipe
+    pthread_join(*log_thread, (void **)&log_ret);
+    return SUCCESS;
 }
 
 static bool packet_checksum_pass(uint32_t checksum, comm_packet_t * p_packet)

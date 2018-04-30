@@ -33,6 +33,7 @@
 #include "inc/task.h"
 #include "inc/timers.h"
 #include "inc/semphr.h"
+#include "inc/logger.h"
 #include "inc/controller.h"
 
 #define BUTTONS_MASK    (0x0FFF)

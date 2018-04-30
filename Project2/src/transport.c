@@ -18,6 +18,7 @@
 #include "inc/cartridge.h"
 #include "inc/API.h"
 #include "inc/controller.h"
+#include "inc/logger.h"
 #include "inc/transport.h"
 
 #define CLEAR_NONE      (0x00000000)

@@ -40,7 +40,6 @@ TaskHandle_t xTransportTask;
 int main(void)
 {
 
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     /* Startup config */
     vSystem_init();
 
@@ -65,6 +64,7 @@ int main(void)
     xTaskCreate(vLoggerTask, "Logger Task", LOG_STACK_DEPTH, NULL,
                                                     LOG_PRIO, &xLoggerTask);
     vTaskStartScheduler();
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
 
     while (pdTRUE); // Do nothing
 

@@ -20,6 +20,7 @@
 #include "inc/queue.h"
 #include "inc/task.h"
 #include "inc/transport.h"
+#include "inc/logger.h"
 #include "inc/cartridge.h"
 
 #define FAIL            (-1)
@@ -130,7 +131,7 @@ void vCartridgeTask(void *pvParameters)
     vCartridge_init();
     xTaskExit = pdFALSE;
 
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
+//    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eNoAction );
     /* Cartridge Task main loop */
     while (!xTaskExit)
     {
@@ -187,7 +188,7 @@ void vCartridgeTask(void *pvParameters)
         }
     }
 
-    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
+//    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eNoAction );
     /* Exit Task */
     vTaskDelete(NULL);
 }
