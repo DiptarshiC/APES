@@ -148,6 +148,22 @@ int main(int argc, char *argv[])
         printf("(Main) [INFO]: Created Logger.\n");
     }
 
+     /* Set up named pipe */
+    if (open(name, O_WRONLY) == FAILURE)
+    {
+        if (mkfifo(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH
+                                                            | S_IWOTH))
+        {
+            printf("(Process A) E!: Creation of named pipe failed.\n");
+            return FAILURE;
+        }
+    }
+    pipe_fd = open(name, O_WRONLY); // Blocking until procB opens to read
+    if (pipe_fd == FAILURE)
+    {
+        printf("(Process A) E!: Opening (for write) of named pipe failed.\n");
+        return FAILURE;
+    }
 
     state = WAITING_TO_START;
 
