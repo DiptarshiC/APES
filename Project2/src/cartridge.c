@@ -111,6 +111,7 @@
 #define NOTIFY_END_TO_LOGGER    (0x0001<<4)
 extern QueueHandle_t xMROM_Queue;
 extern TaskHandle_t xTransportTask;
+extern TaskHandle_t xLoggerTask;
 static uint8_t ucRead_rom_byte (uint32_t ulAddress, uint8_t ucSpeed);
 static void vCartridge_init (void);
 static int8_t cCart_addr_scheme (void);
@@ -132,7 +133,7 @@ void vCartridgeTask(void *pvParameters)
     vCartridge_init();
     xTaskExit = pdFALSE;
 
-   xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
+   xTaskNotify(xLoggerTask, NOTIFY_START_TO_LOGGER, eSetBits);
     /* Cartridge Task main loop */
     while (!xTaskExit)
     {
@@ -189,7 +190,7 @@ void vCartridgeTask(void *pvParameters)
         }
     }
 
-    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
+    xTaskNotify(xLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
     /* Exit Task */
     vTaskDelete(NULL);
 }

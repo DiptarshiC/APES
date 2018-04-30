@@ -48,6 +48,7 @@
 
 
 extern TaskHandle_t xTransportTask;
+extern TaskHandle_t xLoggerTask;
 TimerHandle_t xTimerController;
 extern SemaphoreHandle_t xController_TimerSemaphore;
 extern SemaphoreHandle_t xTransport_MailboxSemaphore;
@@ -65,7 +66,7 @@ void vControllerTask(void *pvParameters)
 
     xTaskExit = pdFALSE;
 
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
+    xTaskNotify(xLoggerTask,NOTIFY_START_TO_LOGGER, eSetBits);
     /* Controller Task main loop */
     while (!xTaskExit)
     {
@@ -88,7 +89,7 @@ void vControllerTask(void *pvParameters)
     }
 
 
-    xTaskNotify(vLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
+    xTaskNotify(xLoggerTask,NOTIFY_END_TO_LOGGER,eSetBits );
     /* Graceful exit */
     vTaskDelete(NULL);
 }

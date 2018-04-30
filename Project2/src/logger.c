@@ -75,25 +75,24 @@ void vLoggerTask(void *pvParameters)
 
 
 
-    comm_packet_t *logger_packet;
+    comm_packet_t logger_packet;
 
 
 
-    comm_packet_t *mypacket;
+    comm_packet_t mypacket;
 
-    //xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
     while(!xTaskExit)
     {
         //Here i create a packet exclusively for the logger task
-        logger_packet->xDest=BB_LOGGER;
-        logger_packet->xSource=TIVA_LOGGER;
-        logger_packet->ulSize=4;
+        logger_packet.xDest = BB_LOGGER;
+        logger_packet.xSource = TIVA_LOGGER;
+        logger_packet.ulSize = 4;
         for(index1=0;index1<4;index1++)
         {
-            logger_packet->ucPayload[index1]=message[7][index1];
+            logger_packet.ucPayload[index1]=message[7][index1];
         }
         xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
-        xQueueSend(xComms_Queue, logger_packet,portMAX_DELAY);
+        xQueueSend(xComms_Queue, &logger_packet,portMAX_DELAY);
         xSemaphoreGive(xComms_QueueSemaphore);
 
 
@@ -111,37 +110,37 @@ void vLoggerTask(void *pvParameters)
             if((ulNotification_Value)&(BITMASK))
             {
                 //Do  logging
-                mypacket->xDest=BB_LOGGER;
+                mypacket.xDest=BB_LOGGER;
                                  if(index==0)
                                  {
-                                     mypacket->xSource=TIVA_INIT;
+                                     mypacket.xSource=TIVA_INIT;
                                  }
                                  else if(index==1||index==2)
                                  {
 #ifdef CONTROLLER_1
-                                     mypacket->xSource=TIVA_CONTROL0;
+                                     mypacket.xSource=TIVA_CONTROL0;
 #elif defined(CONTROLLER_0)
-                                     mypacket->xSource=TIVA_CONTROL1;
+                                     mypacket.xSource=TIVA_CONTROL1;
 #endif
                                  }
                                  else if(index==3||index==4)
                                  {
-                                     mypacket->xSource=TIVA_CART;
+                                     mypacket.xSource=TIVA_CART;
                                  }
                                  else if(index==5||index==6)
                                  {
-                                     mypacket->xSource=TIVA_XPORT;
+                                     mypacket.xSource=TIVA_XPORT;
                                  }
 
-                                 mypacket->ulSize=4;
+                                 mypacket.ulSize=4;
 
                                  for(index1=0;index1<4;index1++)
                                  {
-                                         mypacket->ucPayload[index1]=message[index][index1];
+                                         mypacket.ucPayload[index1]=message[index][index1];
                                  }
 
                                  xSemaphoreTake(xComms_QueueSemaphore, portMAX_DELAY);
-                                 xQueueSend(xComms_Queue, mypacket,portMAX_DELAY);
+                                 xQueueSend(xComms_Queue, &mypacket,portMAX_DELAY);
                                  xSemaphoreGive(xComms_QueueSemaphore);
 
 

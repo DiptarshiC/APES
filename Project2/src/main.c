@@ -64,7 +64,7 @@ int main(void)
     xTaskCreate(vLoggerTask, "Logger Task", LOG_STACK_DEPTH, NULL,
                                                     LOG_PRIO, &xLoggerTask);
     vTaskStartScheduler();
-    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER,eSetBits );
+    xTaskNotify(vLoggerTask,NOTIFY_START_TO_LOGGER, eSetBits);
 
     while (pdTRUE); // Do nothing
 
@@ -76,3 +76,4 @@ static void vSystem_init(void)
     MAP_SysCtlClockFreqSet(SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL
                                                 | SYSCTL_CFG_VCO_480, MHZ_120);
 }
+
