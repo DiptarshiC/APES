@@ -68,7 +68,8 @@ void * logger(void * arg)
     uint8_t str_level[10] = "";
     uint8_t str_source[16] = "";
     uint8_t str_msg[100] = "";
-    uint8_t message[32][4] = {0,};
+    uint8_t message[4] = {0, 0, 0, 0};
+    uint8_t i_message;
 
     /* Open logfile */
     gp_log_file = fopen(LOG_NAME, "a");
@@ -136,31 +137,31 @@ void * logger(void * arg)
             switch (p_packet->xSource)
             {
                 case (TIVA_INIT):
-                    str_source = "(TIVA) ";
+                    strcpy(str_source, "(TIVA) ");
                 break;
 
                 case (TIVA_CART):
-                    str_source = "(TIVA_CART) ";
+                    strcpy(str_source, "(TIVA_CART) ");
                 break;
 
                 case (TIVA_CONTROL0):
-                    str_source = "(TIVA_CONTROL0) ";
+                    strcpy(str_source, "(TIVA_CONTROL0) ");
                 break;
 
                 case (TIVA_CONTROL1):
-                    str_source = "(TIVA_CONTROL1) ";
+                    strcpy(str_source, "(TIVA_CONTROL1) ");
                 break;
 
                 case (TIVA_LOGGER):
-                    str_source = "(TIVA_LOGGER) ";
+                    strcpy(str_source, "(TIVA_LOGGER) ");
                 break;
 
                 case (TIVA_XPORT):
-                    str_source = "(TIVA_XPORT) ";
+                    strcpy(str_source, "(TIVA_XPORT) ");
                 break;
 
                 case (TIVA_COMMS):
-                    str_source = "(TIVA_COMMS) ";
+                    strcpy(str_source, "(TIVA_COMMS) ");
                 break;
 
                 default:
@@ -170,46 +171,65 @@ void * logger(void * arg)
             /* Prep Log*/
             strcpy(string, str_source);
             strcat(string, str_level);
-            message = p_packet->ucPayload;
-            switch (message)
+            for (i_message = 0; i_message < 4; i_message++)
             {
-                case ({'S','I','_','_'}):
-                    str_msg = "System Init";
+                message[i_message] = *(p_packet->ucPayload + i_message);
+            }
+            switch (message[0])
+            {
+                case ('S'):
+                    strcpy(str_msg, "System Init");
                 break;
 
-                case ({'C','O','_','I'}):
-                    str_msg = "Controller Init";
+                case ('C'):
+                    if ('O' == message[1])
+                    {
+                        if ('I' == message[3])
+                        {
+                            strcpy(str_msg, "Controller Init");
+                        }
+                        else if ('E' == message[3])
+                        {
+                            strcpy(str_msg, "Controller Exit");
+                        }
+                    }
+                    else if ('A' == message[1])
+                    {
+                        if ('I' == message[3])
+                        {
+                            strcpy(str_msg, "Cartridge Init");
+                        }
+                        else if ('E' == message[3])
+                        {
+                            strcpy(str_msg, "Cartridge Exit");
+                        }
+                    }
                 break;
 
-                case ({'C','O','_','E'}):
-                    str_msg = "Controller Exit";
+                case ('T'):
+                    if ('I' == message[3])
+                    {
+                        strcpy(str_msg, "Transport Init");
+                    }
+                    else if ('E' == message[3])
+                    {
+                        strcpy(str_msg, "Transport Exit");
+                    }
                 break;
 
-                case ({'C','A','_','I'}):
-                    str_msg = "Cartridge Init";
-                break;
-
-                case ({'C','A','_','E'}):
-                    str_msg = "Cartridge Exit";
-                break;
-
-                case ({'T','R','_','I'}):
-                    str_msg = "Transport Init";
-                break;
-
-                case {'T','R','_','E'}():
-                    str_msg = "Transport Exit";
-                break;
-
-                case ({'L','O','_','I'}):
-                    str_msg = "Logger Init";
-                break;
-
-                case ({'L','O','_','E'}):
-                    str_msg = "Logger Exit";
+                case ('L'):
+                    if ('I' == message[3])
+                    {
+                        strcpy(str_msg, "Logger Init");
+                    }
+                    else if ('E' == message[3])
+                    {
+                        strcpy(str_msg, "Logger Exit");
+                    }
                 break;
 
                 default:
+                    strcpy(str_msg, "");
                 break;
             }
             strcat(string, str_msg);

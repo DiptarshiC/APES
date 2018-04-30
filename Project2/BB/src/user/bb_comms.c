@@ -30,7 +30,7 @@
 
 #define PIPE_NAME           ("/tmp/project2_pipe")
 #define ROMFILE_PATH        ("/home/debian/romfile.sfc")
-#define EXPECTED_ARGC       (2)
+#define EXPECTED_ARGC       (1)
 #define FAILURE             (-1)
 #define SUCCESS             (0)
 #define ONE_BYTE            (1)
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     /* Check parameters */
     if (argc != EXPECTED_ARGC)
     {
-        printf("Usage: %s \"path/to/dumpfile\"\n", argv[0]);
+        printf("Usage: %s \n", argv[0]);
         return FAILURE;
     }
 
@@ -140,8 +140,8 @@ int main(int argc, char *argv[])
     uint8_t log_args;
     pthread_attr_t log_tattr;
     pthread_attr_init(&log_tattr);  // Default pthread attr
-    pthread_t * log_thread;
-    if (pthread_create(log_thread, &log_tattr, logger, &log_args))
+    pthread_t log_thread;
+    if (pthread_create(&log_thread, &log_tattr, logger, &log_args))
     {
         perror("(Main) [ERROR]: Could not create Logger.\n");
         return FAILURE;
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
     write(pipe_fd, &inc_packet, sizeof(comm_packet_t));
     close(pipe_fd);
 
-    pthread_join(*log_thread, (void **)&log_ret);
+    pthread_join(log_thread, (void **)&log_ret);
     return SUCCESS;
 }
 
